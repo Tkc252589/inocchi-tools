@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eBayセットアップサポート - マインドマップ</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .header {
+    text-align: center;
+    padding: 24px 16px 8px;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-bottom: 1px solid #334155;
+  }
+  .header h1 {
+    font-size: 1.5rem;
+    color: #38bdf8;
+    margin-bottom: 4px;
+  }
+  .header .sub {
+    font-size: 0.9rem;
+    color: #94a3b8;
+  }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding: 12px;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    flex-wrap: wrap;
+  }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .legend .dot {
+    width: 12px; height: 12px; border-radius: 50%; display: inline-block;
+  }
+
+  .mindmap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 16px 40px;
+    position: relative;
+  }
+
+  /* Central node */
+  .center-node {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .center-node .box {
+    display: inline-block;
+    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding: 16px 32px;
+    border-radius: 50px;
+    box-shadow: 0 0 30px rgba(14, 165, 233, 0.3);
+  }
+  .center-node .time {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 400;
+    margin-top: 4px;
+    opacity: 0.9;
+  }
+
+  /* Section container */
+  .sections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 768px) {
+    .sections { grid-template-columns: 1fr; }
+  }
+
+  .section {
+    background: #1e293b;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #334155;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+
+  .section-header {
+    padding: 14px 20px;
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .section-header .icon {
+    font-size: 1.3rem;
+  }
+  .section-header .toggle {
+    margin-left: auto;
+    font-size: 0.8rem;
+    opacity: 0.6;
+    transition: transform 0.3s;
+  }
+  .section-header.open .toggle {
+    transform: rotate(180deg);
+  }
+
+  .section-body {
+    padding: 0 20px 16px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease;
+  }
+  .section-body.open {
+    max-height: 3000px;
+    padding: 0 20px 20px;
+  }
+
+  /* Color themes */
+  .theme-prep .section-header    { background: linear-gradient(135deg, #f59e0b22, #f59e0b11); color: #fbbf24; border-bottom: 2px solid #f59e0b44; }
+  .theme-myprep .section-header  { background: linear-gradient(135deg, #0ea5e922, #0ea5e911); color: #38bdf8; border-bottom: 2px solid #0ea5e944; }
+  .theme-flow .section-header    { background: linear-gradient(135deg, #10b98122, #10b98111); color: #34d399; border-bottom: 2px solid #10b98144; }
+  .theme-biz .section-header     { background: linear-gradient(135deg, #6366f122, #6366f111); color: #818cf8; border-bottom: 2px solid #6366f144; }
+  .theme-list .section-header    { background: linear-gradient(135deg, #ec489922, #ec489911); color: #f472b6; border-bottom: 2px solid #ec489944; }
+  .theme-trouble .section-header { background: linear-gradient(135deg, #ef444422, #ef444411); color: #f87171; border-bottom: 2px solid #ef444444; }
+  .theme-close .section-header   { background: linear-gradient(135deg, #8b5cf622, #8b5cf611); color: #a78bfa; border-bottom: 2px solid #8b5cf644; }
+
+  /* Branch items */
+  .branch {
+    margin: 10px 0;
+    padding-left: 16px;
+    border-left: 3px solid #334155;
+  }
+  .branch-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .branch-title .num {
+    background: #334155;
+    color: #94a3b8;
+    font-size: 0.7rem;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .leaf {
+    margin: 4px 0 4px 28px;
+    font-size: 0.85rem;
+    color: #cbd5e1;
+    position: relative;
+    padding-left: 14px;
+  }
+  .leaf::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: #64748b;
+    font-weight: 700;
+  }
+
+  .tip {
+    margin: 8px 0 4px 28px;
+    font-size: 0.8rem;
+    color: #fbbf24;
+    background: #f59e0b11;
+    border-left: 3px solid #f59e0b44;
+    padding: 6px 10px;
+    border-radius: 0 8px 8px 0;
+  }
+  .tip::before {
+    content: '💡 ';
+  }
+
+  .warn {
+    margin: 8px 0 4px 28px;
+    font-size: 0.8rem;
+    color: #f87171;
+    background: #ef444411;
+    border-left: 3px solid #ef444444;
+    padding: 6px 10px;
+    border-radius: 0 8px 8px 0;
+  }
+  .warn::before {
+    content: '⚠️ ';
+  }
+
+  .prep-item {
+    margin: 8px 0 4px 28px;
+    font-size: 0.8rem;
+    background: #0ea5e911;
+    border-left: 3px solid #0ea5e944;
+    padding: 6px 10px;
+    border-radius: 0 8px 8px 0;
+    color: #7dd3fc;
+  }
+  .prep-item::before {
+    content: '📋 ';
+  }
+
+  .formula {
+    margin: 8px 0 4px 28px;
+    font-size: 0.8rem;
+    background: #8b5cf611;
+    border-left: 3px solid #8b5cf644;
+    padding: 6px 10px;
+    border-radius: 0 8px 8px 0;
+    color: #c4b5fd;
+    font-family: 'Courier New', monospace;
+  }
+  .formula::before {
+    content: '🧮 ';
+  }
+
+  .talk {
+    margin: 8px 0 4px 28px;
+    font-size: 0.8rem;
+    background: #10b98111;
+    border-left: 3px solid #10b98144;
+    padding: 8px 10px;
+    border-radius: 0 8px 8px 0;
+    color: #6ee7b7;
+    font-style: italic;
+    line-height: 1.5;
+  }
+  .talk::before {
+    content: '💬 ';
+    font-style: normal;
+  }
+
+  /* Timeline */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 4px;
+  }
+  .timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    position: relative;
+    padding-bottom: 12px;
+  }
+  .timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 28px;
+    bottom: 0;
+    width: 2px;
+    background: #334155;
+  }
+  .timeline-time {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #fff;
+  }
+  .theme-flow .timeline-time { background: #10b981; }
+  .timeline-content {
+    font-size: 0.85rem;
+    padding-top: 5px;
+  }
+  .timeline-content strong {
+    display: block;
+    margin-bottom: 2px;
+    color: #e2e8f0;
+  }
+  .timeline-content span {
+    color: #94a3b8;
+    font-size: 0.8rem;
+  }
+  .timeline-content .time-tag {
+    display: inline-block;
+    background: #10b98122;
+    color: #6ee7b7;
+    font-size: 0.7rem;
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-left: 4px;
+  }
+
+  /* Checklist */
+  .checklist {
+    margin-top: 8px;
+  }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 6px 0;
+    font-size: 0.85rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  .check-item input[type="checkbox"] {
+    margin-top: 3px;
+    accent-color: #f59e0b;
+    flex-shrink: 0;
+  }
+  .check-item.checked label {
+    text-decoration: line-through;
+    color: #64748b;
+  }
+
+  /* My prep list (non-interactive) */
+  .myprep-list {
+    margin-top: 8px;
+  }
+  .myprep-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 6px 0;
+    font-size: 0.85rem;
+    padding-left: 4px;
+  }
+  .myprep-item::before {
+    content: '▸';
+    color: #38bdf8;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* Reference links */
+  .ref-card {
+    display: block;
+    margin: 8px 0;
+    padding: 12px 16px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .ref-card:hover {
+    border-color: #38bdf8;
+    background: #0ea5e908;
+  }
+  .ref-card .ref-label {
+    font-size: 0.7rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .ref-card .ref-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #38bdf8;
+    margin-bottom: 2px;
+  }
+  .ref-card .ref-url {
+    font-size: 0.7rem;
+    color: #475569;
+    word-break: break-all;
+  }
+  .ref-divider {
+    font-size: 0.75rem;
+    color: #475569;
+    margin: 14px 0 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #1e293b;
+    letter-spacing: 0.5px;
+  }
+
+  .full-width {
+    grid-column: 1 / -1;
+  }
+
+  .note-box {
+    margin-top: 16px;
+    background: #1e293b;
+    border: 1px dashed #475569;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.85rem;
+  }
+  .note-box strong { color: #fbbf24; }
+
+  .sub-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Trouble items */
+  .trouble-item {
+    margin: 8px 0;
+    padding: 10px 14px;
+    background: #1a1a2e;
+    border-radius: 8px;
+    border: 1px solid #334155;
+  }
+  .trouble-q {
+    font-size: 0.85rem;
+    color: #f87171;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .trouble-a {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    padding-left: 12px;
+    border-left: 2px solid #475569;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>eBay セットアップサポート</h1>
+  <div class="sub">ともさん向け｜3月29日（日）7:00〜9:00</div>
+</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#fbbf24"></span>ともさん準備</span>
+  <span><span class="dot" style="background:#38bdf8"></span>参考資料</span>
+  <span><span class="dot" style="background:#34d399"></span>当日の流れ</span>
+  <span><span class="dot" style="background:#818cf8"></span>ビジネスポリシー</span>
+  <span><span class="dot" style="background:#f472b6"></span>初出品サポート</span>
+  <span><span class="dot" style="background:#f87171"></span>トラブル対応</span>
+  <span><span class="dot" style="background:#a78bfa"></span>クロージング</span>
+</div>
+
+<div class="mindmap">
+
+  <!-- Central Node -->
+  <div class="center-node">
+    <div class="box">
+      eBay セットアップサポート
+      <span class="time">3/29（日）7:00〜9:00</span>
+    </div>
+  </div>
+
+  <div class="sections">
+
+    <!-- ===== 1. ともさん事前準備チェックリスト ===== -->
+    <div class="section theme-prep">
+      <div class="section-header open" onclick="toggleSection(this)">
+        <span class="icon">📦</span>
+        ともさんに事前に送ること
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body open">
+        <div class="checklist">
+          <div class="check-item" onclick="toggleCheck(this)">
+            <input type="checkbox"><label><strong>eBayアカウント</strong>のログイン情報を手元に用意</label>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <input type="checkbox"><label><strong>Payoneerアカウント</strong>のリンク状況を確認（未リンクなら事前にリンク）</label>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <input type="checkbox"><label><strong>出品予定のジャンル</strong>を確認しておく（何系を売りたいか）</label>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <input type="checkbox"><label>出品したい<strong>商品を1点</strong>決めておく（写真撮影済みのもの）</label>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <input type="checkbox"><label>商品の<strong>仕入れ価格・希望販売価格</strong>を確認しておく</label>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <input type="checkbox"><label>商品の<strong>重さ・サイズ</strong>を測っておく（送料設定に必要）</label>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <input type="checkbox"><label><strong>利用予定の配送業者</strong>を確認（日本郵便 / FedEx / DHL など）</label>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <input type="checkbox"><label><strong>CPASS・eLogi等</strong>の発送システムの登録が済んでいるか確認</label>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <input type="checkbox"><label><strong>発送除外国</strong>があれば事前に考えておく</label>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)">
+            <input type="checkbox"><label>eBayの<strong>Seller Hub</strong>にアクセスできるか確認</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 2. 参考資料・ツール ===== -->
+    <div class="section theme-myprep">
+      <div class="section-header open" onclick="toggleSection(this)">
+        <span class="icon">📎</span>
+        参考資料・ツール
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body open">
+
+        <div class="ref-divider">利益計算ツール</div>
+        <a class="ref-card" href="https://japanebayschool.com/profitcalculation" target="_blank" rel="noopener">
+          <div class="ref-label">利益計算（上級者用）</div>
+          <div class="ref-title">eBay利益計算ツール - Japan eBay School</div>
+          <div class="ref-url">japanebayschool.com/profitcalculation</div>
+        </a>
+        <a class="ref-card" href="https://e-shikumi-labo.com/tool-app/20170227_benecalc_r3b.html" target="_blank" rel="noopener">
+          <div class="ref-label">利益計算（簡易版）</div>
+          <div class="ref-title">eBay利益計算ツール - e-しくみラボ</div>
+          <div class="ref-url">e-shikumi-labo.com/tool-app/20170227_benecalc_r3b.html</div>
+        </a>
+
+        <div class="ref-divider">出品テンプレート</div>
+        <a class="ref-card" href="https://japanebayschool.com/ebaytemplate" target="_blank" rel="noopener">
+          <div class="ref-label">テンプレート作成</div>
+          <div class="ref-title">eBay出品テンプレート - Japan eBay School</div>
+          <div class="ref-url">japanebayschool.com/ebaytemplate</div>
+        </a>
+
+        <div class="ref-divider">当日用メモ</div>
+        <div class="myprep-list">
+          <div class="myprep-item"><strong>ビジネスポリシーのテンプレート</strong>（Shipping・Return・Paymentの名称）</div>
+          <div class="myprep-item"><strong>出品サンプル用の商品データ</strong>（実演用）</div>
+          <div class="myprep-item"><strong>計算式メモ</strong>（固定費・手数料・利益率の目安）</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== 3. 当日の流れ ===== -->
+    <div class="section theme-flow full-width">
+      <div class="section-header open" onclick="toggleSection(this)">
+        <span class="icon">🕐</span>
+        当日の流れ（タイムライン目安）
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body open">
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-time">1</div>
+            <div class="timeline-content">
+              <strong>7:00〜7:10 ｜ アイスブレイク・現状確認 <span class="time-tag">10分</span></strong>
+              <span>アカウント作成状況の確認 → 前回サポートからの進捗 → 今日のゴールを共有</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">2</div>
+            <div class="timeline-content">
+              <strong>7:10〜7:30 ｜ Shippingポリシー設定 <span class="time-tag">20分</span></strong>
+              <span>送料・配送方法・発送除外国の設定</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">3</div>
+            <div class="timeline-content">
+              <strong>7:30〜7:45 ｜ Returnポリシー設定 <span class="time-tag">15分</span></strong>
+              <span>返品受付期間・返送料負担・条件の設定</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">4</div>
+            <div class="timeline-content">
+              <strong>7:45〜7:55 ｜ Paymentポリシー設定 <span class="time-tag">10分</span></strong>
+              <span>Managed Payments → 即時支払いON → Payoneer連携確認</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">5</div>
+            <div class="timeline-content">
+              <strong>7:55〜8:00 ｜ 小休憩・質疑応答 <span class="time-tag">5分</span></strong>
+              <span>ここまでの不明点を解消</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">6</div>
+            <div class="timeline-content">
+              <strong>8:00〜8:05 ｜ 商品写真のポイント説明 <span class="time-tag">5分</span></strong>
+              <span>白背景・最低4枚・傷は正直に → ともさんの写真をチェック</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">7</div>
+            <div class="timeline-content">
+              <strong>8:05〜8:15 ｜ タイトル作成 <span class="time-tag">10分</span></strong>
+              <span>80文字フル活用 → ブランド名・型番・状態 → Terapeak確認</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">8</div>
+            <div class="timeline-content">
+              <strong>8:15〜8:40 ｜ 商品登録の実演→一緒にやる <span class="time-tag">25分</span></strong>
+              <span>カテゴリ選択 → Item Specifics → 価格設定 → テンプレート適用 → 出品</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">9</div>
+            <div class="timeline-content">
+              <strong>8:40〜8:50 ｜ 出品完了・確認 <span class="time-tag">10分</span></strong>
+              <span>プレビュー確認 → ポリシー紐づけ確認 → Seller Hubで状況確認</span>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">10</div>
+            <div class="timeline-content">
+              <strong>8:50〜9:00 ｜ まとめ・次のアクション <span class="time-tag">10分</span></strong>
+              <span>今日できたこと → 次にやること（出品数・目標） → 次回サポートの確認</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 4. ビジネスポリシー設定 ===== -->
+    <div class="section theme-biz">
+      <div class="section-header open" onclick="toggleSection(this)">
+        <span class="icon">⚙️</span>
+        ③ ビジネスポリシー設定
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body open">
+
+        <div class="branch">
+          <div class="branch-title"><span class="num">A</span>配送ポリシー（Shipping）</div>
+          <div class="leaf">Free Shipping（送料無料）推奨</div>
+          <div class="leaf">配送日数：最大10日程度に設定</div>
+          <div class="leaf">EMS or Japan Post で設定</div>
+          <div class="leaf">Handling Time（出荷準備日数）の設定</div>
+          <div class="leaf">発送除外国の設定（紛争リスクのある国など）</div>
+          <div class="leaf">CPASS・eLogiとの連携について</div>
+          <div class="tip">ポリシー名は分かりやすい名称で統一する</div>
+          <div class="prep-item">事前確認：利用予定の配送業者と送料の目安</div>
+        </div>
+
+        <div class="branch">
+          <div class="branch-title"><span class="num">B</span>返品ポリシー（Return）</div>
+          <div class="leaf">30日返品受け付けが推奨</div>
+          <div class="leaf">返送料：Seller負担が評価に有利</div>
+          <div class="leaf">返品理由による対応方針</div>
+          <div class="tip">アカウント育成段階では買い手に優しく → 検索順位にも影響</div>
+        </div>
+
+        <div class="branch">
+          <div class="branch-title"><span class="num">C</span>支払い設定（Payment）</div>
+          <div class="leaf">Managed Payments が基本（PayPalは不要）</div>
+          <div class="leaf">Payoneer との連携状況を確認</div>
+          <div class="leaf">Require immediate payment をON</div>
+          <div class="tip">Payoneerリンク済みなら設定はシンプル</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== 5. 初出品サポート ===== -->
+    <div class="section theme-list">
+      <div class="section-header open" onclick="toggleSection(this)">
+        <span class="icon">🛍️</span>
+        ④ 初出品サポート
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body open">
+
+        <div class="branch">
+          <div class="branch-title"><span class="num">A</span>商品写真のポイント</div>
+          <div class="leaf">白背景推奨・最低4枚以上</div>
+          <div class="leaf">傷・汚れがあれば必ず撮影</div>
+          <div class="leaf">ズームカットも入れる</div>
+          <div class="leaf">1枚目がサムネイル → 最も目を引く写真を</div>
+          <div class="leaf">推奨サイズ：長辺 1600px 以上</div>
+          <div class="prep-item">事前準備：商品写真をPCに取り込んでおく</div>
+        </div>
+
+        <div class="branch">
+          <div class="branch-title"><span class="num">B</span>タイトル作成術</div>
+          <div class="leaf">最大80文字をフル活用する</div>
+          <div class="leaf">ブランド名・型番・状態・特徴を入れる</div>
+          <div class="leaf">日本語NG・大文字小文字を意識</div>
+          <div class="leaf">英語キーワードの選び方（Terapeak活用）</div>
+          <div class="leaf">不要語は省く（a, the, nice, good など）</div>
+          <div class="tip">例：「Sony WH-1000XM5 Wireless Noise Canceling Headphones Black」</div>
+        </div>
+
+        <div class="branch">
+          <div class="branch-title"><span class="num">C</span>商品登録の流れ</div>
+          <div class="leaf">カテゴリ選択（適切なカテゴリで検索露出UP）</div>
+          <div class="leaf">Item Specifics（商品詳細情報）の入力</div>
+          <div class="leaf">コンディション選択（New / Used / For Partsなど）</div>
+          <div class="leaf">Used の場合は必ず Notes 欄に詳細を記載</div>
+          <div class="leaf">商品説明文の書き方</div>
+          <div class="warn">「説明と違う」返品を防ぐため、状態は正直に書く</div>
+        </div>
+
+        <div class="branch">
+          <div class="branch-title"><span class="num">D</span>価格設定</div>
+          <div class="leaf">Buy It Now（即決価格）がおすすめ</div>
+          <div class="leaf">Terapeakで競合価格を確認</div>
+          <div class="leaf">最初は相場より少し安めに設定 → 売れ実績を作る</div>
+          <div class="formula">利益計算：売上 × 0.8 ÷ 為替レート − 仕入れ</div>
+          <div class="prep-item">事前確認：仕入れ価格と希望販売価格</div>
+        </div>
+
+        <div class="branch">
+          <div class="branch-title"><span class="num">E</span>出品テンプレート紹介</div>
+          <div class="leaf">テンプレートを使うメリット（効率化・統一感）</div>
+          <div class="leaf">Japan eBay School のテンプレートを紹介</div>
+          <div class="leaf">HTMLテンプレートの基本的な使い方</div>
+          <div class="leaf">商品説明の見栄えを整えるポイント</div>
+          <div class="tip">無料テンプレートでも十分プロっぽく仕上がる</div>
+          <div class="prep-item">参考資料セクションにリンクあり → 当日画面共有で見せる</div>
+        </div>
+
+        <div class="branch">
+          <div class="branch-title"><span class="num">F</span>出品→確認→完了</div>
+          <div class="leaf">プレビューで表示を確認</div>
+          <div class="leaf">ポリシーが正しく紐づいているか確認</div>
+          <div class="leaf">出品ボタンを押して完了！</div>
+          <div class="leaf">Seller Hub で出品状況を確認する方法</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== 6. トラブルシューティング ===== -->
+    <div class="section theme-trouble">
+      <div class="section-header" onclick="toggleSection(this)">
+        <span class="icon">🔧</span>
+        トラブルシューティング（よくある詰まりポイント）
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="trouble-item">
+          <div class="trouble-q">ビジネスポリシーが表示されない</div>
+          <div class="trouble-a">→ アカウントの国設定を確認</div>
+        </div>
+        <div class="trouble-item">
+          <div class="trouble-q">出品ボタンが押せない</div>
+          <div class="trouble-a">→ 必須項目の未入力を確認</div>
+        </div>
+        <div class="trouble-item">
+          <div class="trouble-q">写真がアップロードできない</div>
+          <div class="trouble-a">→ ファイルサイズ・形式を確認（JPG推奨）</div>
+        </div>
+        <div class="trouble-item">
+          <div class="trouble-q">価格がドル表示されない</div>
+          <div class="trouble-a">→ サイトを ebay.com に切り替え</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 7. クロージングメッセージ ===== -->
+    <div class="section theme-close">
+      <div class="section-header" onclick="toggleSection(this)">
+        <span class="icon">🎯</span>
+        クロージングで伝えること
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="branch">
+          <div class="branch-title"><span class="num">1</span>今日できたことの確認</div>
+          <div class="leaf">ビジネスポリシー設定完了</div>
+          <div class="leaf">初出品が完了</div>
+        </div>
+        <div class="branch">
+          <div class="branch-title"><span class="num">2</span>次にやること</div>
+          <div class="leaf">出品数の目標を決める</div>
+          <div class="leaf">最初の10件の評価が特に大事</div>
+          <div class="leaf">小さい商品から丁寧に出品していく</div>
+        </div>
+        <div class="branch">
+          <div class="branch-title"><span class="num">3</span>次回サポートの確認</div>
+          <div class="leaf">追加サポートが必要かヒアリング</div>
+        </div>
+        <div class="talk">
+          「今日出品した1点が売れると、アカウントの信頼度が上がります。最初の10件の評価が特に大事なので、小さい商品から丁寧に出品していきましょう」
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /sections -->
+
+  <div class="note-box">
+    <strong>⚠️ ご注意</strong><br>
+    ともさんのアカウント設定状況や進捗によっては、2時間で完了しない可能性があります。<br>
+    その場合は、後日あらためてお時間をいただきます。<br>
+    <span style="margin-top:6px;display:inline-block;color:#64748b;font-size:0.8rem;">ともさんは出品で詰まっているので、焦らず丁寧に進める</span>
+  </div>
+
+</div><!-- /mindmap -->
+
+<script>
+function toggleSection(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+function toggleCheck(item) {
+  const cb = item.querySelector('input[type="checkbox"]');
+  cb.checked = !cb.checked;
+  item.classList.toggle('checked', cb.checked);
+}
+
+// Prevent checkbox default to let our handler manage it
+document.querySelectorAll('.check-item input[type="checkbox"]').forEach(cb => {
+  cb.addEventListener('click', e => e.stopPropagation());
+});
+</script>
+
+</body>
+</html>

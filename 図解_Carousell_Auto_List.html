@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carousell Auto List - 図解ドキュメント</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Hiragino Sans', sans-serif; background: #fdf5f7; color: #3a2a2f; line-height: 1.7; }
+.page { max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
+
+/* ── Header ── */
+.hero { text-align: center; padding: 60px 20px 40px; }
+.hero h1 { font-size: 32px; color: #c07090; margin-bottom: 8px; letter-spacing: 1px; }
+.hero .sub { font-size: 14px; color: #b89; margin-bottom: 20px; }
+.hero .tags { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.hero .tag { background: #f8e8ee; color: #9a6080; padding: 4px 14px; border-radius: 20px; font-size: 12px; }
+
+/* ── Section ── */
+.section { margin: 50px 0; }
+.section-num { display: inline-block; background: linear-gradient(135deg, #e8a0b4, #d88aa4); color: #fff; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-size: 14px; font-weight: 700; margin-right: 10px; }
+.section-title { font-size: 22px; color: #9a6080; margin-bottom: 20px; display: flex; align-items: center; }
+.section-desc { font-size: 14px; color: #7a6a6f; margin-bottom: 20px; }
+
+/* ── Architecture Diagram ── */
+.arch-diagram { background: #fff; border-radius: 20px; border: 1px solid rgba(200,150,170,0.15); padding: 30px; overflow-x: auto; }
+.arch-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 16px 0; flex-wrap: wrap; }
+.arch-box { border-radius: 14px; padding: 16px 20px; text-align: center; min-width: 140px; position: relative; }
+.arch-box .label { font-size: 11px; font-weight: 600; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.arch-box .name { font-size: 14px; font-weight: 600; }
+.arch-box .detail { font-size: 10px; margin-top: 4px; opacity: 0.8; }
+.arch-user { background: linear-gradient(135deg, #e8a0b4, #d88aa4); color: #fff; }
+.arch-ext { background: linear-gradient(135deg, #a8c0d8, #90b0c8); color: #fff; }
+.arch-gas { background: linear-gradient(135deg, #a8d8a0, #88c088); color: #fff; }
+.arch-sheet { background: linear-gradient(135deg, #d8c8a8, #c8b888); color: #fff; }
+.arch-carousell { background: linear-gradient(135deg, #e86050, #d04840); color: #fff; }
+.arch-mercari { background: linear-gradient(135deg, #d06080, #c05070); color: #fff; }
+.arch-arrow { font-size: 24px; color: #d0a0b0; flex-shrink: 0; }
+.arch-arrow-down { font-size: 24px; color: #d0a0b0; text-align: center; margin: 4px 0; }
+.arch-group { border: 2px dashed rgba(200,150,170,0.3); border-radius: 16px; padding: 16px; margin: 8px 0; }
+.arch-group-label { font-size: 11px; color: #b89; margin-bottom: 8px; font-weight: 600; }
+
+/* ── Flow Diagram ── */
+.flow-diagram { background: #fff; border-radius: 20px; border: 1px solid rgba(200,150,170,0.15); padding: 30px; }
+.flow-steps { display: flex; flex-direction: column; gap: 0; }
+.flow-step { display: flex; align-items: flex-start; gap: 16px; position: relative; }
+.flow-line { width: 40px; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+.flow-dot { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; }
+.flow-connector { width: 2px; height: 40px; background: #e0c0d0; }
+.flow-content { flex: 1; padding-bottom: 20px; }
+.flow-content h4 { font-size: 14px; color: #9a6080; margin-bottom: 4px; }
+.flow-content p { font-size: 12px; color: #8a7a7f; }
+.flow-content .auto { display: inline-block; background: #e6f7f0; color: #5a9a7e; padding: 1px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+.flow-content .manual { display: inline-block; background: #fce8e8; color: #d06070; padding: 1px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+
+/* ── Before/After ── */
+.ba-container { display: flex; gap: 20px; }
+.ba-card { flex: 1; border-radius: 16px; padding: 24px; }
+.ba-before { background: #f5eaec; border: 2px solid #e0c0c8; }
+.ba-after { background: #eaf5ee; border: 2px solid #b0d8b8; }
+.ba-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.ba-before .ba-title { color: #c07070; }
+.ba-after .ba-title { color: #5a9a7e; }
+.ba-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 13px; }
+.ba-item:last-child { border-bottom: none; }
+.ba-icon { font-size: 18px; width: 28px; text-align: center; flex-shrink: 0; }
+.ba-time { font-size: 12px; font-weight: 600; color: #999; margin-left: auto; white-space: nowrap; }
+.ba-total { margin-top: 16px; padding: 12px 16px; border-radius: 10px; text-align: center; font-size: 15px; font-weight: 700; }
+.ba-before .ba-total { background: #e8c8cc; color: #a05060; }
+.ba-after .ba-total { background: #c8e8cc; color: #4a8a5a; }
+.ba-savings { text-align: center; margin-top: 20px; padding: 16px; background: linear-gradient(135deg, #e8a0b4, #d88aa4); color: #fff; border-radius: 14px; font-size: 18px; font-weight: 700; }
+
+/* ── File Structure ── */
+.file-diagram { background: #fff; border-radius: 20px; border: 1px solid rgba(200,150,170,0.15); padding: 30px; }
+.file-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.file-card { border: 1px solid rgba(200,150,170,0.15); border-radius: 12px; padding: 16px; }
+.file-card .fname { font-size: 13px; font-weight: 600; font-family: 'SF Mono', Monaco, monospace; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.file-card .fdesc { font-size: 11px; color: #8a7a7f; margin-bottom: 8px; }
+.file-card .fdetails { font-size: 11px; color: #b89; }
+.file-card .fdetails li { margin-bottom: 2px; }
+.file-icon { font-size: 16px; }
+.file-card.primary { border-color: #d8a0b8; background: #fef8fa; }
+.file-card.secondary { border-color: #a8c0d8; background: #f8faff; }
+.file-card.support { border-color: #d8d0a8; background: #fdfcf8; }
+
+/* ── Connection arrows ── */
+.connections { background: #fff; border-radius: 20px; border: 1px solid rgba(200,150,170,0.15); padding: 24px; margin-top: 16px; }
+.conn-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgba(200,150,170,0.08); font-size: 12px; }
+.conn-row:last-child { border-bottom: none; }
+.conn-from, .conn-to { background: #f8e8ee; padding: 3px 10px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #9a6080; }
+.conn-arrow { color: #d0a0b0; font-size: 16px; }
+.conn-desc { color: #8a7a7f; font-size: 11px; }
+
+/* ── Timeline ── */
+.timeline { background: #fff; border-radius: 20px; border: 1px solid rgba(200,150,170,0.15); padding: 30px; }
+.tl-item { display: flex; gap: 16px; padding: 12px 0; border-bottom: 1px solid rgba(200,150,170,0.08); }
+.tl-item:last-child { border-bottom: none; }
+.tl-phase { width: 80px; flex-shrink: 0; text-align: center; }
+.tl-phase .phase-num { background: linear-gradient(135deg, #e8a0b4, #d88aa4); color: #fff; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+.tl-phase .phase-label { font-size: 10px; color: #b89; margin-top: 4px; }
+.tl-body { flex: 1; }
+.tl-title { font-size: 14px; font-weight: 600; color: #9a6080; margin-bottom: 4px; }
+.tl-desc { font-size: 12px; color: #8a7a7f; }
+.tl-techs { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.tl-tech { background: #f8e8ee; color: #9a6080; padding: 2px 8px; border-radius: 4px; font-size: 10px; }
+.tl-issues { margin-top: 6px; font-size: 11px; }
+.tl-issue { color: #d06070; }
+.tl-solved { color: #5a9a7e; }
+
+@media (max-width: 700px) {
+  .ba-container { flex-direction: column; }
+  .file-grid { grid-template-columns: 1fr; }
+  .arch-row { flex-direction: column; }
+  .arch-arrow { transform: rotate(90deg); }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ===== Hero ===== -->
+<div class="hero">
+  <h1>Carousell Auto List</h1>
+  <p class="sub">スプレッドシートからCarousellへの出品を半自動化するChrome拡張</p>
+  <div class="tags">
+    <span class="tag">Chrome Extension (Manifest V3)</span>
+    <span class="tag">Google Apps Script</span>
+    <span class="tag">Google Sheets</span>
+    <span class="tag">Carousell Singapore</span>
+    <span class="tag">Mercari Japan</span>
+  </div>
+</div>
+
+<!-- ===== 1. System Architecture ===== -->
+<div class="section">
+  <div class="section-title"><span class="section-num">1</span> システム全体像 / アーキテクチャ</div>
+  <p class="section-desc">5つのサービスがChrome拡張を中心に連携して、出品作業を自動化しています。</p>
+
+  <div class="arch-diagram">
+    <!-- Top row: User -->
+    <div class="arch-row">
+      <div class="arch-box arch-user">
+        <div class="label">User</div>
+        <div class="name">操作者</div>
+        <div class="detail">ポップアップで操作</div>
+      </div>
+    </div>
+    <div class="arch-arrow-down">▼</div>
+
+    <!-- Middle: Chrome Extension -->
+    <div class="arch-group">
+      <div class="arch-group-label">Chrome Extension（Manifest V3）</div>
+      <div class="arch-row">
+        <div class="arch-box arch-ext">
+          <div class="label">Popup</div>
+          <div class="name">商品一覧UI</div>
+          <div class="detail">未出品商品を表示<br>1クリックで出品開始</div>
+        </div>
+        <div class="arch-box arch-ext">
+          <div class="label">Background</div>
+          <div class="name">Service Worker</div>
+          <div class="detail">画像取得<br>スプシ更新API呼び出し</div>
+        </div>
+        <div class="arch-box arch-ext">
+          <div class="label">Content Script</div>
+          <div class="name">フォーム自動入力</div>
+          <div class="detail">Category / Brand / Type<br>Title / Price / Description</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom row: External services -->
+    <div class="arch-arrow-down">▼ ▼ ▼</div>
+    <div class="arch-row">
+      <div class="arch-box arch-sheet">
+        <div class="label">Data Source</div>
+        <div class="name">Google Sheets</div>
+        <div class="detail">商品データ管理<br>出品結果の記録</div>
+      </div>
+      <div class="arch-arrow">⇄</div>
+      <div class="arch-box arch-gas">
+        <div class="label">Backend</div>
+        <div class="name">Google Apps Script</div>
+        <div class="detail">スプシ書き戻しAPI<br>A列:日付 B列:ID C列:URL</div>
+      </div>
+    </div>
+    <div style="height: 12px;"></div>
+    <div class="arch-row">
+      <div class="arch-box arch-mercari">
+        <div class="label">Image Source</div>
+        <div class="name">メルカリ / Shops</div>
+        <div class="detail">商品画像の取得<br>連番URL or タブ方式</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box arch-carousell">
+        <div class="label">Destination</div>
+        <div class="name">Carousell SG</div>
+        <div class="detail">出品先プラットフォーム<br>フォーム自動入力</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 2. Before/After ===== -->
+<div class="section">
+  <div class="section-title"><span class="section-num">2</span> ビフォー / アフター</div>
+  <p class="section-desc">1商品あたりの出品にかかる手作業の比較です。</p>
+
+  <div class="ba-container">
+    <div class="ba-card ba-before">
+      <div class="ba-title">BEFORE（全手動）</div>
+      <div class="ba-item"><span class="ba-icon">📷</span>メルカリから画像を1枚ずつ保存<span class="ba-time">2分</span></div>
+      <div class="ba-item"><span class="ba-icon">📤</span>Carousellに画像をアップロード<span class="ba-time">1分</span></div>
+      <div class="ba-item"><span class="ba-icon">📂</span>カテゴリを手動で選択<span class="ba-time">15秒</span></div>
+      <div class="ba-item"><span class="ba-icon">✏️</span>タイトルをコピペ<span class="ba-time">20秒</span></div>
+      <div class="ba-item"><span class="ba-icon">💰</span>価格を計算して入力<span class="ba-time">15秒</span></div>
+      <div class="ba-item"><span class="ba-icon">📝</span>説明文をコピペ<span class="ba-time">20秒</span></div>
+      <div class="ba-item"><span class="ba-icon">🏷️</span>Brand/Type/Gender/Condition選択<span class="ba-time">30秒</span></div>
+      <div class="ba-item"><span class="ba-icon">📋</span>出品後にスプシにID・URL記入<span class="ba-time">30秒</span></div>
+      <div class="ba-total">合計: 約5〜6分 / 1商品</div>
+    </div>
+
+    <div class="ba-card ba-after">
+      <div class="ba-title">AFTER（Auto List）</div>
+      <div class="ba-item"><span class="ba-icon">👆</span>ポップアップで「出品→」クリック <span class="auto">自動</span><span class="ba-time">2秒</span></div>
+      <div class="ba-item"><span class="ba-icon">📷</span>「①画像」ボタン → 自動取得 <span class="auto">自動</span><span class="ba-time">10秒</span></div>
+      <div class="ba-item"><span class="ba-icon">✕</span>Closeボタンを押す <span class="manual">手動</span><span class="ba-time">2秒</span></div>
+      <div class="ba-item"><span class="ba-icon">📝</span>「②フォーム」ボタン → 全自動入力 <span class="auto">自動</span><span class="ba-time">15秒</span></div>
+      <div class="ba-item"><span class="ba-icon">👀</span>内容確認 <span class="manual">手動</span><span class="ba-time">10秒</span></div>
+      <div class="ba-item"><span class="ba-icon">🚀</span>「List now」クリック <span class="manual">手動</span><span class="ba-time">2秒</span></div>
+      <div class="ba-item"><span class="ba-icon">📋</span>スプシ自動更新 <span class="auto">自動</span><span class="ba-time">0秒</span></div>
+      <div class="ba-total">合計: 約40秒 / 1商品</div>
+    </div>
+  </div>
+
+  <div class="ba-savings">約85%の時間短縮（5分 → 40秒）<br><span style="font-size:13px;font-weight:400">10商品なら50分 → 7分に</span></div>
+</div>
+
+<!-- ===== 3. Listing Flow ===== -->
+<div class="section">
+  <div class="section-title"><span class="section-num">3</span> 出品フロー</div>
+  <p class="section-desc">1商品を出品する際の処理の流れです。</p>
+
+  <div class="flow-diagram">
+    <div class="flow-steps">
+
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot" style="background:#9a6080;">0</div><div class="flow-connector"></div></div>
+        <div class="flow-content">
+          <h4>商品選択</h4>
+          <p>ポップアップが Google Sheets API（Visualization Query）でA列・B列が空の商品を取得。下の行から表示。</p>
+          <p><span class="auto">自動</span> スプシ → popup.js → 商品一覧表示</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot" style="background:#6a8aaa;">1</div><div class="flow-connector"></div></div>
+        <div class="flow-content">
+          <h4>画像取得 & アップロード</h4>
+          <p><strong>通常メルカリ:</strong> HTMLから画像ID抽出 → <code>/photos/mXXX_1.jpg</code>〜<code>_20.jpg</code>連番ダウンロード → file inputにセット</p>
+          <p><strong>メルカリShops:</strong> バックグラウンドでタブを開き → DOM走査 → <code>mercari-shops-static.com</code> の画像を取得</p>
+          <p><span class="auto">自動</span> background.js → Carousellのfile input</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot" style="background:#c0a080;">⚡</div><div class="flow-connector"></div></div>
+        <div class="flow-content">
+          <h4>画像モーダルを閉じる</h4>
+          <p>Carousellの「Edit photos」モーダルの「Close」ボタンを押す</p>
+          <p><span class="manual">手動</span></p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot" style="background:#7bab92;">2</div><div class="flow-connector"></div></div>
+        <div class="flow-content">
+          <h4>フォーム自動入力（9項目）</h4>
+          <p>Category → Title → Condition → Price → Description → Brand → Model → Gender → Type を順番に自動入力。ドロップダウンは検索→ArrowDown+Enter→PointerEventで選択。</p>
+          <p><span class="auto">自動</span> content-carousell.js</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot" style="background:#e86050;">3</div><div class="flow-connector"></div></div>
+        <div class="flow-content">
+          <h4>出品</h4>
+          <p>右上の「List now」ボタンを押して出品完了</p>
+          <p><span class="manual">手動</span> 最終確認してクリック</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-line"><div class="flow-dot" style="background:#a8d8a0;">4</div></div>
+        <div class="flow-content">
+          <h4>スプシ自動更新</h4>
+          <p>商品ページのURLから ID を抽出 → GAS API経由でスプシに自動書き込み</p>
+          <p>A列: 日付 / B列: Carousell ID / C列: 商品URL</p>
+          <p><span class="auto">自動</span> content-listed.js → background.js → GAS → Sheets</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== 4. File Structure ===== -->
+<div class="section">
+  <div class="section-title"><span class="section-num">4</span> 技術構成 / ファイルの役割と連携</div>
+  <p class="section-desc">Chrome拡張の各ファイルがどんな役割を持ち、どう連携しているかの図解です。</p>
+
+  <div class="file-diagram">
+    <div class="file-grid">
+
+      <div class="file-card primary">
+        <div class="fname"><span class="file-icon">📦</span> manifest.json</div>
+        <div class="fdesc">拡張の設定ファイル（Manifest V3）</div>
+        <ul class="fdetails">
+          <li>permissions: storage, tabs, scripting</li>
+          <li>host_permissions: carousell.sg, mercari.com, mercdn.net, mercari-shops-static.com</li>
+          <li>content_scripts: /sell* → carousell.js, /p/* → listed.js</li>
+        </ul>
+      </div>
+
+      <div class="file-card primary">
+        <div class="fname"><span class="file-icon">⚙️</span> background.js</div>
+        <div class="fdesc">Service Worker（バックグラウンド処理）</div>
+        <ul class="fdetails">
+          <li><code>smartFetchImages()</code> — URLに応じて画像取得方式を選択</li>
+          <li><code>fetchImagesFromUrl()</code> — 連番URL方式（通常メルカリ）</li>
+          <li><code>fetchImagesViaTab()</code> — タブ方式（Shops）</li>
+          <li><code>updateSheet()</code> — GAS APIでスプシ更新</li>
+          <li><code>downloadImages()</code> — 画像ダウンロード共通処理</li>
+        </ul>
+      </div>
+
+      <div class="file-card secondary">
+        <div class="fname"><span class="file-icon">🎨</span> content-carousell.js</div>
+        <div class="fdesc">Carousell出品ページ用 Content Script</div>
+        <ul class="fdetails">
+          <li><code>selectDropdown()</code> — ドロップダウン操作（Category/Brand/Type共通）</li>
+          <li><code>fillForm()</code> — 9項目の自動入力</li>
+          <li><code>uploadOnly()</code> — 画像アップロードのみ</li>
+          <li><code>detectType()</code> — タイトルからバッグ種類を推定</li>
+          <li>Brand未登録時: Others → 新input検出 → ブランド名入力</li>
+        </ul>
+      </div>
+
+      <div class="file-card secondary">
+        <div class="fname"><span class="file-icon">✅</span> content-listed.js</div>
+        <div class="fdesc">出品完了ページ用 Content Script</div>
+        <ul class="fdetails">
+          <li>URLから商品IDを自動抽出（<code>/p/slug-12345/</code>）</li>
+          <li>background.jsに更新リクエスト送信</li>
+          <li>5秒後にステータス自動非表示</li>
+        </ul>
+      </div>
+
+      <div class="file-card support">
+        <div class="fname"><span class="file-icon">🖥️</span> popup.html / popup.js</div>
+        <div class="fdesc">ポップアップUI（ピンクデザイン）</div>
+        <ul class="fdetails">
+          <li>Google Visualization API で未出品商品を取得</li>
+          <li>SQLクエリ: A列・B列が空 & N列にタイトルあり</li>
+          <li>ブランド・Type自動検出して一覧表示</li>
+          <li>「出品→」で chrome.storage にデータ保存 → タブ作成</li>
+        </ul>
+      </div>
+
+      <div class="file-card support">
+        <div class="fname"><span class="file-icon">🔧</span> CarousellGAS.gs</div>
+        <div class="fdesc">スプシ書き戻し用 GAS Web App</div>
+        <ul class="fdetails">
+          <li>POST <code>{ action: "markListed", title, carousellId, url, date }</code></li>
+          <li>N列のタイトルで行を検索</li>
+          <li>A列=日付, B列=ID, C列=URL を書き込み</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Connections -->
+  <div class="connections">
+    <div style="font-size: 13px; font-weight: 600; color: #9a6080; margin-bottom: 12px;">ファイル間の連携フロー</div>
+    <div class="conn-row"><span class="conn-from">popup.js</span><span class="conn-arrow">→</span><span class="conn-to">background.js</span><span class="conn-desc">OPEN_CAROUSELL メッセージ + 商品データ</span></div>
+    <div class="conn-row"><span class="conn-from">background.js</span><span class="conn-arrow">→</span><span class="conn-to">chrome.storage</span><span class="conn-desc">pendingListing / lastListedItem を保存</span></div>
+    <div class="conn-row"><span class="conn-from">chrome.storage</span><span class="conn-arrow">→</span><span class="conn-to">content-carousell.js</span><span class="conn-desc">保存されたデータを読み取り → UI表示</span></div>
+    <div class="conn-row"><span class="conn-from">content-carousell.js</span><span class="conn-arrow">→</span><span class="conn-to">background.js</span><span class="conn-desc">FETCH_IMAGES メッセージ（画像取得依頼）</span></div>
+    <div class="conn-row"><span class="conn-from">background.js</span><span class="conn-arrow">→</span><span class="conn-to">メルカリ</span><span class="conn-desc">画像URL取得 & ダウンロード</span></div>
+    <div class="conn-row"><span class="conn-from">content-listed.js</span><span class="conn-arrow">→</span><span class="conn-to">background.js</span><span class="conn-desc">UPDATE_SHEET メッセージ（ID + URL）</span></div>
+    <div class="conn-row"><span class="conn-from">background.js</span><span class="conn-arrow">→</span><span class="conn-to">GAS Web App</span><span class="conn-desc">POST リクエスト → スプシ書き込み</span></div>
+  </div>
+</div>
+
+<!-- ===== 5. Development Timeline ===== -->
+<div class="section">
+  <div class="section-title"><span class="section-num">5</span> 開発タイムライン</div>
+  <p class="section-desc">試行錯誤を含めた開発の流れです。</p>
+
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-phase"><div class="phase-num">1</div><div class="phase-label">基盤</div></div>
+      <div class="tl-body">
+        <div class="tl-title">Chrome拡張 + ポップアップ作成</div>
+        <div class="tl-desc">Manifest V3でChrome拡張を構築。スプシからGoogle Visualization APIで未出品商品を取得して一覧表示するポップアップUIを作成。</div>
+        <div class="tl-techs"><span class="tl-tech">Manifest V3</span><span class="tl-tech">Google Visualization API</span><span class="tl-tech">SQL Query</span></div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-phase"><div class="phase-num">2</div><div class="phase-label">フォーム</div></div>
+      <div class="tl-body">
+        <div class="tl-title">Carousellフォーム自動入力</div>
+        <div class="tl-desc">Content Scriptで出品フォームの9項目を自動入力。React SPAのため、setNativeValue + イベントシミュレーションが必要だった。</div>
+        <div class="tl-techs"><span class="tl-tech">Content Script</span><span class="tl-tech">React互換イベント</span><span class="tl-tech">DOM操作</span></div>
+        <div class="tl-issues">
+          <span class="tl-issue">問題: ドロップダウン選択が効かない</span><br>
+          <span class="tl-solved">解決: ArrowDown+Enter + PointerEvent + elementFromPoint</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-phase"><div class="phase-num">3</div><div class="phase-label">ドロップ<br>ダウン</div></div>
+      <div class="tl-body">
+        <div class="tl-title">Category / Brand / Type 選択の安定化</div>
+        <div class="tl-desc">動画分析からCarousellの実際のUI構造を把握。ドロップダウンのクリック→検索→選択の3ステップを共通関数化。Brandの Others→カスタム入力フローも対応。</div>
+        <div class="tl-techs"><span class="tl-tech">動画フレーム分析</span><span class="tl-tech">selectDropdown()</span><span class="tl-tech">input差分検出</span></div>
+        <div class="tl-issues">
+          <span class="tl-issue">問題: 検索テキストが別フィールドに入力される</span><br>
+          <span class="tl-solved">解決: placeholder検索 + 1文字ずつ入力（React対応）</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-phase"><div class="phase-num">4</div><div class="phase-label">画像</div></div>
+      <div class="tl-body">
+        <div class="tl-title">メルカリからの画像自動取得</div>
+        <div class="tl-desc">通常メルカリは連番URL方式で安定。Shopsは別CDN（mercari-shops-static.com）でUUIDベースのURL体系と判明。タブ方式で取得を試みるも課題あり。</div>
+        <div class="tl-techs"><span class="tl-tech">連番URL</span><span class="tl-tech">Tab API</span><span class="tl-tech">scripting.executeScript</span></div>
+        <div class="tl-issues">
+          <span class="tl-solved">解決: 通常メルカリ → 連番URL方式（15枚OK）</span><br>
+          <span class="tl-issue">未解決: Shops → タブ方式の画像特定が不安定</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-phase"><div class="phase-num">5</div><div class="phase-label">スプシ<br>連携</div></div>
+      <div class="tl-body">
+        <div class="tl-title">GASによるスプシ自動更新</div>
+        <div class="tl-desc">出品完了ページでCarousell IDを自動抽出し、GAS Web App経由でスプシのA列（日付）、B列（ID）、C列（URL）に書き込み。</div>
+        <div class="tl-techs"><span class="tl-tech">GAS Web App</span><span class="tl-tech">content-listed.js</span><span class="tl-tech">clasp</span></div>
+        <div class="tl-issues">
+          <span class="tl-solved">解決: URLパスから商品IDを正しく抽出</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-phase"><div class="phase-num">6</div><div class="phase-label">デザイン</div></div>
+      <div class="tl-body">
+        <div class="tl-title">フェミニンデザインへの変更</div>
+        <div class="tl-desc">ポップアップ・フローティングパネル・完了通知をピンク系パステルカラーに統一。グラデーションボタン、柔らかい角丸デザイン。</div>
+        <div class="tl-techs"><span class="tl-tech">CSS</span><span class="tl-tech">ピンクグラデーション</span><span class="tl-tech">パステルカラー</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== Footer ===== -->
+<div style="text-align: center; padding: 40px 0; color: #c9a; font-size: 12px;">
+  Built with Claude Code — 2026.04
+</div>
+
+</div>
+</body>
+</html>

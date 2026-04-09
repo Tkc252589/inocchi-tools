@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ブランド別分析 Q1 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{--bg:#fff;--bg2:#f7f7f5;--txt:#1a1a1a;--txt2:#6b6b6b;--bdr:#e5e5e3;--green:#2d8a56;--gbg:#eaf3de;--red:#a32d2d;--rbg:#fcebeb;--blue:#185fa5;--bbg:#e6f1fb;--amber:#854f0b;--abg:#faeeda;--purple:#534ab7;--pbg:#eeedfe}
+@media(prefers-color-scheme:dark){:root{--bg:#1a1a1a;--bg2:#252525;--txt:#e5e5e3;--txt2:#999;--bdr:#333;--green:#97c459;--gbg:#27500a;--red:#f7c1c1;--rbg:#501313;--blue:#b5d4f4;--bbg:#042c53;--amber:#fac775;--abg:#412402;--purple:#cecbf6;--pbg:#26215c}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);line-height:1.6;padding:24px;max-width:900px;margin:0 auto}
+h1{font-size:20px;font-weight:600;margin-bottom:4px}
+.sub{font-size:13px;color:var(--txt2);margin-bottom:24px}
+.sl{font-size:11px;color:var(--txt2);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:20px}
+.cd{background:var(--bg2);border-radius:8px;padding:12px 14px}
+.cl{font-size:11px;color:var(--txt2);margin-bottom:3px}
+.cv{font-size:22px;font-weight:600}
+.cs{font-size:11px;color:var(--txt2);margin-top:2px}
+.sec{margin-bottom:28px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:7px 5px;border-bottom:2px solid var(--bdr);color:var(--txt2);font-weight:600;font-size:11px}
+td{padding:6px 5px;border-bottom:1px solid var(--bdr)}
+.r{text-align:right}
+tr:last-child td{font-weight:600;border-bottom:2px solid var(--bdr)}
+.badge{display:inline-block;padding:2px 7px;border-radius:6px;font-size:10px;font-weight:600}
+.bg{background:var(--gbg);color:var(--green)}.br{background:var(--rbg);color:var(--red)}.bi{background:var(--bbg);color:var(--blue)}.ba{background:var(--abg);color:var(--amber)}.bp{background:var(--pbg);color:var(--purple)}
+.tier{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600}
+.hr{border:none;border-top:1px solid var(--bdr);margin:24px 0}
+.note{font-size:12px;color:var(--txt2);margin-top:8px;line-height:1.7}
+.leg{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:8px;font-size:11px;color:var(--txt2)}
+.ld{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:3px;vertical-align:middle}
+.chart-wrap{position:relative;width:100%;margin-bottom:12px}
+.tier-card{border-left:3px solid;padding-left:12px}
+</style>
+</head>
+<body>
+
+<h1>ブランド別 販売分析レポート</h1>
+<p class="sub">2026年 Q1（1〜3月）｜販売タブ97件から抽出 ｜ Carousell中心</p>
+
+<div class="sec">
+<div class="sl">サマリー</div>
+<div class="cards">
+<div class="cd"><div class="cl">分析対象</div><div class="cv">97件</div><div class="cs">17ブランド検出</div></div>
+<div class="cd"><div class="cl">売上合計</div><div class="cv">517万円</div><div class="cs">Carousell + メルカリ</div></div>
+<div class="cd"><div class="cl">全体平均単価</div><div class="cv">¥53,337</div><div class="cs">≒ S$367</div></div>
+<div class="cd"><div class="cl">全体粗利率</div><div class="cv">30%</div><div class="cs">eBay 13%の2.3倍</div></div>
+</div>
+</div>
+
+<div class="hr"></div>
+
+<div class="sec">
+<div class="sl">ブランド別 Q1総合ランキング（売上順）</div>
+<div style="overflow-x:auto">
+<table>
+<thead><tr><th>#</th><th>ブランド</th><th class="r">売上</th><th class="r">件数</th><th class="r">平均単価</th><th class="r">粗利率</th><th class="r">1月</th><th class="r">2月</th><th class="r">3月</th><th>評価</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><b>COACH</b></td><td class="r">1,213,007</td><td class="r">39</td><td class="r">¥31,103</td><td class="r"><span class="badge bg">34%</span></td><td class="r">6</td><td class="r">18</td><td class="r">15</td><td><span class="tier ba">量産型</span></td></tr>
+<tr><td>2</td><td><b>LOEWE</b></td><td class="r">553,501</td><td class="r">8</td><td class="r">¥69,188</td><td class="r"><span class="badge bg">31%</span></td><td class="r">4</td><td class="r">3</td><td class="r">1</td><td><span class="tier bg">優良</span></td></tr>
+<tr><td>3</td><td><b>BOTTEGA VENETA</b></td><td class="r">475,261</td><td class="r">7</td><td class="r">¥67,894</td><td class="r"><span class="badge bg">33%</span></td><td class="r">0</td><td class="r">3</td><td class="r">4</td><td><span class="tier bg">成長株</span></td></tr>
+<tr><td>4</td><td><b>CHLOE</b></td><td class="r">393,436</td><td class="r">3</td><td class="r">¥131,145</td><td class="r"><span class="badge br">16%</span></td><td class="r">2</td><td class="r">0</td><td class="r">1</td><td><span class="tier ba">高単価低利益</span></td></tr>
+<tr><td>5</td><td><b>BALENCIAGA</b></td><td class="r">366,740</td><td class="r">2</td><td class="r">¥183,370</td><td class="r"><span class="badge bg">31%</span></td><td class="r">0</td><td class="r">0</td><td class="r">2</td><td><span class="tier bp">最高単価</span></td></tr>
+<tr><td>6</td><td><b>CELINE</b></td><td class="r">284,503</td><td class="r">4</td><td class="r">¥71,126</td><td class="r"><span class="badge bg">32%</span></td><td class="r">0</td><td class="r">0</td><td class="r">4</td><td><span class="tier bg">新規</span></td></tr>
+<tr><td>7</td><td><b>GUCCI</b></td><td class="r">239,836</td><td class="r">5</td><td class="r">¥47,967</td><td class="r"><span class="badge br">18%</span></td><td class="r">0</td><td class="r">2</td><td class="r">2</td><td><span class="tier br">低利益</span></td></tr>
+<tr><td>8</td><td><b>PRADA</b></td><td class="r">185,034</td><td class="r">3</td><td class="r">¥61,678</td><td class="r"><span class="badge bg">36%</span></td><td class="r">0</td><td class="r">1</td><td class="r">2</td><td><span class="tier bg">高効率</span></td></tr>
+<tr><td>9</td><td><b>FENDI</b></td><td class="r">138,609</td><td class="r">2</td><td class="r">¥69,305</td><td class="r"><span class="badge ba">27%</span></td><td class="r">1</td><td class="r">0</td><td class="r">1</td><td>-</td></tr>
+<tr><td>10</td><td><b>SAINT LAURENT</b></td><td class="r">136,485</td><td class="r">2</td><td class="r">¥68,243</td><td class="r"><span class="badge bg">38%</span></td><td class="r">1</td><td class="r">1</td><td class="r">0</td><td><span class="tier bg">最高利益率</span></td></tr>
+<tr><td>11</td><td><b>MARC JACOBS</b></td><td class="r">132,010</td><td class="r">4</td><td class="r">¥33,003</td><td class="r"><span class="badge bg">32%</span></td><td class="r">0</td><td class="r">2</td><td class="r">2</td><td><span class="tier ba">低単価</span></td></tr>
+<tr><td>12</td><td><b>その他6ブランド</b></td><td class="r">421,350</td><td class="r">20</td><td class="r">¥21,068</td><td class="r"><span class="badge ba">30%</span></td><td class="r">1</td><td class="r">9</td><td class="r">10</td><td>-</td></tr>
+<tr><td></td><td>合計</td><td class="r">5,173,773</td><td class="r">97</td><td class="r">¥53,337</td><td class="r"><span class="badge bi">30%</span></td><td class="r">15</td><td class="r">37</td><td class="r">39</td><td></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="hr"></div>
+
+<div class="sec">
+<div class="sl">ブランド別 売上 vs 粗利率マッピング（バブルサイズ＝件数）</div>
+<div class="leg"><span>右上にあるほど理想的（高売上 × 高利益率）</span></div>
+<div class="chart-wrap" style="height:340px"><canvas id="bubble"></canvas></div>
+</div>
+
+<div class="hr"></div>
+
+<div class="sec">
+<div class="sl">ブランド別 月次件数推移（積み上げ）</div>
+<div class="leg">
+<span><span class="ld" style="background:#EF9F27"></span>COACH</span>
+<span><span class="ld" style="background:#5DCAA5"></span>LOEWE</span>
+<span><span class="ld" style="background:#85B7EB"></span>BV</span>
+<span><span class="ld" style="background:#AFA9EC"></span>CELINE</span>
+<span><span class="ld" style="background:#ED93B1"></span>BALENCIAGA</span>
+<span><span class="ld" style="background:#E24B4A"></span>GUCCI</span>
+<span><span class="ld" style="background:#F09795"></span>PRADA</span>
+<span><span class="ld" style="background:#B4B2A9"></span>その他</span>
+</div>
+<div class="chart-wrap" style="height:260px"><canvas id="trend"></canvas></div>
+<div class="note">3月にCELINE(4件)・BALENCIAGA(2件)が新規参入し、ブランド多角化が進行中。BVも0→3→4件と安定成長。一方LOEWEは4→3→1件と減少傾向。</div>
+</div>
+
+<div class="hr"></div>
+
+<div class="sec">
+<div class="sl">1件あたり粗利額ランキング（対応コスト効率の指標）</div>
+<div class="chart-wrap" style="height:320px"><canvas id="ppi"></canvas></div>
+<div class="note">外注さんの対応工数は「件数」に比例します。問い合わせ対応・梱包・発送は1件¥31,000のCOACHも¥183,000のBALENCIAGAもほぼ同じ工数。1件あたりの粗利額が高いブランドほど、対応コストに見合う利益が出ています。</div>
+</div>
+
+<div class="hr"></div>
+
+<div class="sec">
+<div class="sl">ティア分類と仕入れ方針</div>
+<div style="display:grid;gap:12px;margin-top:8px">
+
+<div class="cd tier-card" style="border-color:#5DCAA5">
+<div style="font-size:11px;color:var(--green);font-weight:600;margin-bottom:4px">TIER 1 — 最優先仕入れ</div>
+<div style="font-size:15px;font-weight:600;margin-bottom:4px">BALENCIAGA / LOEWE / CELINE</div>
+<div style="font-size:12px;color:var(--txt2)">高単価(¥69K〜183K) × 高利益率(31〜32%)。BALENCIAGAは2件で37万円・粗利11万円。1件あたり粗利額がトップクラス。LOEWEの仕入れ減少を改善すること。</div>
+</div>
+
+<div class="cd tier-card" style="border-color:#85B7EB">
+<div style="font-size:11px;color:var(--blue);font-weight:600;margin-bottom:4px">TIER 2 — 積極拡大</div>
+<div style="font-size:15px;font-weight:600;margin-bottom:4px">BOTTEGA VENETA / PRADA / SAINT LAURENT</div>
+<div style="font-size:12px;color:var(--txt2)">高利益率(33〜38%) × 安定単価(¥62K〜68K)。BVは月3→4件と成長中。SAINT LAURENTは粗利率38%で最高効率。仕入れ比率を増やす価値あり。</div>
+</div>
+
+<div class="cd tier-card" style="border-color:#EF9F27">
+<div style="font-size:11px;color:var(--amber);font-weight:600;margin-bottom:4px">TIER 3 — 選別仕入れ</div>
+<div style="font-size:15px;font-weight:600;margin-bottom:4px">COACH / MARC JACOBS / FENDI</div>
+<div style="font-size:12px;color:var(--txt2)">COACHは39件(全体の40%)を占めるが売上構成比は23%。1件あたり粗利¥10,575はBALENCIAGAの1/5。S$400(約¥58K)以上の商品に厳選し、件数を半減させても利益は維持可能。</div>
+</div>
+
+<div class="cd tier-card" style="border-color:#E24B4A">
+<div style="font-size:11px;color:var(--red);font-weight:600;margin-bottom:4px">TIER 4 — 比率縮小</div>
+<div style="font-size:15px;font-weight:600;margin-bottom:4px">GUCCI / CHLOE</div>
+<div style="font-size:12px;color:var(--txt2)">GUCCI粗利率18%、CHLOE 16%。高単価だが利益が残らない構造。仕入れ価格が高すぎる可能性。仕入れ判断基準を見直すか、比率を下げること。</div>
+</div>
+
+</div>
+</div>
+
+<div class="hr"></div>
+
+<div class="sec">
+<div class="sl">COACH 深掘り分析（39件 / 売上構成比23%）</div>
+<div class="cards">
+<div class="cd"><div class="cl">平均単価</div><div class="cv">¥31,103</div><div class="cs">≒ S$214</div></div>
+<div class="cd"><div class="cl">粗利率</div><div class="cv">34%</div><div class="cs">全体平均を上回る</div></div>
+<div class="cd"><div class="cl">1件粗利額</div><div class="cv">¥10,575</div><div class="cs">BALENCIAGA¥56,845の1/5</div></div>
+<div class="cd"><div class="cl">件数シェア</div><div class="cv">40%</div><div class="cs">売上シェアは23%</div></div>
+</div>
+<div class="note" style="background:var(--abg);padding:12px;border-radius:8px;color:var(--amber)">
+<b>COACHの課題：</b>件数の40%を占めるが売上は23%。ユリサさんの対応工数の多くがCOACH対応に消費されている可能性が高い。S$400以上に絞り込めば、件数を半減（39→20件）しても売上は大きく落ちず、対応工数を他のTier1/2ブランドに振り向けられる。
+</div>
+</div>
+
+<div class="hr"></div>
+
+<div class="sec">
+<div class="sl">アクションプラン</div>
+<div style="display:grid;gap:8px;margin-top:8px">
+<div class="cd" style="display:flex;gap:12px;align-items:flex-start">
+<div style="background:var(--rbg);color:var(--red);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
+<div><div style="font-weight:600;font-size:13px">COACHの仕入れ基準をS$400以上に引き上げ</div><div style="font-size:12px;color:var(--txt2)">対応工数を約50%削減しつつ、売上インパクトは最小限に</div></div>
+</div>
+<div class="cd" style="display:flex;gap:12px;align-items:flex-start">
+<div style="background:var(--rbg);color:var(--red);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
+<div><div style="font-weight:600;font-size:13px">LOEWE仕入れの立て直し（4→3→1件と減少中）</div><div style="font-size:12px;color:var(--txt2)">高単価¥69K × 高利益率31% のTier1ブランドが減少するのは機会損失</div></div>
+</div>
+<div class="cd" style="display:flex;gap:12px;align-items:flex-start">
+<div style="background:var(--bbg);color:var(--blue);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
+<div><div style="font-weight:600;font-size:13px">BV・PRADA・SAINT LAURENTの仕入れ量を増加</div><div style="font-size:12px;color:var(--txt2)">利益率33〜38%の高効率Tier2。BVは成長中(0→3→4件)</div></div>
+</div>
+<div class="cd" style="display:flex;gap:12px;align-items:flex-start">
+<div style="background:var(--bbg);color:var(--blue);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">4</div>
+<div><div style="font-weight:600;font-size:13px">GUCCIとCHLOEの仕入れ価格を再検証</div><div style="font-size:12px;color:var(--txt2)">粗利率16〜18%は仕入れ価格が高すぎる可能性。利益が出る仕入れ基準を明文化</div></div>
+</div>
+<div class="cd" style="display:flex;gap:12px;align-items:flex-start">
+<div style="background:var(--abg);color:var(--amber);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">5</div>
+<div><div style="font-weight:600;font-size:13px">ティア別仕入れ基準をドキュメント化して共有</div><div style="font-size:12px;color:var(--txt2)">仕入れ判断を属人化させず、チーム全体で統一基準を持つ</div></div>
+</div>
+</div>
+</div>
+
+<script>
+const isDark = matchMedia('(prefers-color-scheme:dark)').matches;
+const gridC = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+const txtC = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.45)';
+
+const brands = [
+  {name:'COACH',sales:1213007,count:39,margin:34,profit:412422,color:'#EF9F27'},
+  {name:'LOEWE',sales:553501,count:8,margin:31,profit:171585,color:'#5DCAA5'},
+  {name:'BV',sales:475261,count:7,margin:33,profit:156836,color:'#85B7EB'},
+  {name:'CHLOE',sales:393436,count:3,margin:16,profit:62950,color:'#ED93B1'},
+  {name:'BALENCIAGA',sales:366740,count:2,margin:31,profit:113689,color:'#AFA9EC'},
+  {name:'CELINE',sales:284503,count:4,margin:32,profit:91041,color:'#7F77DD'},
+  {name:'GUCCI',sales:239836,count:5,margin:18,profit:43170,color:'#E24B4A'},
+  {name:'PRADA',sales:185034,count:3,margin:36,profit:66612,color:'#378ADD'},
+  {name:'FENDI',sales:138609,count:2,margin:27,profit:37424,color:'#B4B2A9'},
+  {name:'YSL',sales:136485,count:2,margin:38,profit:51864,color:'#97C459'},
+  {name:'M.JACOBS',sales:132010,count:4,margin:32,profit:42243,color:'#888780'},
+];
+
+// Bubble chart
+new Chart(document.getElementById('bubble'),{
+  type:'bubble',
+  data:{
+    datasets: brands.map(b => ({
+      label: b.name,
+      data:[{x:Math.round(b.sales/10000), y:b.margin, r: Math.max(b.count*1.3, 6)}],
+      backgroundColor: b.color + '88',
+      borderColor: b.color,
+      borderWidth: 2
+    }))
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{
+        label: ctx => {
+          const b = brands[ctx.datasetIndex];
+          return b.name+': 売上'+Math.round(b.sales/10000)+'万 / 粗利率'+b.margin+'% / '+b.count+'件';
+        }
+      }}
+    },
+    scales:{
+      x:{title:{display:true,text:'売上（万円）',color:txtC,font:{size:12}},ticks:{callback:v=>v+'万',color:txtC},grid:{color:gridC},min:0,max:140},
+      y:{title:{display:true,text:'粗利率（%）',color:txtC,font:{size:12}},ticks:{callback:v=>v+'%',color:txtC},grid:{color:gridC},min:10,max:45}
+    }
+  }
+});
+
+// Monthly trend stacked bar
+new Chart(document.getElementById('trend'),{
+  type:'bar',
+  data:{
+    labels:['1月','2月','3月'],
+    datasets:[
+      {label:'COACH',data:[6,18,15],backgroundColor:'#EF9F27',borderRadius:3},
+      {label:'LOEWE',data:[4,3,1],backgroundColor:'#5DCAA5',borderRadius:3},
+      {label:'BV',data:[0,3,4],backgroundColor:'#85B7EB',borderRadius:3},
+      {label:'CELINE',data:[0,0,4],backgroundColor:'#AFA9EC',borderRadius:3},
+      {label:'BALENCIAGA',data:[0,0,2],backgroundColor:'#ED93B1',borderRadius:3},
+      {label:'GUCCI',data:[0,2,2],backgroundColor:'#E24B4A',borderRadius:3},
+      {label:'PRADA',data:[0,1,2],backgroundColor:'#F09795',borderRadius:3},
+      {label:'その他',data:[5,10,9],backgroundColor:'#B4B2A9',borderRadius:3},
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{stacked:true,grid:{display:false},ticks:{color:txtC}},
+      y:{stacked:true,ticks:{callback:v=>v+'件',color:txtC},grid:{color:gridC}}
+    }
+  }
+});
+
+// Profit per item horizontal bar
+const profitData = brands.map(b => ({name:b.name, ppi: Math.round(b.profit/b.count)})).sort((a,b)=>b.ppi-a.ppi);
+const barColors = profitData.map(d => d.ppi > 30000 ? '#5DCAA5' : d.ppi > 15000 ? '#85B7EB' : d.ppi > 10000 ? '#EF9F27' : '#E24B4A');
+
+new Chart(document.getElementById('ppi'),{
+  type:'bar',
+  data:{
+    labels: profitData.map(d=>d.name),
+    datasets:[{data: profitData.map(d=>d.ppi), backgroundColor: barColors, borderRadius:4}]
+  },
+  options:{
+    indexAxis:'y',
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:ctx=>'¥'+ctx.parsed.x.toLocaleString()+'/件'}}
+    },
+    scales:{
+      x:{ticks:{callback:v=>'¥'+(v/1000).toFixed(0)+'K',color:txtC},grid:{color:gridC}},
+      y:{ticks:{color:txtC,autoSkip:false,font:{size:11}},grid:{display:false}}
+    }
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>「おはよう」だけで動く — Claude AI 活用術</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green: #059669;
+  --green-l: #d1fae5;
+  --blue: #2563eb;
+  --blue-l: #dbeafe;
+  --amber: #d97706;
+  --amber-l: #fef3c7;
+  --purple: #7c3aed;
+  --purple-l: #ede9fe;
+  --coral: #e11d48;
+  --coral-l: #ffe4e6;
+  --gray: #374151;
+  --gray-l: #f9fafb;
+  --border: #e5e7eb;
+  --text: #111827;
+  --muted: #6b7280;
+}
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: #f0f4ff;
+  color: var(--text);
+}
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 70%, #6366f1 100%);
+  padding: 56px 24px 48px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  top: -200px; right: -100px;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+  bottom: -100px; left: -50px;
+}
+.hero-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.9);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 14px;
+  border-radius: 100px;
+  margin-bottom: 20px;
+  letter-spacing: 0.06em;
+}
+.hero-chip::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: #4ade80;
+  border-radius: 50%;
+  animation: blink 1.8s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+
+.hero h1 {
+  font-size: clamp(26px, 6vw, 48px);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+}
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(90deg, #a5f3fc, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,0.65);
+  max-width: 400px;
+  margin: 0 auto 28px;
+  line-height: 1.7;
+}
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.hero-tag {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.85);
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 6px;
+}
+
+/* ── MAIN ── */
+.main {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 32px 16px 64px;
+}
+
+/* ── SECTION ── */
+.section {
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  padding: 28px 24px;
+  margin-bottom: 16px;
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.section-num {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: #fff;
+}
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ── TRIGGER ── */
+.trigger-box {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 2px solid #86efac;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+}
+.trigger-word {
+  font-size: 40px;
+  font-weight: 900;
+  color: var(--green);
+  letter-spacing: -1px;
+  display: block;
+  margin-bottom: 6px;
+}
+.trigger-desc {
+  font-size: 13px;
+  color: #065f46;
+  line-height: 1.7;
+}
+.trigger-arrow {
+  text-align: center;
+  font-size: 28px;
+  color: #86efac;
+  margin: 12px 0 4px;
+  line-height: 1;
+}
+.trigger-note {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 12px;
+  color: #166534;
+  margin-top: 12px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+/* ── FLOW STEPS ── */
+.flow-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.flow-item {
+  display: flex;
+  gap: 16px;
+  position: relative;
+}
+.flow-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 44px;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+.flow-icon-wrap {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.flow-body {
+  flex: 1;
+  padding: 8px 0 20px;
+}
+.flow-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.flow-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.flow-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+.source-pill {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* ── OUTPUT CARDS ── */
+.output-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media(max-width: 500px){ .output-grid { grid-template-columns: 1fr; } }
+.output-card {
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  padding: 16px;
+  background: var(--gray-l);
+}
+.output-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+.output-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.output-desc {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+.output-card.highlight {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+}
+
+/* ── COMPARISON ── */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media(max-width: 480px){ .compare-grid { grid-template-columns: 1fr; } }
+.compare-col {
+  border-radius: 14px;
+  padding: 18px;
+}
+.compare-col.before {
+  background: #fef2f2;
+  border: 1.5px solid #fecaca;
+}
+.compare-col.after {
+  background: #f0fdf4;
+  border: 1.5px solid #bbf7d0;
+}
+.compare-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.compare-col.before .compare-label { color: #991b1b; }
+.compare-col.after .compare-label { color: #166534; }
+.compare-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-bottom: 6px;
+}
+.compare-item:last-child { margin-bottom: 0; }
+.compare-col.before .compare-item { color: #7f1d1d; }
+.compare-col.after .compare-item { color: #14532d; }
+
+/* ── INSIGHT CARDS ── */
+.insight-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+@media(max-width: 520px){ .insight-grid { grid-template-columns: 1fr; } }
+.insight-card {
+  background: var(--gray-l);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 16px;
+}
+.insight-icon { font-size: 24px; margin-bottom: 8px; }
+.insight-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+.insight-desc {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+/* ── FOOTER ── */
+.footer {
+  background: #1e1b4b;
+  padding: 28px 24px;
+  text-align: center;
+  color: rgba(255,255,255,0.4);
+  font-size: 12px;
+  line-height: 2;
+}
+.footer strong { color: #a5b4fc; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-chip">Claude AI × 日常業務</div>
+  <h1>「おはよう」だけで<br><em>1日が動き出す</em></h1>
+  <p class="hero-sub">AIに話しかけるだけで、スケジュール確認・進捗管理・タスク整理が全自動</p>
+  <div class="hero-tags">
+    <span class="hero-tag">🗓 カレンダー連携</span>
+    <span class="hero-tag">📊 データ自動取得</span>
+    <span class="hero-tag">✅ タスク管理</span>
+    <span class="hero-tag">🤖 AI分析</span>
+    <span class="hero-tag">📱 スマホ対応</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- 1. トリガー -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num" style="background:var(--green)">1</div>
+      <span class="section-title">たった一言が、すべての始まり</span>
+    </div>
+    <div class="trigger-box">
+      <em class="trigger-word">「おはよう」</em>
+      <p class="trigger-desc">この一言を送るだけ。<br>あとはClaudeが全部やってくれる。</p>
+    </div>
+    <div class="trigger-arrow">↓</div>
+    <div class="trigger-note">
+      プログラミング不要・設定不要・毎朝ゼロ秒で起動<br>
+      声でも文字でもOK。スマホからでも使える。
+    </div>
+  </div>
+
+  <!-- 2. 自動で動く流れ -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num" style="background:var(--blue)">2</div>
+      <span class="section-title">Claudeが自動で動く流れ</span>
+    </div>
+    <div class="flow-list">
+
+      <div class="flow-item">
+        <div class="flow-icon-wrap" style="background:#dbeafe">📅</div>
+        <div class="flow-body">
+          <div class="flow-title" style="color:var(--blue)">①  カレンダーを確認する</div>
+          <div class="flow-desc">今日の予定・打ち合わせ・締め切りを自動取得</div>
+          <div class="flow-sources">
+            <span class="source-pill" style="background:#dbeafe;color:#1e40af">Google Calendar</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-item">
+        <div class="flow-icon-wrap" style="background:#ede9fe">💬</div>
+        <div class="flow-body">
+          <div class="flow-title" style="color:var(--purple)">②  チャットを読みに行く</div>
+          <div class="flow-desc">各担当者・取引先・チームとのやり取りを確認。誰が何をしているか一目でわかる</div>
+          <div class="flow-sources">
+            <span class="source-pill" style="background:#ede9fe;color:#5b21b6">リベシティ</span>
+            <span class="source-pill" style="background:#ede9fe;color:#5b21b6">Chatwork</span>
+            <span class="source-pill" style="background:#ede9fe;color:#5b21b6">各種DM</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-item">
+        <div class="flow-icon-wrap" style="background:#d1fae5">📊</div>
+        <div class="flow-body">
+          <div class="flow-title" style="color:var(--green)">③  データを取得・分析する</div>
+          <div class="flow-desc">売上・在庫・外注作業の進捗をスプレッドシートから自動で読み込み</div>
+          <div class="flow-sources">
+            <span class="source-pill" style="background:#d1fae5;color:#065f46">スプレッドシート</span>
+            <span class="source-pill" style="background:#d1fae5;color:#065f46">販売データ</span>
+            <span class="source-pill" style="background:#d1fae5;color:#065f46">在庫管理</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-item">
+        <div class="flow-icon-wrap" style="background:#fef3c7">🏪</div>
+        <div class="flow-body">
+          <div class="flow-title" style="color:var(--amber)">④  外部サービスを確認する</div>
+          <div class="flow-desc">eBay・Carousellなど各プラットフォームの最新状況をブラウザ経由で自動チェック</div>
+          <div class="flow-sources">
+            <span class="source-pill" style="background:#fef3c7;color:#92400e">eBay</span>
+            <span class="source-pill" style="background:#fef3c7;color:#92400e">Carousell</span>
+            <span class="source-pill" style="background:#fef3c7;color:#92400e">各種サービス</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-item">
+        <div class="flow-icon-wrap" style="background:#ffe4e6">🤖</div>
+        <div class="flow-body">
+          <div class="flow-title" style="color:var(--coral)">⑤  AI部長がレポートを作る</div>
+          <div class="flow-desc">集めた情報を分析して、部門ごとの進捗・課題・今日やるべきことをまとめてくれる</div>
+          <div class="flow-sources">
+            <span class="source-pill" style="background:#ffe4e6;color:#9f1239">AI自動分析</span>
+            <span class="source-pill" style="background:#ffe4e6;color:#9f1239">進捗レポート</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-item">
+        <div class="flow-icon-wrap" style="background:#f0fdf4">✅</div>
+        <div class="flow-body" style="padding-bottom:0">
+          <div class="flow-title" style="color:var(--green)">⑥  タスクアプリに流し込む</div>
+          <div class="flow-desc">今日やることをタスク管理アプリに自動追加。あとはチェックするだけ</div>
+          <div class="flow-sources">
+            <span class="source-pill" style="background:#d1fae5;color:#065f46">タスクアプリ</span>
+            <span class="source-pill" style="background:#d1fae5;color:#065f46">チェックリスト</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 3. 出力されるもの -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num" style="background:var(--purple)">3</div>
+      <span class="section-title">毎朝届くもの（全自動で生成）</span>
+    </div>
+    <div class="output-grid">
+      <div class="output-card highlight">
+        <span class="output-icon">📣</span>
+        <div class="output-title">コミュニティ投稿文</div>
+        <div class="output-desc">その日の振り返りと今日の目標を、すぐ投稿できる文章で生成</div>
+      </div>
+      <div class="output-card highlight">
+        <span class="output-icon">🗓</span>
+        <div class="output-title">タイムブロック</div>
+        <div class="output-desc">ルーティン・会議・タスクを時間ごとに配置したスケジュール表</div>
+      </div>
+      <div class="output-card">
+        <span class="output-icon">🏢</span>
+        <div class="output-title">部門別進捗レポート</div>
+        <div class="output-desc">各担当者・チームの状況を部門ごとにまとめて一括確認</div>
+      </div>
+      <div class="output-card">
+        <span class="output-icon">💡</span>
+        <div class="output-title">AIメンターの一言</div>
+        <div class="output-desc">目標達成率をもとに、今日フォーカスすべきことをアドバイス</div>
+      </div>
+      <div class="output-card">
+        <span class="output-icon">💰</span>
+        <div class="output-title">外注費・売上サマリー</div>
+        <div class="output-desc">月途中でも今月の外注費合計・売上進捗をリアルタイムで確認</div>
+      </div>
+      <div class="output-card">
+        <span class="output-icon">🏷️</span>
+        <div class="output-title">称号システム</div>
+        <div class="output-desc">前日の達成率で称号が変わる。ゲーム感覚で習慣を続けられる</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. AIありvsなし -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num" style="background:var(--coral)">4</div>
+      <span class="section-title">AIあり vs なし</span>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-col before">
+        <div class="compare-label">❌ AIなしの場合（従来）</div>
+        <div class="compare-item"><span>😮‍💨</span>各チャットを毎朝1つずつ開いて確認</div>
+        <div class="compare-item"><span>😮‍💨</span>スプシを開いて数字を手動で集計</div>
+        <div class="compare-item"><span>😮‍💨</span>投稿文を一から考えて書く</div>
+        <div class="compare-item"><span>😮‍💨</span>スケジュールを手動で組み立てる</div>
+        <div class="compare-item"><span>😮‍💨</span>担当者の進捗を個別に確認する</div>
+        <div class="compare-item"><span>😮‍💨</span>朝の準備に30〜60分かかる</div>
+      </div>
+      <div class="compare-col after">
+        <div class="compare-label">✅ AIありの場合（今）</div>
+        <div class="compare-item"><span>🚀</span>「おはよう」の一言で全部始まる</div>
+        <div class="compare-item"><span>🚀</span>売上・在庫・外注費を自動集計</div>
+        <div class="compare-item"><span>🚀</span>投稿文・レポートが自動生成</div>
+        <div class="compare-item"><span>🚀</span>カレンダーと連動して最適配置</div>
+        <div class="compare-item"><span>🚀</span>全担当者の進捗を一括確認</div>
+        <div class="compare-item"><span>🚀</span>朝の準備が実質0分に</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 気づき -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num" style="background:var(--amber)">5</div>
+      <span class="section-title">使って気づいたこと</span>
+    </div>
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="insight-icon">🗣️</div>
+        <div class="insight-title">「具体的に言う」が大事</div>
+        <div class="insight-desc">曖昧な指示よりも「〇〇を追加して」「〇〇日までに」と具体的に伝えると精度が上がる</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">🔄</div>
+        <div class="insight-title">会話で育てられる</div>
+        <div class="insight-desc">最初はシンプルに始めて「これも追加して」と重ねていくのがコツ。一気に作ろうとしない</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">🔧</div>
+        <div class="insight-title">環境の制約も超える</div>
+        <div class="insight-desc">アクセスできないツールがあっても、代替手段を自動で提案・実装してくれる</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="footer">
+  <strong>作成：Claude（Anthropic）× ユーザーの会話</strong><br>
+  カレンダー・スプシ・チャット・外部サービスをつなぎ、毎朝「おはよう」一言で全自動起動<br>
+  プログラミング知識ゼロ・会話だけで構築
+</div>
+
+</body>
+</html>

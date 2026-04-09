@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>メルカリ → Carousell 自動転記システム 解説</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Segoe UI', sans-serif;
+  background: #0f1117;
+  color: #e8eaf0;
+  line-height: 1.8;
+}
+.container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.header h1 {
+  font-size: 28px;
+  background: linear-gradient(135deg, #5b9bd5, #6fcf6f);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+.header .subtitle {
+  color: #8899aa;
+  font-size: 14px;
+}
+.badge {
+  display: inline-block;
+  background: #1e4a8c;
+  color: #fff;
+  font-size: 11px;
+  padding: 3px 12px;
+  border-radius: 12px;
+  margin-top: 12px;
+}
+
+/* Section */
+.section {
+  margin-bottom: 48px;
+}
+.section-title {
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 20px;
+  padding-left: 14px;
+  border-left: 4px solid #5b9bd5;
+}
+
+/* Flow diagram */
+.flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 24px 0;
+}
+.flow-box {
+  background: #1e2130;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 16px 20px;
+  text-align: center;
+  min-width: 140px;
+  position: relative;
+}
+.flow-box.highlight-blue {
+  border-color: #5b9bd5;
+  box-shadow: 0 0 12px rgba(91, 155, 213, 0.2);
+}
+.flow-box.highlight-green {
+  border-color: #6fcf6f;
+  box-shadow: 0 0 12px rgba(111, 207, 111, 0.2);
+}
+.flow-box.highlight-red {
+  border-color: #e94560;
+  box-shadow: 0 0 12px rgba(233, 69, 96, 0.2);
+}
+.flow-box .icon { font-size: 28px; margin-bottom: 6px; }
+.flow-box .label { font-size: 13px; font-weight: 600; }
+.flow-box .sub { font-size: 11px; color: #8899aa; margin-top: 4px; }
+.flow-arrow {
+  font-size: 24px;
+  color: #5b9bd5;
+}
+
+/* Cards */
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 20px 0;
+}
+@media (max-width: 600px) {
+  .card-grid { grid-template-columns: 1fr; }
+  .flow { flex-direction: column; }
+  .flow-arrow { transform: rotate(90deg); }
+}
+.card {
+  background: #1e2130;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 20px;
+}
+.card h3 {
+  font-size: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card ul {
+  list-style: none;
+  padding: 0;
+}
+.card li {
+  font-size: 13px;
+  color: #b0b8c8;
+  padding: 4px 0;
+  padding-left: 16px;
+  position: relative;
+}
+.card li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: #5b9bd5;
+}
+
+/* Table */
+.table-wrap {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th {
+  background: #1e2130;
+  color: #5b9bd5;
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #333;
+}
+td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #262a36;
+  color: #c0c8d8;
+}
+tr:hover td { background: #1a1e2a; }
+
+/* Marker examples */
+.marker {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.marker-green { background: #1a3a1a; color: #6fcf6f; }
+.marker-blue { background: #1a2a3a; color: #6faacf; }
+.marker-red { background: #3a1a1a; color: #cf6f6f; }
+
+/* Screenshot style */
+.screenshot {
+  background: #1a1d24;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+}
+.screenshot-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #333;
+}
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+.dot-r { background: #e94560; }
+.dot-y { background: #f0b429; }
+.dot-g { background: #6fcf6f; }
+.screenshot-title {
+  font-size: 13px;
+  color: #8899aa;
+  margin-left: 8px;
+}
+.btn-mock {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 8px;
+  cursor: default;
+}
+.btn-blue { background: #1e4a8c; color: #fff; }
+.btn-green { background: #2d6a4f; color: #fff; }
+.btn-red { background: #c0392b; color: #fff; }
+.mock-divider {
+  border-top: 1px solid #333;
+  margin: 12px 0;
+}
+.mock-status {
+  background: #1a3a1a;
+  color: #6fcf6f;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* Tech stack */
+.tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+.tech-tag {
+  background: #262a36;
+  color: #8899aa;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+/* Steps */
+.steps {
+  counter-reset: step;
+  margin: 20px 0;
+}
+.step {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  align-items: flex-start;
+}
+.step-num {
+  counter-increment: step;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background: #1e4a8c;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+.step-content h4 {
+  font-size: 14px;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.step-content p {
+  font-size: 13px;
+  color: #8899aa;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 60px;
+  padding-top: 24px;
+  border-top: 1px solid #262a36;
+  color: #555;
+  font-size: 12px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>メルカリ → Carousell 自動転記システム</h1>
+    <div class="subtitle">Chrome拡張 × GAS × スプレッドシート で構築した自動化ワークフロー</div>
+    <div class="badge">Claude Code で構築</div>
+  </div>
+
+  <!-- 全体像 -->
+  <div class="section">
+    <h2 class="section-title">全体像</h2>
+    <div class="flow">
+      <div class="flow-box highlight-red">
+        <div class="icon">🛒</div>
+        <div class="label">メルカリ</div>
+        <div class="sub">商品ページ</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box highlight-blue">
+        <div class="icon">🧩</div>
+        <div class="label">Chrome拡張</div>
+        <div class="sub">ワンクリック取得</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">
+        <div class="icon">📊</div>
+        <div class="label">スプレッドシート</div>
+        <div class="sub">出品リスト</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box highlight-blue">
+        <div class="icon">🤖</div>
+        <div class="label">ChatGPT翻訳</div>
+        <div class="sub">SEOタイトル自動生成</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box highlight-green">
+        <div class="icon">📋</div>
+        <div class="label">出品リスト</div>
+        <div class="sub">Carousell用</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3つの拡張機能 -->
+  <div class="section">
+    <h2 class="section-title">Chrome拡張機能 3種</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>🔵 なごさん用（リサーチ）</h3>
+        <ul>
+          <li>メルカリの商品タブを自動検出</li>
+          <li>商品情報（タイトル・価格・画像・セラー名）を抽出</li>
+          <li>出品リストに一括保存</li>
+          <li>ボタン1つで一括転記も可能</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🟢 オーナー用（直接転記）</h3>
+        <ul>
+          <li>メルカリ商品を即座にCarousell出品リストへ</li>
+          <li>ChatGPTで英語SEOタイトル自動生成</li>
+          <li>Carousell用テンプレート説明文も自動作成</li>
+          <li>価格の自動換算</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🔄 フォローリスト同期</h3>
+        <ul>
+          <li>メルカリのフォロー中アカウント・ショップを自動取得</li>
+          <li>検索条件も含めてスプシに同期</li>
+          <li>★注目マーカーで重要セラーをハイライト</li>
+          <li>「もっと見る」も自動クリック</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🏗️ 技術スタック</h3>
+        <div class="tech-stack">
+          <span class="tech-tag">Chrome Extension MV3</span>
+          <span class="tech-tag">Google Apps Script</span>
+          <span class="tech-tag">Google Sheets API</span>
+          <span class="tech-tag">OpenAI API (GPT-4o-mini)</span>
+          <span class="tech-tag">clasp (CLI deploy)</span>
+          <span class="tech-tag">Claude Code</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- フロー詳細 -->
+  <div class="section">
+    <h2 class="section-title">2つの登録フロー</h2>
+
+    <h3 style="color:#6faacf; margin: 20px 0 12px;">🔵 なごさんフロー（リサーチ → レビュー → 転記）</h3>
+    <div class="flow">
+      <div class="flow-box">
+        <div class="icon">🔍</div>
+        <div class="label">メルカリでリサーチ</div>
+        <div class="sub">商品タブを開く</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box highlight-blue">
+        <div class="icon">📥</div>
+        <div class="label">出品リストに保存</div>
+        <div class="sub">拡張機能ボタン</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">
+        <div class="icon">👀</div>
+        <div class="label">レビュー</div>
+        <div class="sub">スプシで確認</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box highlight-green">
+        <div class="icon">📋</div>
+        <div class="label">一括転記</div>
+        <div class="sub">ボタン1クリック</div>
+      </div>
+    </div>
+    <p style="text-align:center; margin-top:8px;">
+      <span class="marker marker-blue">🔵 なご 4/9</span>
+      <span style="color:#666; font-size:12px; margin-left:8px;">← V列に自動マーキング</span>
+    </p>
+
+    <h3 style="color:#6fcf6f; margin: 28px 0 12px;">🟢 オーナーフロー（即時転記）</h3>
+    <div class="flow">
+      <div class="flow-box">
+        <div class="icon">🔍</div>
+        <div class="label">メルカリで発見</div>
+        <div class="sub">商品タブを開く</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box highlight-green">
+        <div class="icon">⚡</div>
+        <div class="label">直接転記</div>
+        <div class="sub">翻訳 + 即登録</div>
+      </div>
+    </div>
+    <p style="text-align:center; margin-top:8px;">
+      <span class="marker marker-green">🟢 いのっち 4/9</span>
+      <span style="color:#666; font-size:12px; margin-left:8px;">← V列に自動マーキング</span>
+    </p>
+  </div>
+
+  <!-- 拡張機能UI -->
+  <div class="section">
+    <h2 class="section-title">拡張機能のUI</h2>
+    <div class="card-grid">
+      <div class="screenshot">
+        <div class="screenshot-header">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <span class="screenshot-title">なごさん用拡張</span>
+        </div>
+        <div style="text-align:center; font-size:13px; color:#fff; margin-bottom:8px;">メルカリ → スプシ V2</div>
+        <div style="text-align:center; font-size:28px; color:#5b9bd5; font-weight:bold; margin:12px 0;">3件</div>
+        <div style="text-align:center; font-size:12px; color:#888; margin-bottom:12px;">メルカリタブ検出</div>
+        <div class="btn-mock btn-blue">出品リストに保存</div>
+        <div class="mock-divider"></div>
+        <div class="btn-mock btn-green">📋 出品リスト → 一括転記</div>
+      </div>
+      <div class="screenshot">
+        <div class="screenshot-header">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <span class="screenshot-title">オーナー用拡張</span>
+        </div>
+        <div style="text-align:center; font-size:13px; color:#fff; margin-bottom:4px;">メルカリ → 出品リスト直接転記</div>
+        <div style="display:inline-block; background:#e74c3c; color:#fff; font-size:10px; padding:2px 8px; border-radius:10px; margin-bottom:12px;">オーナー用 - ChatGPT翻訳込み</div>
+        <div style="text-align:center; font-size:28px; color:#e74c3c; font-weight:bold; margin:12px 0;">3件</div>
+        <div style="text-align:center; font-size:12px; color:#888; margin-bottom:12px;">メルカリタブ検出</div>
+        <div class="btn-mock btn-red">翻訳して直接転記する</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 自動処理の詳細 -->
+  <div class="section">
+    <h2 class="section-title">ChatGPT自動処理の内容</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>処理</th><th>内容</th><th>例</th></tr>
+        <tr>
+          <td>SEOタイトル生成</td>
+          <td>日本語タイトル＋説明文から英語SEOタイトルを自動生成（80文字以内）</td>
+          <td>COACH Vintage Ergo Leather Shoulder Bag Brown</td>
+        </tr>
+        <tr>
+          <td>商品詳細抽出</td>
+          <td>ブランド・素材・色・サイズ・コンディションを自動判別</td>
+          <td>Brand: COACH / Material: Leather / Color: Brown</td>
+        </tr>
+        <tr>
+          <td>テンプレート生成</td>
+          <td>Carousell用の説明文テンプレートに自動挿入</td>
+          <td>クーポン案内 + ITEM DETAILS + 発送情報</td>
+        </tr>
+        <tr>
+          <td>価格自動換算</td>
+          <td>日本円 → SGD を為替・手数料込みで自動計算</td>
+          <td>¥18,500 → $SGD XX.XX</td>
+        </tr>
+        <tr>
+          <td>管理番号</td>
+          <td>連番の管理番号を自動生成</td>
+          <td>A001, A002, A003...</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- スプシの構成 -->
+  <div class="section">
+    <h2 class="section-title">スプレッドシートの構成</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>列</th><th>出品リスト（中間）</th><th>出品して欲しいリスト（最終）</th></tr>
+        <tr><td>A</td><td>URL</td><td>—</td></tr>
+        <tr><td>B</td><td>日付 / 「重複」</td><td>—</td></tr>
+        <tr><td>C</td><td>タイトル（日本語）</td><td>セラー名</td></tr>
+        <tr><td>D</td><td>価格（円）</td><td>Carousell価格（SGD・自動計算）</td></tr>
+        <tr><td>G</td><td>セラー名</td><td>仕入れ元URL</td></tr>
+        <tr><td>I</td><td>登録者（なご/いのっち）</td><td>—</td></tr>
+        <tr><td>J</td><td>—</td><td>商品価格（円）</td></tr>
+        <tr><td>N</td><td>—</td><td>英語SEOタイトル + 管理番号</td></tr>
+        <tr><td>O</td><td>—</td><td>テンプレート説明文（英語）</td></tr>
+        <tr><td>V</td><td>—</td><td style="font-weight:bold;">登録者マーカー 🟢🔵 + 日付</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 重複処理 -->
+  <div class="section">
+    <h2 class="section-title">重複チェック</h2>
+    <div class="card">
+      <ul>
+        <li>出品リストに保存する際：既存URL（出品リスト + 転記先の両方）と照合</li>
+        <li>一括転記する際：転記先に既にあるURLはスキップ</li>
+        <li>スキップされた行は <span class="marker marker-red">赤背景</span> + B列に「重複」と表示</li>
+        <li>日付は入れない（重複と正常処理が一目で区別可能）</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- フォローリスト同期 -->
+  <div class="section">
+    <h2 class="section-title">フォローリスト同期</h2>
+    <div class="flow">
+      <div class="flow-box">
+        <div class="icon">👥</div>
+        <div class="label">メルカリフォロー</div>
+        <div class="sub">アカウント・ショップ・検索条件</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box highlight-blue">
+        <div class="icon">🔄</div>
+        <div class="label">自動スクレイピング</div>
+        <div class="sub">もっと見るも自動クリック</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box highlight-green">
+        <div class="icon">📊</div>
+        <div class="label">キーワードリスト</div>
+        <div class="sub">スプシに同期</div>
+      </div>
+    </div>
+    <div class="card" style="margin-top: 16px;">
+      <h3>取得データ</h3>
+      <div class="table-wrap">
+        <table>
+          <tr><th>種類</th><th>内容</th><th>例</th></tr>
+          <tr><td>検索条件</td><td>フォロー中の検索キーワード</td><td>「ブランドバッグ レザー」</td></tr>
+          <tr><td>アカウント</td><td>フォロー中のユーザー</td><td>古着屋カラフル｜値下げ交渉OK</td></tr>
+          <tr><td>ショップ</td><td>フォロー中のメルカリShops</td><td>BRANJE メルカリ店</td></tr>
+        </table>
+      </div>
+      <p style="font-size:13px; color:#f0b429; margin-top:8px;">★ G列「★注目」に何か入力すると、その行が黄色ハイライトで目立ちます</p>
+    </div>
+  </div>
+
+  <!-- 構築ツール -->
+  <div class="section">
+    <h2 class="section-title">構築方法</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Claude Code に要件を伝える</h4>
+          <p>「メルカリの商品情報を自動で取得してスプシに送りたい」「ChatGPTで英語に翻訳したい」など、やりたいことを日本語で伝えるだけ</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Chrome拡張 + GASを自動生成</h4>
+          <p>manifest.json、background.js、popup.html/js、GASコードをすべてClaude Codeが自動生成。clasp CLIでデプロイまで自動化</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Chrome拡張をロード</h4>
+          <p>chrome://extensions → デベロッパーモード → パッケージ化されていない拡張機能を読み込む → フォルダを指定</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>改善のループ</h4>
+          <p>「セラー名も取得したい」「V列にマーカーを入れたい」→ Claude Codeに伝えるだけで即修正・再デプロイ</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Built with Claude Code × Google Apps Script × Chrome Extension MV3
+  </div>
+
+</div>
+</body>
+</html>

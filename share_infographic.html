@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude活用事例 - オフ会アンケート自動化</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .card {
+    width: 800px;
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+
+  /* ===== ヘッダー ===== */
+  .header {
+    background: linear-gradient(135deg, #1a73e8, #6c5ce7);
+    color: #fff;
+    padding: 36px 40px 28px;
+    position: relative;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+  }
+  .header-label {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+  .header h1 {
+    font-size: 26px;
+    font-weight: 900;
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+  .header p {
+    font-size: 14px;
+    opacity: 0.85;
+  }
+
+  /* ===== 本体 ===== */
+  .body {
+    padding: 20px 40px 36px;
+  }
+
+  /* ===== 課題セクション ===== */
+  .problem {
+    background: #fff3e0;
+    border-left: 4px solid #f9ab00;
+    border-radius: 0 12px 12px 0;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+  }
+  .problem-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: #e65100;
+    margin-bottom: 8px;
+  }
+  .problem ul {
+    list-style: none;
+    padding: 0;
+  }
+  .problem li {
+    font-size: 14px;
+    color: #555;
+    padding: 3px 0;
+    padding-left: 20px;
+    position: relative;
+  }
+  .problem li::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: #f9ab00;
+    font-weight: 700;
+  }
+
+  /* ===== フロー ===== */
+  .flow {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+    align-items: stretch;
+  }
+  .flow-step {
+    flex: 1;
+    background: #f8f9fa;
+    border-radius: 14px;
+    padding: 20px 16px;
+    text-align: center;
+    position: relative;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .flow-step.highlight {
+    background: #e8f0fe;
+    border-color: #1a73e8;
+  }
+  .flow-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+  .flow-step h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 6px;
+  }
+  .flow-step p {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+  }
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    color: #1a73e8;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ===== 指示内容 ===== */
+  .prompt-section {
+    margin-bottom: 28px;
+  }
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title .dot {
+    width: 8px;
+    height: 8px;
+    background: #1a73e8;
+    border-radius: 50%;
+  }
+
+  .prompt-box {
+    background: #1e1e1e;
+    color: #e0e0e0;
+    border-radius: 12px;
+    padding: 20px 24px;
+    font-size: 13px;
+    line-height: 1.7;
+    position: relative;
+  }
+  .prompt-box::before {
+    content: 'Claude への指示';
+    position: absolute;
+    top: -10px;
+    left: 16px;
+    background: #6c5ce7;
+    color: #fff;
+    font-size: 11px;
+    padding: 2px 12px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+  .prompt-box .highlight-text {
+    color: #7ec8e3;
+  }
+
+  /* ===== 成果物 ===== */
+  .outputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .output-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 18px 20px;
+    border-left: 4px solid;
+  }
+  .output-card:nth-child(1) { border-color: #1a73e8; }
+  .output-card:nth-child(2) { border-color: #0d904f; }
+  .output-card:nth-child(3) { border-color: #6c5ce7; }
+  .output-card:nth-child(4) { border-color: #f9ab00; }
+
+  .output-card h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 6px;
+  }
+  .output-card p {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.6;
+  }
+
+  /* ===== KPI ===== */
+  .kpi-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .kpi {
+    flex: 1;
+    text-align: center;
+    background: linear-gradient(135deg, #f8f9fa, #e8f0fe);
+    border-radius: 12px;
+    padding: 16px 10px;
+  }
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 900;
+    color: #1a73e8;
+  }
+  .kpi-value.green { color: #0d904f; }
+  .kpi-value.orange { color: #e8710a; }
+  .kpi-label {
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+    font-weight: 500;
+  }
+
+  /* ===== 時間 ===== */
+  .time-compare {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    background: #f0fdf4;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 28px;
+  }
+  .time-box {
+    text-align: center;
+  }
+  .time-box .label {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 4px;
+  }
+  .time-box .value {
+    font-size: 24px;
+    font-weight: 900;
+  }
+  .time-box .value.before { color: #999; }
+  .time-box .value.after { color: #0d904f; }
+  .time-arrow {
+    font-size: 28px;
+    color: #0d904f;
+  }
+  .time-saved {
+    background: #0d904f;
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  /* ===== ポイント ===== */
+  .points {
+    background: #f8f9fa;
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-bottom: 24px;
+  }
+  .points ul {
+    list-style: none;
+    padding: 0;
+  }
+  .points li {
+    font-size: 14px;
+    color: #444;
+    padding: 6px 0;
+    padding-left: 28px;
+    position: relative;
+    line-height: 1.6;
+  }
+  .points li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #0d904f;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  /* ===== フッター ===== */
+  .footer {
+    text-align: center;
+    padding: 20px;
+    border-top: 1px solid #eee;
+    color: #aaa;
+    font-size: 12px;
+  }
+  .footer strong {
+    color: #1a73e8;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <!-- ヘッダー -->
+  <div class="header">
+    <div class="header-label">Claude Code 活用事例</div>
+    <h1>オフ会アンケート × 自動集計ダッシュボード<br>をAIで一括構築した話</h1>
+    <p>Googleフォーム + スプレッドシート + GAS を Claude Code だけで作成</p>
+  </div>
+
+  <div class="body">
+
+    <!-- 課題 -->
+    <div class="problem">
+      <div class="problem-title">こんな課題がありました</div>
+      <ul>
+        <li>Claude Codeオフ会を開催しているが、成果や満足度が可視化できていない</li>
+        <li>次の営業・集客に使える実績データがない</li>
+        <li>スキルマーケット（コンサル・講座）の需要がわからない</li>
+        <li>ノウハウ図書館に投稿する活用事例が集まっていない</li>
+      </ul>
+    </div>
+
+    <!-- フロー -->
+    <div class="section-title"><div class="dot"></div>やったこと（3ステップ）</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-icon">💬</div>
+        <h3>STEP 1</h3>
+        <h3>要件を伝える</h3>
+        <p>目的・活用先を<br>Claudeに相談</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step highlight">
+        <div class="flow-icon">🤖</div>
+        <h3>STEP 2</h3>
+        <h3>Claudeが自動生成</h3>
+        <p>フォーム20問<br>+ ダッシュボード<br>+ GASコード</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">📊</div>
+        <h3>STEP 3</h3>
+        <h3>GASで実行</h3>
+        <p>コピペ→実行で<br>全自動デプロイ</p>
+      </div>
+    </div>
+
+    <!-- 指示内容 -->
+    <div class="prompt-section">
+      <div class="section-title"><div class="dot"></div>実際の指示（こんな感じで伝えました）</div>
+      <div class="prompt-box">
+        <span class="highlight-text">Claudeオフ会の実績や反省点を可視化したい。</span><br>
+        アンケートを作って集計したい。<br>
+        その後スキルマーケットを開いたり、<br>
+        ノウハウ図書館に投稿する活用事例の例にしたい。<br>
+        <span class="highlight-text">どんな形にすると次の営業や活動に繋がるか考えて。</span>
+      </div>
+    </div>
+
+    <!-- 成果物 -->
+    <div class="section-title"><div class="dot"></div>自動生成された成果物</div>
+    <div class="outputs">
+      <div class="output-card">
+        <h4>Googleフォーム（20問）</h4>
+        <p>基本情報 → スキル変化 → 満足度 → 需要調査 → 許諾まで網羅した設計</p>
+      </div>
+      <div class="output-card">
+        <h4>自動集計ダッシュボード</h4>
+        <p>KPIカード5枚 / NPS分布 / スキル変化 / テーマランキング / 需要マトリクス</p>
+      </div>
+      <div class="output-card">
+        <h4>営業用サマリー（コピペ用）</h4>
+        <p>満足度・NPS・スキルアップ幅が自動でテキスト化。SNS投稿にそのまま使える</p>
+      </div>
+      <div class="output-card">
+        <h4>活用事例一覧</h4>
+        <p>回答者の職種×学びを自動表示。ノウハウ図書館への投稿ネタに直結</p>
+      </div>
+    </div>
+
+    <!-- ダッシュボードKPI -->
+    <div class="section-title"><div class="dot"></div>ダッシュボードで見える指標（サンプル）</div>
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-value">10</div>
+        <div class="kpi-label">回答数</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value green">4.5</div>
+        <div class="kpi-label">平均満足度 / 5</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value orange">+50</div>
+        <div class="kpi-label">NPS スコア</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value green">+1.7</div>
+        <div class="kpi-label">スキルアップ幅</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value green">90%</div>
+        <div class="kpi-label">効率化実感率</div>
+      </div>
+    </div>
+
+    <!-- 所要時間 -->
+    <div class="time-compare">
+      <div class="time-box">
+        <div class="label">手作業で作った場合</div>
+        <div class="value before">3〜5時間</div>
+      </div>
+      <div class="time-arrow">→</div>
+      <div class="time-box">
+        <div class="label">Claude Codeで作った場合</div>
+        <div class="value after">約15分</div>
+      </div>
+      <div class="time-saved">90%以上の時短</div>
+    </div>
+
+    <!-- ポイント -->
+    <div class="section-title"><div class="dot"></div>この事例のポイント</div>
+    <div class="points">
+      <ul>
+        <li>「何を聞くか」だけでなく「集めたデータをどう使うか」まで設計してもらった</li>
+        <li>フォーム・集計・ダッシュボードを一つのGASコードで一括生成</li>
+        <li>フィードバックを伝えるだけで即座に修正（初心者向け選択肢の追加など）</li>
+        <li>回答が増えるたびにダッシュボードが自動更新される仕組み</li>
+        <li>営業用サマリーが自動生成されるので、集客にすぐ活用できる</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Made with <strong>Claude Code</strong> | Claude Code オフ会 & Cowork
+  </div>
+</div>
+
+</body>
+</html>

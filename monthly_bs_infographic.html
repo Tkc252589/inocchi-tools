@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude活用事例 - 毎月の貸借対照表 & KPI自動更新</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .card {
+    width: 800px;
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+
+  /* ===== ヘッダー ===== */
+  .header {
+    background: linear-gradient(135deg, #1a73e8, #0f9d58);
+    color: #fff;
+    padding: 36px 40px 28px;
+    position: relative;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 0; right: 0;
+    height: 40px;
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+  }
+  .header-label {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+  .header p {
+    font-size: 14px;
+    opacity: 0.85;
+  }
+
+  .body { padding: 20px 40px 36px; }
+
+  /* ===== 課題 ===== */
+  .problem {
+    background: #fff3e0;
+    border-left: 4px solid #f9ab00;
+    border-radius: 0 12px 12px 0;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+  }
+  .problem-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: #e65100;
+    margin-bottom: 8px;
+  }
+  .problem ul { list-style: none; }
+  .problem li {
+    font-size: 14px;
+    color: #555;
+    padding: 3px 0 3px 20px;
+    position: relative;
+  }
+  .problem li::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: #f9ab00;
+    font-weight: 700;
+  }
+
+  /* ===== セクションタイトル ===== */
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title .dot {
+    width: 8px; height: 8px;
+    background: #0f9d58;
+    border-radius: 50%;
+  }
+
+  /* ===== データソース ===== */
+  .datasources {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .datasource-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .datasource-box {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    min-width: 200px;
+    border: 1px solid #e8eaed;
+  }
+  .datasource-box .emoji {
+    margin-right: 6px;
+  }
+  .datasource-detail {
+    font-size: 12px;
+    color: #888;
+  }
+  .datasource-arrow {
+    color: #1a73e8;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  /* ===== 処理フロー ===== */
+  .process-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 28px;
+    padding: 16px 0;
+  }
+  .process-step {
+    background: #e8f5e9;
+    border: 2px solid #0f9d58;
+    border-radius: 14px;
+    padding: 16px 18px;
+    text-align: center;
+    flex: 1;
+  }
+  .process-step .p-icon { font-size: 28px; margin-bottom: 6px; }
+  .process-step h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f9d58;
+    margin-bottom: 4px;
+  }
+  .process-step p {
+    font-size: 11px;
+    color: #666;
+  }
+  .process-arrow {
+    font-size: 20px;
+    color: #0f9d58;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ===== テーブル ===== */
+  .table-section {
+    margin-bottom: 28px;
+  }
+  .bs-table {
+    display: flex;
+    gap: 16px;
+  }
+  .bs-col {
+    flex: 1;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+  }
+  .bs-col-header {
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .bs-col:nth-child(1) .bs-col-header { background: #1a73e8; }
+  .bs-col:nth-child(2) .bs-col-header { background: #0f9d58; }
+  .bs-col-body { padding: 14px 16px; }
+  .bs-col-body ul { list-style: none; }
+  .bs-col-body li {
+    font-size: 13px;
+    color: #444;
+    padding: 5px 0 5px 20px;
+    position: relative;
+    line-height: 1.5;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  .bs-col-body li:last-child { border-bottom: none; }
+  .bs-col-body li::before {
+    content: '・';
+    position: absolute;
+    left: 2px;
+    color: #888;
+    font-weight: 700;
+  }
+  .bs-sub-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0f9d58;
+    margin-top: 8px;
+    margin-bottom: 2px;
+    padding-left: 4px;
+  }
+  .bs-sub-label:first-child { margin-top: 0; }
+
+  /* ===== 使い方ステップ ===== */
+  .howto {
+    background: #f0fdf4;
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-bottom: 28px;
+  }
+  .howto-steps { list-style: none; }
+  .howto-steps li {
+    font-size: 14px;
+    color: #333;
+    padding: 8px 0 8px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    line-height: 1.6;
+  }
+  .howto-steps li + li {
+    border-top: 1px solid #d1fae5;
+  }
+  .step-badge {
+    background: #0f9d58;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-text {
+    flex: 1;
+  }
+  .step-text code {
+    background: #e8f5e9;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #0d904f;
+    font-weight: 700;
+  }
+
+  /* ===== 時間比較 ===== */
+  .time-compare {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    background: #f0fdf4;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 28px;
+  }
+  .time-box { text-align: center; }
+  .time-box .label { font-size: 12px; color: #888; margin-bottom: 4px; }
+  .time-box .value { font-size: 24px; font-weight: 900; }
+  .time-box .value.before { color: #999; }
+  .time-box .value.after { color: #0d904f; }
+  .time-arrow { font-size: 28px; color: #0d904f; }
+  .time-saved {
+    background: #0d904f;
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  /* ===== ポイント ===== */
+  .points {
+    background: #f8f9fa;
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-bottom: 24px;
+  }
+  .points ul { list-style: none; }
+  .points li {
+    font-size: 14px;
+    color: #444;
+    padding: 6px 0 6px 28px;
+    position: relative;
+    line-height: 1.6;
+  }
+  .points li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #0d904f;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  /* ===== フッター ===== */
+  .footer {
+    text-align: center;
+    padding: 20px;
+    border-top: 1px solid #eee;
+    color: #aaa;
+    font-size: 12px;
+  }
+  .footer strong { color: #0f9d58; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <div class="header-label">Claude Code 活用事例</div>
+    <h1>毎月の貸借対照表 & KPIを<br>コマンド1つで自動更新</h1>
+    <p>eBay/Carousellせどりの月次管理をClaude Codeで完全自動化</p>
+  </div>
+
+  <div class="body">
+
+    <!-- 課題 -->
+    <div class="problem">
+      <div class="problem-title">こんな課題がありました</div>
+      <ul>
+        <li>毎月、複数のサービスにログインして残高や売上を手動で確認している</li>
+        <li>SBIネット銀行、アメックス、eBay、Carousell、せどり管理スプシ...バラバラ</li>
+        <li>数字を転記するだけなのに毎回30分以上かかる</li>
+        <li>転記ミスのリスクもある</li>
+      </ul>
+    </div>
+
+    <!-- データ収集フロー -->
+    <div class="section-title"><div class="dot"></div>データ収集フロー</div>
+    <div class="datasources">
+      <div class="datasource-row">
+        <div class="datasource-box"><span class="emoji">🏦</span>SBIネット銀行</div>
+        <div class="datasource-arrow">→</div>
+        <div class="datasource-detail">口座残高</div>
+      </div>
+      <div class="datasource-row">
+        <div class="datasource-box"><span class="emoji">💳</span>アメックス</div>
+        <div class="datasource-arrow">→</div>
+        <div class="datasource-detail">未払金</div>
+      </div>
+      <div class="datasource-row">
+        <div class="datasource-box"><span class="emoji">📊</span>せどり管理スプシ</div>
+        <div class="datasource-arrow">→</div>
+        <div class="datasource-detail">在庫・売上・原価・粗利</div>
+      </div>
+      <div class="datasource-row">
+        <div class="datasource-box"><span class="emoji">🛒</span>Carousell</div>
+        <div class="datasource-arrow">→</div>
+        <div class="datasource-detail">出品数</div>
+      </div>
+      <div class="datasource-row">
+        <div class="datasource-box"><span class="emoji">💱</span>為替API</div>
+        <div class="datasource-arrow">→</div>
+        <div class="datasource-detail">SGD/JPY, USD/JPY</div>
+      </div>
+    </div>
+
+    <!-- 処理フロー -->
+    <div class="process-flow">
+      <div class="process-step">
+        <div class="p-icon">🤖</div>
+        <h3>Claude Code</h3>
+        <p>自動収集</p>
+      </div>
+      <div class="process-arrow">→</div>
+      <div class="process-step">
+        <div class="p-icon">📋</div>
+        <h3>GASコード生成</h3>
+        <p>スプシ書き込み用</p>
+      </div>
+      <div class="process-arrow">→</div>
+      <div class="process-step">
+        <div class="p-icon">📊</div>
+        <h3>貸借対照表スプシ</h3>
+        <p>一括書き込み</p>
+      </div>
+    </div>
+
+    <!-- 書き込まれる項目 -->
+    <div class="section-title"><div class="dot"></div>書き込まれる項目</div>
+    <div class="table-section">
+      <div class="bs-table">
+        <div class="bs-col">
+          <div class="bs-col-header">貸借対照表</div>
+          <div class="bs-col-body">
+            <ul>
+              <li>口座残高（SBI）</li>
+              <li>在庫金額（スプシから）</li>
+              <li>売掛金（eBay保留 + Carousell売上 x 為替）</li>
+              <li>未払金（アメックス）</li>
+            </ul>
+          </div>
+        </div>
+        <div class="bs-col">
+          <div class="bs-col-header">KPI</div>
+          <div class="bs-col-body">
+            <div class="bs-sub-label">Carousell</div>
+            <ul>
+              <li>出品数</li>
+              <li>平均単価</li>
+              <li>粗利率</li>
+              <li>月商</li>
+              <li>成約件数</li>
+            </ul>
+            <div class="bs-sub-label">国内</div>
+            <ul>
+              <li>仕入原価</li>
+              <li>回転率</li>
+              <li>粗利</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 使い方 -->
+    <div class="section-title"><div class="dot"></div>使い方（3ステップ）</div>
+    <div class="howto">
+      <ul class="howto-steps">
+        <li>
+          <span class="step-badge">STEP 1</span>
+          <span class="step-text">SBI・アメックス・CarousellにChromeでログイン</span>
+        </li>
+        <li>
+          <span class="step-badge">STEP 2</span>
+          <span class="step-text">Claude Codeで <code>/user:monthly-bs</code> と入力</span>
+        </li>
+        <li>
+          <span class="step-badge">STEP 3</span>
+          <span class="step-text">生成されたGASコードをスプシのApps Scriptに貼って実行</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 時間比較 -->
+    <div class="section-title"><div class="dot"></div>時間比較</div>
+    <div class="time-compare">
+      <div class="time-box">
+        <div class="label">手作業</div>
+        <div class="value before">30〜60分</div>
+      </div>
+      <div class="time-arrow">→</div>
+      <div class="time-box">
+        <div class="label">Claude Code</div>
+        <div class="value after">約5分</div>
+      </div>
+      <div class="time-saved">90%以上の時短</div>
+    </div>
+
+    <!-- ポイント -->
+    <div class="section-title"><div class="dot"></div>この事例のポイント</div>
+    <div class="points">
+      <ul>
+        <li>Chrome x AppleScriptで銀行・クレカの残高を自動読み取り</li>
+        <li>為替レートはAPIで当日レートを自動取得</li>
+        <li>せどり管理スプシからCSVエクスポートで売上・在庫を自動集計</li>
+        <li>毎月同じコマンドを叩くだけで完了</li>
+        <li>転記ミスゼロ</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Made with <strong>Claude Code</strong> | いのっち@eBayせどりフルタイム挑戦中
+  </div>
+</div>
+
+</body>
+</html>

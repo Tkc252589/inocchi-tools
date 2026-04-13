@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude 活用リスト</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f11;
+    --surface: #18181c;
+    --surface2: #22222a;
+    --border: #2e2e38;
+    --text: #e8e8f0;
+    --muted: #7a7a90;
+    --done: #34d399;
+    --done-bg: rgba(52,211,153,0.08);
+    --done-border: rgba(52,211,153,0.2);
+    --todo: #60a5fa;
+    --todo-bg: rgba(96,165,250,0.08);
+    --todo-border: rgba(96,165,250,0.2);
+    --accent1: #a78bfa; /* eBay有在庫 */
+    --accent2: #60a5fa; /* eBay無在庫 */
+    --accent3: #fb923c; /* Carousell */
+    --accent4: #f472b6; /* 日常業務 */
+    --community: #38bdf8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; padding: 40px 24px 80px; line-height: 1.6;
+  }
+  .container { max-width: 800px; margin: 0 auto; }
+
+  /* ヘッダー */
+  .header { margin-bottom: 48px; }
+  .header-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--muted);
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px;
+  }
+  h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+  .header-sub { font-size: 13px; color: var(--muted); }
+  .stats { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
+  .stat { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  .stat-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .stat-num { font-weight: 700; color: var(--text); }
+
+  /* タブ */
+  .tabs {
+    display: flex; gap: 0; margin-bottom: 32px;
+    border-bottom: 2px solid var(--border);
+  }
+  .tab {
+    padding: 12px 24px; font-size: 14px; font-weight: 600;
+    color: var(--muted); cursor: pointer; position: relative;
+    transition: color 0.2s; user-select: none;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--text); }
+  .tab.active::after {
+    content: ''; position: absolute; bottom: -2px; left: 0; right: 0;
+    height: 2px; background: var(--accent1); border-radius: 2px;
+  }
+  .tab[data-tab="community"].active::after { background: var(--community); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* セクション */
+  .section { margin-bottom: 36px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+  }
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+    padding: 3px 10px; border-radius: 20px; text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .tag-done { background: var(--done-bg); color: var(--done); border: 1px solid var(--done-border); }
+  .tag-todo { background: var(--todo-bg); color: var(--todo); border: 1px solid var(--todo-border); }
+  .section-title { font-size: 16px; font-weight: 700; }
+
+  /* カテゴリラベル */
+  .group { margin-bottom: 18px; }
+  .group-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; margin-bottom: 8px; padding-left: 2px;
+  }
+  .gl-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  /* カード */
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 16px; margin-bottom: 6px;
+    display: flex; align-items: flex-start; gap: 12px;
+    transition: border-color 0.15s, background 0.15s; cursor: default;
+  }
+  .card:hover { background: var(--surface2); border-color: #3e3e50; }
+  .card-icon { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+  .icon-done { background: var(--done); box-shadow: 0 0 6px rgba(52,211,153,0.5); }
+  .icon-todo { background: var(--todo); box-shadow: 0 0 6px rgba(96,165,250,0.4); }
+  .card-body { flex: 1; }
+  .card-title {
+    font-size: 14px; font-weight: 500; color: var(--text);
+    display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+  }
+  .card-sub { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
+    letter-spacing: 0.04em; flex-shrink: 0;
+  }
+  .chip-gas { background: rgba(251,146,60,0.12); color: #fb923c; border: 1px solid rgba(251,146,60,0.25); }
+  .chip-chrome { background: rgba(96,165,250,0.12); color: #60a5fa; border: 1px solid rgba(96,165,250,0.25); }
+  .chip-claude { background: rgba(167,139,250,0.12); color: #a78bfa; border: 1px solid rgba(167,139,250,0.25); }
+  .chip-html { background: rgba(244,114,182,0.12); color: #f472b6; border: 1px solid rgba(244,114,182,0.25); }
+  .chip-api { background: rgba(52,211,153,0.12); color: #34d399; border: 1px solid rgba(52,211,153,0.25); }
+
+  a.card-link { color: var(--text); text-decoration: none; border-bottom: 1px dashed var(--muted); }
+  a.card-link:hover { border-bottom-color: var(--text); }
+
+  .divider {
+    margin: 36px 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  /* 図解付きカード (アコーディオン) */
+  .card-expandable {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    margin-bottom: 6px; transition: border-color 0.2s, background 0.2s;
+  }
+  .card-expandable:hover { background: var(--surface2); border-color: #3e3e50; }
+  .card-expandable.open { border-color: var(--accent1); }
+  .card-head {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 16px; cursor: pointer; user-select: none;
+  }
+  .card-head .toggle {
+    margin-left: auto; font-size: 11px; color: var(--muted);
+    padding: 2px 8px; border-radius: 6px;
+    background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.2);
+    flex-shrink: 0; margin-top: 2px; transition: all 0.2s;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .card-expandable.open .toggle { background: rgba(167,139,250,0.2); color: var(--accent1); }
+  .card-detail {
+    max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.25s ease;
+    padding: 0 16px;
+  }
+  .card-expandable.open .card-detail { max-height: 800px; padding: 0 16px 16px; }
+
+  /* フロー図パーツ */
+  .flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; justify-content: flex-start; margin: 10px 0; }
+  .flow-v { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 8px 0; }
+  .fn {
+    padding: 10px 14px; border-radius: 10px; text-align: center;
+    font-size: 12px; font-weight: 600; border: 1.5px solid;
+    min-width: 100px; flex-shrink: 0; line-height: 1.4;
+  }
+  .fn small { display: block; font-weight: 400; font-size: 10px; opacity: 0.7; margin-top: 2px; }
+  .fn-blue   { background: rgba(59,130,246,0.12);  border-color: #3b82f6; color: #93c5fd; }
+  .fn-purple { background: rgba(139,92,246,0.12);  border-color: #8b5cf6; color: #c4b5fd; }
+  .fn-pink   { background: rgba(236,72,153,0.12);  border-color: #ec4899; color: #f9a8d4; }
+  .fn-green  { background: rgba(34,197,94,0.12);   border-color: #22c55e; color: #86efac; }
+  .fn-orange { background: rgba(249,115,22,0.12);  border-color: #f97316; color: #fdba74; }
+  .fn-cyan   { background: rgba(6,182,212,0.12);   border-color: #06b6d4; color: #67e8f9; }
+  .fn-yellow { background: rgba(234,179,8,0.12);   border-color: #eab308; color: #fde047; }
+  .fn-red    { background: rgba(239,68,68,0.12);   border-color: #ef4444; color: #fca5a5; }
+  .fa { color: #475569; padding: 0 6px; font-size: 16px; flex-shrink: 0; }
+  .fa-down { color: #475569; padding: 4px 0; font-size: 16px; text-align: center; }
+  .flow-note {
+    font-size: 11px; color: var(--muted); margin-top: 10px;
+    padding: 8px 12px; background: rgba(167,139,250,0.06);
+    border-radius: 8px; border: 1px solid rgba(167,139,250,0.12); line-height: 1.5;
+  }
+  .flow-note strong { color: #c4b5fd; }
+  .flow-modes { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .flow-mode {
+    flex: 1; min-width: 120px; padding: 8px 10px;
+    background: rgba(15,15,17,0.5); border: 1px solid var(--border);
+    border-radius: 8px; font-size: 11px; text-align: center;
+  }
+  .flow-mode .mode-label { font-weight: 700; font-size: 11px; margin-bottom: 3px; }
+  .flow-mode .mode-desc { color: var(--muted); font-size: 10px; }
+  .branch-row { display: flex; gap: 10px; margin-top: 8px; }
+  .branch-box {
+    flex: 1; padding: 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: rgba(15,15,17,0.5);
+  }
+  .branch-box .bl {
+    font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px;
+    display: inline-block; margin-bottom: 6px;
+  }
+
+  /* コミュニティ投稿枠 */
+  .community-empty {
+    text-align: center; padding: 48px 20px;
+    color: var(--muted); font-size: 14px;
+  }
+  .community-empty .big-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+  .community-cta {
+    display: inline-block; margin-top: 16px;
+    padding: 10px 24px; border-radius: 10px;
+    background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.25);
+    color: var(--community); font-weight: 600; font-size: 13px;
+    cursor: default;
+  }
+
+  .footer {
+    margin-top: 48px; font-size: 12px; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  @media (max-width: 600px) {
+    .flow { flex-direction: column; align-items: stretch; }
+    .fa { transform: rotate(90deg); text-align: center; padding: 4px 0; }
+    .fn { min-width: auto; }
+    .branch-row { flex-direction: column; }
+    .flow-modes { flex-direction: column; }
+    .tabs { overflow-x: auto; }
+    .tab { padding: 10px 16px; font-size: 13px; white-space: nowrap; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div class="header-label">Claude Code 活用事例集</div>
+    <h1>Claude 活用リスト</h1>
+    <p class="header-sub">せどり業務の効率化を中心にClaude Codeで作ったものまとめ</p>
+    <div class="stats">
+      <div class="stat"><span class="stat-dot" style="background:var(--done)"></span> 活用中 <span class="stat-num">22</span></div>
+      <div class="stat"><span class="stat-dot" style="background:var(--todo)"></span> これから <span class="stat-num">15</span></div>
+    </div>
+  </div>
+
+  <!-- ===== タブ切り替え ===== -->
+  <div class="tabs">
+    <div class="tab active" data-tab="inocchi" onclick="switchTab('inocchi')">いのっちの活用事例</div>
+    <div class="tab" data-tab="community" onclick="switchTab('community')">みんなの活用事例</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!--  いのっちの活用事例                                            -->
+  <!-- ============================================================ -->
+  <div class="tab-content active" id="tab-inocchi">
+
+    <!-- ========== 日常業務 ========== -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-tag tag-done">活用中</span>
+        <span class="section-title">日常業務</span>
+      </div>
+      <div class="group">
+        <div class="group-label"><span class="gl-dot" style="background:var(--accent4);box-shadow:0 0 6px var(--accent4);"></span><span style="color:var(--accent4);">効率化・管理</span></div>
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/general_tools_infographic.html" target="_blank">AI戦略会議チーム <span class="chip chip-claude">Claude</span> <span class="chip chip-html">HTML</span></a></div>
+          <div class="card-sub">CEO・eBay専門家・経理・リスク管理・AI効率化・投資家・リアリストの7役</div>
+        </div></div>
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/ohayo_infographic.html" target="_blank">「おはよう」スケジュール管理 <span class="chip chip-claude">Claude</span></a></div>
+          <div class="card-sub">Googleカレンダー連携・タスクリスト・45分タイムブロック・RPGランキング</div>
+        </div></div>
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/general_tools_infographic.html" target="_blank">出品URLまとめ収集 <span class="chip chip-chrome">Chrome拡張</span> <span class="chip chip-html">HTML</span></a></div>
+          <div class="card-sub">1ウィンドウからスプシの出品リストシートへ自動収集</div>
+        </div></div>
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/general_tools_infographic.html" target="_blank">よく使うスプレッドシート一覧をすぐ表示 <span class="chip chip-chrome">Chrome拡張</span> <span class="chip chip-html">HTML</span></a></div>
+        </div></div>
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/eBay%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88_%E3%83%9E%E3%82%A4%E3%83%B3%E3%83%89%E3%83%9E%E3%83%83%E3%83%97.html" target="_blank">スキルマーケット用資料 <span class="chip chip-html">HTML</span></a></div>
+          <div class="card-sub">
+            <a href="https://tkc252589.github.io/inocchi-tools/eBay%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88_%E3%83%9E%E3%82%A4%E3%83%B3%E3%83%89%E3%83%9E%E3%83%83%E3%83%97.html" target="_blank" style="color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border);">マインドマップ</a>
+            　／
+            <a href="https://tkc252589.github.io/inocchi-tools/eBay%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88_%E3%81%A6%E3%81%A4%E3%81%8A%E3%81%95%E3%82%93_%E3%83%9E%E3%82%A4%E3%83%B3%E3%83%89%E3%83%9E%E3%83%83%E3%83%97.html" target="_blank" style="color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border);">てつおさん版</a>
+          </div>
+        </div></div>
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/general_tools_infographic.html" target="_blank">Mac mini ストレージ整理 <span class="chip chip-html">HTML</span></a></div>
+          <div class="card-sub">1.2GB → 75GB（+約74GB回収）</div>
+        </div></div>
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/weekly_research_infographic.html" target="_blank">週次コミュニティリサーチ自動化 <span class="chip chip-claude">Claude</span> <span class="chip chip-html">HTML</span></a></div>
+          <div class="card-sub">
+            <a href="https://tkc252589.github.io/inocchi-tools/community_research_summary.html" target="_blank" style="color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border);">リサーチまとめ</a>
+            　／
+            <a href="https://tkc252589.github.io/inocchi-tools/weekly-research.md" target="_blank" style="color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border);">コマンドファイル</a>
+            　／
+            <a href="https://tkc252589.github.io/inocchi-tools/weekly_research_infographic.html" target="_blank" style="color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border);">図解</a>
+          </div>
+          <div class="card-sub" style="margin-top:6px;padding-top:6px;border-top:1px dashed var(--border);">
+            <span style="color:var(--done);font-weight:600;font-size:11px;">📋 今週の活用事例まとめ：</span>
+            <a href="https://tkc252589.github.io/inocchi-tools/community_research_summary.html#チャット" target="_blank" style="color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border);">チャットまとめ</a>
+            　／
+            <a href="https://tkc252589.github.io/inocchi-tools/community_research_summary.html#オフ会" target="_blank" style="color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border);">オフ会まとめ</a>
+            　／
+            <a href="https://tkc252589.github.io/inocchi-tools/community_research_summary.html#図書館" target="_blank" style="color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--border);">ノウハウ図書館まとめ</a>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- ========== せどり（eBay/有在庫）========== -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-tag tag-done">活用中</span>
+        <span class="section-title">せどり（eBay / 有在庫）- Yさんアカウント</span>
+      </div>
+      <div class="group">
+        <div class="group-label"><span class="gl-dot" style="background:var(--accent1);box-shadow:0 0 6px var(--accent1);"></span><span style="color:var(--accent1);">eBay 有在庫 自動化</span></div>
+
+        <!-- 1. AI出品自動化 -->
+        <div class="card-expandable" id="ex-listing">
+          <div class="card-head" onclick="toggleCard('ex-listing')">
+            <span class="card-icon icon-done"></span>
+            <div class="card-body">
+              <div class="card-title">AI出品自動化 (即時/一括/スケジュール) <span class="chip chip-api">eBay API</span></div>
+              <div class="card-sub">ChatGPT+Visionで英語タイトル・説明文・Item Specifics自動生成 → eBay APIで全自動出品</div>
+            </div>
+            <span class="toggle">図解</span>
+          </div>
+          <div class="card-detail">
+            <div class="flow">
+              <div class="fn fn-blue">📱 Yさん<small>フォームに入力<br>(商品名・ブランド等)</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-cyan">📊 スプレッドシート<small>B〜X列に自動転記</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-purple">🤖 ChatGPT<small>タイトル / Specifics<br>/ 説明文を英語で生成</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-green">🛒 eBay出品<small>API で自動投稿<br>ポリシーも自動設定</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-yellow">✅ 完了<small>Item ID・出品日<br>を自動記録</small></div>
+            </div>
+            <div class="flow-note"><strong>ポイント:</strong> Yさんはスマホでフォームに日本語で入力するだけ。あとはAIが全部英語に変換してeBayに出品。出品済み商品は自動スキップするので重複の心配なし。</div>
+            <div class="flow-modes">
+              <div class="flow-mode"><div class="mode-label" style="color:#86efac;">即時出品</div><div class="mode-desc">選択行をワンクリック<br>で今すぐ出品</div></div>
+              <div class="flow-mode"><div class="mode-label" style="color:#fdba74;">スケジュール出品</div><div class="mode-desc">日時指定で予約<br>PCスリープ中もOK</div></div>
+              <div class="flow-mode"><div class="mode-label" style="color:#c4b5fd;">一括出品</div><div class="mode-desc">未出品を全件<br>まとめて出品</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. 画像・動画管理 -->
+        <div class="card-expandable" id="ex-image">
+          <div class="card-head" onclick="toggleCard('ex-image')">
+            <span class="card-icon icon-done"></span>
+            <div class="card-body">
+              <div class="card-title">画像・動画の自動管理 <span class="chip chip-gas">GAS</span></div>
+              <div class="card-sub">フォーム投稿→SKUフォルダ自動移動→連番リネーム→eBayへアップロード</div>
+            </div>
+            <span class="toggle">図解</span>
+          </div>
+          <div class="card-detail">
+            <div class="flow">
+              <div class="fn fn-blue">📱 フォーム投稿<small>写真+動画を<br>アップロード</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-cyan">📁 一時フォルダ<small>Googleフォームの<br>回答フォルダ</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-green">📂 SKUフォルダ<small>商品ごとのフォルダに<br>自動で振り分け</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-purple">🔢 連番リネーム<small>1.jpg, 2.jpg, 3.mp4<br>日付順で自動命名</small></div>
+            </div>
+            <div class="fa-down">↓ 出品時</div>
+            <div class="flow">
+              <div class="fn fn-orange">🔗 URL方式<small>Driveリンクで送信</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-red">⚠ 失敗したら<small>自動で切り替え</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-green">📦 バイナリ方式<small>ファイルを直接<br>アップロード</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-yellow">✅ eBay登録完了</div>
+            </div>
+            <div class="flow-note"><strong>ポイント:</strong> 写真も動画も全部自動で整理。画像のアップロードは2つの方法を試すので失敗しにくい。Yさんは写真を撮ってフォームに投稿するだけでOK。</div>
+          </div>
+        </div>
+
+        <!-- 3. 価格・送料管理 -->
+        <div class="card-expandable" id="ex-price">
+          <div class="card-head" onclick="toggleCard('ex-price')">
+            <span class="card-icon icon-done"></span>
+            <div class="card-body">
+              <div class="card-title">価格・送料一括管理 <span class="chip chip-api">eBay API</span></div>
+              <div class="card-sub">スプシに数字を入れるだけ → eBayの価格・送料が一括で変わる</div>
+            </div>
+            <span class="toggle">図解</span>
+          </div>
+          <div class="card-detail">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:600;">価格変更したいとき:</div>
+            <div class="flow">
+              <div class="fn fn-orange">✏️ AM列に入力<small>新しい価格を<br>スプシに書くだけ</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-cyan">📋 メニュー実行<small>「価格変更を<br>eBayに反映」</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-green">🛒 eBay更新<small>APIで自動的に<br>価格が変わる</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-yellow">✅ 完了</div>
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin:12px 0 8px;font-weight:600;">送料を変えたいとき:</div>
+            <div class="flow">
+              <div class="fn fn-cyan">✏️ AN列に入力<small>US送料(USD)を<br>スプシに書くだけ</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-cyan">📋 メニュー実行<small>「US送料を<br>eBayに反映」</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-green">🚚 eBay更新<small>送料がすぐ反映</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-yellow">✅ 完了</div>
+            </div>
+            <div class="flow-note"><strong>ポイント:</strong> eBayの管理画面を開く必要なし。スプレッドシートに数字を書いてメニューを押すだけ。複数商品をまとめて一括変更もOK。</div>
+          </div>
+        </div>
+
+        <!-- 4. ビジネスポリシー -->
+        <div class="card-expandable" id="ex-policy">
+          <div class="card-head" onclick="toggleCard('ex-policy')">
+            <span class="card-icon icon-done"></span>
+            <div class="card-body">
+              <div class="card-title">ビジネスポリシー自動設定 <span class="chip chip-api">eBay API</span></div>
+              <div class="card-sub">Payment/Shipping/Return ポリシーを名前で検索して自動適用</div>
+            </div>
+            <span class="toggle">図解</span>
+          </div>
+          <div class="card-detail">
+            <div class="flow">
+              <div class="fn fn-blue">🛒 出品実行<small>出品ボタンを押す</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-purple">🔍 ポリシー検索<small>eBay APIで<br>名前から自動検索</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-green">📜 自動セット<small>3つのポリシーを<br>出品に適用</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-yellow">✅ 完了<small>次回はキャッシュ<br>で高速</small></div>
+            </div>
+            <div class="flow-modes">
+              <div class="flow-mode"><div class="mode-label" style="color:#86efac;">💳 Payment</div><div class="mode-desc">「Payment」ポリシー</div></div>
+              <div class="flow-mode"><div class="mode-label" style="color:#67e8f9;">🚚 Shipping</div><div class="mode-desc">「Shipping」ポリシー<br>→即座にUS送料も設定</div></div>
+              <div class="flow-mode"><div class="mode-label" style="color:#f9a8d4;">↩️ Return</div><div class="mode-desc">「seller pay」で固定</div></div>
+            </div>
+            <div class="flow-note"><strong>ポイント:</strong> 出品のたびにポリシーを選ぶ必要なし。名前で自動マッチ。1度取得したらキャッシュされるので速い。</div>
+          </div>
+        </div>
+
+        <!-- 5. 状態ランク -->
+        <div class="card-expandable" id="ex-condition">
+          <div class="card-head" onclick="toggleCard('ex-condition')">
+            <span class="card-icon icon-done"></span>
+            <div class="card-body">
+              <div class="card-title">状態ランク自動処理 <span class="chip chip-gas">GAS</span></div>
+              <div class="card-sub">日本語でもアルファベットでも入力OK → 自動で英語の状態説明に変換</div>
+            </div>
+            <span class="toggle">図解</span>
+          </div>
+          <div class="card-detail">
+            <div class="flow">
+              <div class="fn fn-blue">✏️ Yさんが入力<small>O列=総合<br>P列=外側 / Q列=内側</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-purple">🔄 自動正規化<small>Good → B<br>良好 → AB<br>S → S</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-green">🤖 英語説明を生成<small>B = "Good condition<br>with minor wear"</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-yellow">🏷 eBayに表示<small>色付きバッジで<br>見やすく表示</small></div>
+            </div>
+            <div class="flow-note"><strong>ポイント:</strong> 「Good」でも「B」でも「良好」でも、全部自動で統一されてeBayには英語で表示されます。</div>
+            <div class="flow-modes">
+              <div class="flow-mode"><div class="mode-label" style="color:#86efac;">N</div><div class="mode-desc">New</div></div>
+              <div class="flow-mode"><div class="mode-label" style="color:#67e8f9;">S</div><div class="mode-desc">Like New</div></div>
+              <div class="flow-mode"><div class="mode-label" style="color:#c4b5fd;">A</div><div class="mode-desc">Excellent</div></div>
+              <div class="flow-mode"><div class="mode-label" style="color:#fde047;">AB</div><div class="mode-desc">Very Good</div></div>
+              <div class="flow-mode"><div class="mode-label" style="color:#fdba74;">B</div><div class="mode-desc">Good</div></div>
+              <div class="flow-mode"><div class="mode-label" style="color:#fca5a5;">C</div><div class="mode-desc">Fair</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. メッセージ通知 -->
+        <div class="card-expandable" id="ex-message">
+          <div class="card-head" onclick="toggleCard('ex-message')">
+            <span class="card-icon icon-done"></span>
+            <div class="card-body">
+              <div class="card-title">メッセージ通知・自動返信 <span class="chip chip-api">eBay API</span></div>
+              <div class="card-sub">5分ごとにeBayメッセージチェック→Gmail通知（日本語訳+返信テンプレ）→自動返信</div>
+            </div>
+            <span class="toggle">図解</span>
+          </div>
+          <div class="card-detail">
+            <div class="flow">
+              <div class="fn fn-pink">📨 eBayにメッセージ<small>5分ごとに自動チェック</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-yellow">🔍 種別判定<small>バイヤー？<br>広告メール？</small></div>
+            </div>
+            <div class="fa-down">↓</div>
+            <div class="branch-row">
+              <div class="branch-box" style="border-color: rgba(34,197,94,0.3);">
+                <span class="bl" style="background:rgba(34,197,94,0.2);color:#86efac;">👤 バイヤーからのメッセージ</span>
+                <div class="flow-v">
+                  <div class="fn fn-green" style="width:100%;margin-bottom:6px;">🌐 日本語に翻訳</div>
+                  <div class="fn fn-purple" style="width:100%;margin-bottom:6px;">💬 返信テンプレ生成<small>配送/在庫/値引き/返品<br>内容に合わせて自動選択</small></div>
+                  <div class="fn fn-blue" style="width:100%;">📧 Gmail通知<small>Gmailで返信→eBayに自動転送</small></div>
+                </div>
+              </div>
+              <div class="branch-box" style="border-color: rgba(249,115,22,0.3);">
+                <span class="bl" style="background:rgba(249,115,22,0.2);color:#fdba74;">📢 広告・お知らせ</span>
+                <div class="flow-v">
+                  <div class="fn fn-orange" style="width:100%;margin-bottom:6px;">🧹 HTML除去<small>テキストだけ抽出</small></div>
+                  <div class="fn fn-cyan" style="width:100%;margin-bottom:6px;">📏 要約+翻訳<small>先頭300文字だけ</small></div>
+                  <div class="fn fn-blue" style="width:100%;">📧 簡易通知<small>返信テンプレなし</small></div>
+                </div>
+              </div>
+            </div>
+            <div class="flow-note"><strong>ポイント:</strong> eBayアプリを開かなくてもGmailで読める。日本語訳+返信例つき。Gmailで返信するだけでバイヤーに届く。</div>
+          </div>
+        </div>
+
+        <!-- 7. Item ID一括取得 -->
+        <div class="card-expandable" id="ex-itemid">
+          <div class="card-head" onclick="toggleCard('ex-itemid')">
+            <span class="card-icon icon-done"></span>
+            <div class="card-body">
+              <div class="card-title">Item ID一括取得・タイトルマッチ <span class="chip chip-api">eBay API</span></div>
+              <div class="card-sub">eBayの全出品を取得→商品名でItem ID自動紐付け→価格・送料も一括同期</div>
+            </div>
+            <span class="toggle">図解</span>
+          </div>
+          <div class="card-detail">
+            <div class="flow">
+              <div class="fn fn-cyan">📋 メニュー実行<small>「Item ID<br>一括取得」</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-purple">🛒 eBayから取得<small>全出品リストを<br>APIで一括取得</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-orange">🔍 タイトルマッチ<small>スプシの商品名と<br>eBayタイトルを照合</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-green">📊 自動記入<small>Y列=Item ID<br>AL列=価格<br>AN列=送料</small></div>
+            </div>
+            <div class="flow-note"><strong>ポイント:</strong> 既にeBayに出品済みの商品を一括でスプシに紐付け。価格や送料も一緒に取り込めるのでスプシが常に最新の状態に。</div>
+          </div>
+        </div>
+
+        <!-- 8. 効率化マップ -->
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/efficiency_tools.html" target="_blank">eBay効率化マップ（全体図解） <span class="chip chip-html">HTML</span></a></div>
+          <div class="card-sub">8つの図解: アーキテクチャ/出品フロー/AI生成/画像管理/価格管理/メッセージ/Before-After/列マップ</div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- ========== せどり（eBay/無在庫）========== -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-tag tag-todo">これから</span>
+        <span class="section-title">せどり（eBay / 無在庫）</span>
+      </div>
+      <div class="group">
+        <div class="group-label"><span class="gl-dot" style="background:var(--accent2);box-shadow:0 0 6px var(--accent2);"></span><span style="color:var(--accent2);">eBay 無在庫</span></div>
+        <div class="card"><span class="card-icon icon-todo"></span><div class="card-body">
+          <div class="card-title">リサーチから説明文自動生成</div>
+        </div></div>
+        <div class="card"><span class="card-icon icon-todo"></span><div class="card-body">
+          <div class="card-title">康太アカウント 出品自動化</div>
+          <div class="card-sub">商品リサーチ → タイトル/説明文生成 → eBay自動投稿 → 価格・利益計算</div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- ========== せどり（Carousell/無在庫）========== -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-tag tag-done">活用中</span>
+        <span class="section-title">せどり（Carousell / 無在庫）</span>
+      </div>
+      <div class="group">
+        <div class="group-label"><span class="gl-dot" style="background:var(--accent3);box-shadow:0 0 6px var(--accent3);"></span><span style="color:var(--accent3);">Carousell</span></div>
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body"><div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/carousell_tools_infographic.html" target="_blank">在庫一括削除 <span class="chip chip-html">HTML</span></a></div></div></div>
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body"><div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/carousell_tools_infographic.html" target="_blank">顧客対応管理表に1クリック保存 <span class="chip chip-html">HTML</span></a></div></div></div>
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body"><div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/carousell_tools_infographic.html" target="_blank">在庫URLの1クリックオープン <span class="chip chip-html">HTML</span></a></div></div></div>
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body"><div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/carousell_tools_infographic.html" target="_blank">仕入元ページ → 外注スプシへ説明文1クリック保存 <span class="chip chip-html">HTML</span></a></div></div></div>
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/brand_analysis_q1_2026.html" target="_blank">ブランド別販売分析レポート Q1 2026 <span class="chip chip-html">HTML</span></a></div>
+          <div class="card-sub">売上データをブランド別に集計・可視化</div>
+        </div></div>
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body"><div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/carousell_tools_infographic.html" target="_blank">スマホから在庫チェック <span class="chip chip-html">HTML</span></a></div></div></div>
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/%E5%9B%B3%E8%A7%A3_Carousell_Auto_List.html" target="_blank">出品作業の簡素化 <span class="chip chip-html">HTML</span></a></div>
+        </div></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-header" style="margin-top:0;">
+        <span class="section-tag tag-todo">これから</span>
+        <span class="section-title">Carousell で作りたいもの</span>
+      </div>
+      <div class="group">
+        <div class="group-label"><span class="gl-dot" style="background:var(--accent3);box-shadow:0 0 6px var(--accent3);"></span><span style="color:var(--accent3);">Carousell</span></div>
+        <div class="card"><span class="card-icon icon-todo"></span><div class="card-body"><div class="card-title">在庫の価格調整ツール</div></div></div>
+        <div class="card"><span class="card-icon icon-todo"></span><div class="card-body"><div class="card-title">リサーチツール（自動保存）</div></div></div>
+        <div class="card"><span class="card-icon icon-todo"></span><div class="card-body"><div class="card-title">出品作業のショートカット</div></div></div>
+      </div>
+    </div>
+
+    <!-- ========== Yさん これから ========== -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-tag tag-todo">これから</span>
+        <span class="section-title"><a href="https://tkc252589.github.io/inocchi-tools/ebay_roadmap_infographic.html" target="_blank" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--muted);">eBay有在庫 で作りたいもの（図解・作り方ガイド）</a></span>
+      </div>
+      <div class="group">
+        <div class="group-label"><span class="gl-dot" style="background:var(--accent1);box-shadow:0 0 6px var(--accent1);"></span><span style="color:var(--accent1);">eBay 全体</span></div>
+        <div class="card"><span class="card-icon icon-todo"></span><div class="card-body">
+          <div class="card-title">在庫連動 & 売切自動終了</div>
+          <div class="card-sub">売れた→スプシの在庫数を自動減算→在庫0で他出品も自動終了→売上データ自動記録</div>
+        </div></div>
+        <div class="card"><span class="card-icon icon-todo"></span><div class="card-body">
+          <div class="card-title">売上・利益管理スプシに自動更新</div>
+          <div class="card-sub">eBay APIから売上取得→商品ごとの利益（売値-仕入値-送料-手数料）を自動計算→月次/週次推移を自動生成</div>
+        </div></div>
+        <div class="card"><span class="card-icon icon-todo"></span><div class="card-body">
+          <div class="card-title">売上・手数料・送料・関税を自動取得</div>
+          <div class="card-sub">eBayの売上&手数料、CPASS、elogiの送料・関税・追加費用をAPIで自動取得→スプシに集約</div>
+        </div></div>
+        <div class="card"><span class="card-icon icon-todo"></span><div class="card-body">
+          <div class="card-title">Financial Report等を自動保存→税理士に共有</div>
+          <div class="card-sub">毎月のFinancial overview / invoice / statementを自動DL→Driveに保存→税理士に自動共有</div>
+        </div></div>
+        <div class="card"><span class="card-icon icon-todo"></span><div class="card-body">
+          <div class="card-title">相場チェック & 提案 & 自動価格変更</div>
+          <div class="card-sub">同カテゴリ・同ブランドの他セラー価格を定期チェック→推奨価格を提案→承認で自動変更</div>
+        </div></div>
+        <div class="card"><span class="card-icon icon-todo"></span><div class="card-body">
+          <div class="card-title">Promoted Listings 一括更新</div>
+          <div class="card-sub">広告レート（%）の一括変更・滞留在庫の自動Promo登録・ROI自動計算</div>
+        </div></div>
+        <div class="card"><span class="card-icon icon-todo"></span><div class="card-body">
+          <div class="card-title">Yさんが商品情報・写真を登録したら通知</div>
+          <div class="card-sub">フォーム送信トリガー→LINEまたはSlackに自動通知→登録内容のサマリー付き</div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- ========== その他 これから ========== -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-tag tag-todo">これから</span>
+        <span class="section-title">その他 作りたいもの</span>
+      </div>
+      <div class="group">
+        <div class="group-label"><span class="gl-dot" style="background:var(--accent4);box-shadow:0 0 6px var(--accent4);"></span><span style="color:var(--accent4);">全体</span></div>
+        <div class="card"><span class="card-icon icon-todo"></span><div class="card-body">
+          <div class="card-title">ナノバナナとの連携</div>
+          <div class="card-sub">AIエージェントスキル連携（nano-banana-2-skill）</div>
+        </div></div>
+        <div class="card"><span class="card-icon icon-todo"></span><div class="card-body">
+          <div class="card-title">フリマ出品検知・自動購入 or 通知</div>
+          <div class="card-sub">特定キーワード＋価格条件で検知</div>
+        </div></div>
+        <div class="card"><span class="card-icon icon-todo"></span><div class="card-body">
+          <div class="card-title">自分のHP作成</div>
+          <div class="card-sub">参考サイトのデザインを真似して制作</div>
+        </div></div>
+      </div>
+    </div>
+
+  </div><!-- /tab-inocchi -->
+
+
+  <!-- ============================================================ -->
+  <!--  みんなの活用事例                                               -->
+  <!-- ============================================================ -->
+  <div class="tab-content" id="tab-community">
+
+    <!-- 週次リサーチまとめリンク -->
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:20px;">
+      <div style="font-size:13px;font-weight:700;color:var(--done);margin-bottom:8px;">📋 今週の活用事例まとめ</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <a href="https://tkc252589.github.io/inocchi-tools/community_research_summary.html#チャット" target="_blank" style="color:var(--text);text-decoration:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;">💬 チャットまとめ</a>
+        <a href="https://tkc252589.github.io/inocchi-tools/community_research_summary.html#オフ会" target="_blank" style="color:var(--text);text-decoration:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;">🎉 オフ会まとめ</a>
+        <a href="https://tkc252589.github.io/inocchi-tools/community_research_summary.html#図書館" target="_blank" style="color:var(--text);text-decoration:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;">📚 ノウハウ図書館まとめ</a>
+      </div>
+    </div>
+
+    <!-- オフ会 参加者の活用事例 -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-tag tag-done">4/8・4/9・4/10</span>
+        <span class="section-title">Claude Code & Cowork オフ会 参加者の活用事例</span>
+      </div>
+
+      <div class="group">
+        <div class="group-label"><span class="gl-dot" style="background:var(--done);box-shadow:0 0 6px var(--done);"></span><span style="color:var(--done);">オフ会で作られたもの</span></div>
+
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title">🎬 YouTube 16言語一括翻訳アプリ</div>
+          <div class="card-sub">
+            <strong>Rさん@YouTube</strong>（4/9 オフ会）<br>
+            ブラウザでの手動翻訳は16言語分のボタン操作で膨大な時間がかかるため、APIで一括翻訳・一括登録するアプリをClaudeで作成。エンジニアではないがClaudeの指示通りに操作して完成。
+          </div>
+        </div></div>
+
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title">👗 メルカリ出品下書き自動作成 + サムネ文字入れ</div>
+          <div class="card-sub">
+            <strong>Sさん@アパレルせどり</strong>（4/9 オフ会）<br>
+            写真をCoworkに投げるだけでメルカリの下書きを自動作成。ブランド名の文字入れ、洗濯タグのコラージュもClaudeで実行。将来は全自動出品を目指す。
+          </div>
+        </div></div>
+
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title">🛒 Amazon商品監視ツール（最安値 & 在庫切れ通知）</div>
+          <div class="card-sub">
+            <strong>参加者さん</strong>（4/8 オフ会）<br>
+            特定のAmazon商品を10〜15分ごとに自動チェック。最安値更新・在庫切れ（2回連続確認）でiPhoneに通知。
+            <br><a href="https://files.catbox.moe/003tu4.png" target="_blank" style="color:var(--todo);text-decoration:none;border-bottom:1px dashed var(--todo);">📸 図解を見る</a>
+          </div>
+        </div></div>
+
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title">📋 タスク管理アプリ作成</div>
+          <div class="card-sub">
+            <strong>Tさん</strong>（4/8 オフ会）<br>
+            Mac初心者・AI初心者ながら、オフ会中にタスク管理Webアプリを作成。図解も作成して共有。
+            <br><span style="font-size:10px;color:var(--muted);">※図解URLは一時URLのため期限切れ</span>
+          </div>
+        </div></div>
+
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title">📧 Gmail受信トレイ整理 + インストールガイドスライド</div>
+          <div class="card-sub">
+            <strong>Uさん@導入サポーター</strong>（4/8 オフ会）<br>
+            3ヶ月分の不要メールアーカイブ・ラベル分類・メルマガ配信停止を一括実行。さらに自分がオフ会主催者になれるようCoworkインストールガイドのスライドも作成。
+          </div>
+        </div></div>
+
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title">🗂️ デスクトップ整理 + Google容量削減</div>
+          <div class="card-sub">
+            <strong>Vさん</strong>（4/10 オフ会）<br>
+            デスクトップの写真をゴミ箱に移動、Claude in Chromeの設定、Gmail整理を実施。帰宅後にGoogle容量の削減にも取り組む。
+          </div>
+        </div></div>
+
+        <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
+          <div class="card-title">📱 インスタリール作成</div>
+          <div class="card-sub">
+            <strong>Wさん</strong>（4/10 オフ会）<br>
+            初めてインスタリールの作成にClaude Codeで挑戦。指示の出し方を改善中。
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:20px;">
+      <p style="font-size:12px;color:var(--muted);">あなたのClaude活用事例もシェアしてみませんか？</p>
+      <p style="font-size:11px;color:var(--muted);margin-top:4px;">せどり・副業・日常業務、なんでもOK!</p>
+    </div>
+
+  </div><!-- /tab-community -->
+
+  <div class="footer">// 最終更新: 2026-04-13</div>
+
+</div><!-- /container -->
+
+<script>
+function toggleCard(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+  document.querySelector('.tab[data-tab="' + name + '"]').classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+</script>
+
+</body>
+</html>

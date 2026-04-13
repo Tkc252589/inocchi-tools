@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude活用事例 - スプレッドシート ランチャー</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .card {
+    width: 800px;
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+
+  /* ===== ヘッダー ===== */
+  .header {
+    background: linear-gradient(135deg, #0f9d58, #1a73e8);
+    color: #fff;
+    padding: 36px 40px 28px;
+    position: relative;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 0; right: 0;
+    height: 40px;
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+  }
+  .header-label {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 26px;
+    font-weight: 900;
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+  .header p {
+    font-size: 14px;
+    opacity: 0.85;
+  }
+
+  .body { padding: 20px 40px 36px; }
+
+  /* ===== 課題 ===== */
+  .problem {
+    background: #fff3e0;
+    border-left: 4px solid #f9ab00;
+    border-radius: 0 12px 12px 0;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+  }
+  .problem-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: #e65100;
+    margin-bottom: 8px;
+  }
+  .problem ul { list-style: none; }
+  .problem li {
+    font-size: 14px;
+    color: #555;
+    padding: 3px 0 3px 20px;
+    position: relative;
+  }
+  .problem li::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: #f9ab00;
+    font-weight: 700;
+  }
+
+  /* ===== セクションタイトル ===== */
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title .dot {
+    width: 8px; height: 8px;
+    background: #0f9d58;
+    border-radius: 50%;
+  }
+
+  /* ===== Before / After ===== */
+  .compare {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .compare-box {
+    flex: 1;
+    border-radius: 14px;
+    padding: 22px 20px;
+  }
+  .compare-before {
+    background: #fef2f2;
+    border: 2px solid #fecaca;
+  }
+  .compare-after {
+    background: #f0fdf4;
+    border: 2px solid #bbf7d0;
+  }
+  .compare-label {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .compare-before .compare-label { color: #dc2626; }
+  .compare-after .compare-label { color: #16a34a; }
+
+  .step-list { list-style: none; }
+  .step-list li {
+    font-size: 13px;
+    color: #555;
+    padding: 5px 0;
+    padding-left: 24px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .compare-before .step-list li::before {
+    content: '✕';
+    position: absolute;
+    left: 0;
+    color: #ef4444;
+    font-weight: 700;
+  }
+  .compare-after .step-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #16a34a;
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  /* ===== フロー ===== */
+  .flow {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+    align-items: stretch;
+  }
+  .flow-step {
+    flex: 1;
+    background: #f8f9fa;
+    border-radius: 14px;
+    padding: 20px 16px;
+    text-align: center;
+  }
+  .flow-step.highlight {
+    background: #e8f5e9;
+    border: 2px solid #0f9d58;
+  }
+  .flow-icon { font-size: 32px; margin-bottom: 8px; }
+  .flow-step h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 6px;
+  }
+  .flow-step p {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+  }
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    color: #0f9d58;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ===== モックアップ ===== */
+  .mockup-section {
+    margin-bottom: 28px;
+  }
+  .mockup {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    width: 300px;
+    margin: 0 auto;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+  .mock-header {
+    background: linear-gradient(135deg, #0f9d58, #34a853);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .mock-header-icon {
+    width: 20px; height: 20px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+  }
+  .mock-header h4 {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .mock-list { padding: 4px 0; }
+  .mock-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid #f1f3f4;
+    font-size: 13px;
+    color: #202124;
+  }
+  .mock-item:last-child { border-bottom: none; }
+  .mock-icon {
+    width: 16px; height: 16px;
+    background: #0f9d58;
+    border-radius: 3px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .mock-item span { flex: 1; }
+  .mock-arrow { color: #ccc; font-size: 14px; }
+  .mock-caption {
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+    margin-top: 12px;
+  }
+
+  /* ===== 指示内容 ===== */
+  .prompt-box {
+    background: #1e1e1e;
+    color: #e0e0e0;
+    border-radius: 12px;
+    padding: 20px 24px;
+    font-size: 13px;
+    line-height: 1.7;
+    position: relative;
+    margin-bottom: 28px;
+  }
+  .prompt-box::before {
+    content: 'Claude への指示';
+    position: absolute;
+    top: -10px;
+    left: 16px;
+    background: #6c5ce7;
+    color: #fff;
+    font-size: 11px;
+    padding: 2px 12px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+  .hl { color: #7ec8e3; }
+
+  /* ===== 成果物 ===== */
+  .outputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .output-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 18px 16px;
+    text-align: center;
+    border-top: 4px solid;
+  }
+  .output-card:nth-child(1) { border-color: #0f9d58; }
+  .output-card:nth-child(2) { border-color: #1a73e8; }
+  .output-card:nth-child(3) { border-color: #f9ab00; }
+  .output-card .out-icon { font-size: 28px; margin-bottom: 8px; }
+  .output-card h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .output-card p {
+    font-size: 11px;
+    color: #888;
+    line-height: 1.5;
+  }
+
+  /* ===== 時間比較 ===== */
+  .time-compare {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    background: #f0fdf4;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 28px;
+  }
+  .time-box { text-align: center; }
+  .time-box .label { font-size: 12px; color: #888; margin-bottom: 4px; }
+  .time-box .value { font-size: 24px; font-weight: 900; }
+  .time-box .value.before { color: #999; }
+  .time-box .value.after { color: #0d904f; }
+  .time-arrow { font-size: 28px; color: #0d904f; }
+  .time-saved {
+    background: #0d904f;
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  /* ===== ポイント ===== */
+  .points {
+    background: #f8f9fa;
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-bottom: 24px;
+  }
+  .points ul { list-style: none; }
+  .points li {
+    font-size: 14px;
+    color: #444;
+    padding: 6px 0 6px 28px;
+    position: relative;
+    line-height: 1.6;
+  }
+  .points li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #0d904f;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  /* ===== フッター ===== */
+  .footer {
+    text-align: center;
+    padding: 20px;
+    border-top: 1px solid #eee;
+    color: #aaa;
+    font-size: 12px;
+  }
+  .footer strong { color: #0f9d58; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <div class="header-label">Claude Code 活用事例</div>
+    <h1>よく使うスプレッドシートを<br>1クリックで開くChrome拡張</h1>
+    <p>Chrome拡張機能をClaude Codeだけで作成・運用</p>
+  </div>
+
+  <div class="body">
+
+    <!-- 課題 -->
+    <div class="problem">
+      <div class="problem-title">こんな課題がありました</div>
+      <ul>
+        <li>毎日使うスプレッドシートが7〜8個あるが、毎回ブックマークやDriveから探している</li>
+        <li>タブが増えすぎて目的のシートを見つけるのに時間がかかる</li>
+        <li>スプレッドシートのURLが長くてブックマーク管理も面倒</li>
+        <li>作業の切り替えのたびに集中が途切れる</li>
+      </ul>
+    </div>
+
+    <!-- Before / After -->
+    <div class="section-title"><div class="dot"></div>Before → After</div>
+    <div class="compare">
+      <div class="compare-box compare-before">
+        <div class="compare-label">Before（これまで）</div>
+        <ul class="step-list">
+          <li>Google Driveを開く</li>
+          <li>フォルダを辿って探す</li>
+          <li>「あれ、どのシートだっけ…」</li>
+          <li>ブックマークバーが溢れる</li>
+          <li>1シート開くのに30秒〜1分</li>
+        </ul>
+      </div>
+      <div class="compare-box compare-after">
+        <div class="compare-label">After（導入後）</div>
+        <ul class="step-list">
+          <li>ツールバーのアイコンをクリック</li>
+          <li>一覧から選ぶだけ</li>
+          <li>1クリック・2秒で開く</li>
+          <li>ブックマーク不要</li>
+          <li>追加・変更もClaude Codeに一言で完了</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- モックアップ -->
+    <div class="mockup-section">
+      <div class="section-title"><div class="dot"></div>実際の画面</div>
+      <div class="mockup">
+        <div class="mock-header">
+          <div class="mock-header-icon">+</div>
+          <h4>スプレッドシート</h4>
+        </div>
+        <div class="mock-list">
+          <div class="mock-item">
+            <div class="mock-icon">S</div>
+            <span>せどり管理ツール2026</span>
+            <span class="mock-arrow">›</span>
+          </div>
+          <div class="mock-item">
+            <div class="mock-icon">S</div>
+            <span>せどり管理ツール まっつんさん</span>
+            <span class="mock-arrow">›</span>
+          </div>
+          <div class="mock-item">
+            <div class="mock-icon">S</div>
+            <span>顧客対応管理表</span>
+            <span class="mock-arrow">›</span>
+          </div>
+          <div class="mock-item">
+            <div class="mock-icon">S</div>
+            <span>発送外注さんシート</span>
+            <span class="mock-arrow">›</span>
+          </div>
+          <div class="mock-item">
+            <div class="mock-icon">S</div>
+            <span>Carousell出品リスト</span>
+            <span class="mock-arrow">›</span>
+          </div>
+          <div class="mock-item" style="color:#bbb;font-size:12px;">
+            <div class="mock-icon" style="background:#ccc;">S</div>
+            <span>ほか3件...</span>
+            <span class="mock-arrow">›</span>
+          </div>
+        </div>
+      </div>
+      <div class="mock-caption">ツールバーからワンクリックで一覧表示 → シートを選ぶだけ</div>
+    </div>
+
+    <!-- フロー -->
+    <div class="section-title"><div class="dot"></div>作り方（3ステップ）</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-icon">💬</div>
+        <h3>STEP 1</h3>
+        <h3>要件を伝える</h3>
+        <p>「よく使うスプシを<br>1クリックで開きたい」</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step highlight">
+        <div class="flow-icon">🤖</div>
+        <h3>STEP 2</h3>
+        <h3>Claudeが自動生成</h3>
+        <p>popup.html<br>manifest.json<br>アイコン一式</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">🧩</div>
+        <h3>STEP 3</h3>
+        <h3>Chromeに追加</h3>
+        <p>フォルダを読み込む<br>だけで完成</p>
+      </div>
+    </div>
+
+    <!-- 指示例 -->
+    <div class="section-title"><div class="dot"></div>実際の指示</div>
+    <div class="prompt-box">
+      <span class="hl">よく使うスプレッドシートを一覧で表示して</span><br>
+      <span class="hl">1クリックで開けるChrome拡張を作って。</span><br><br>
+      登録するシートは：<br>
+      ・せどり管理ツール2026（URL）<br>
+      ・顧客対応管理表（URL）<br>
+      ・発送外注さんシート（URL）<br>
+      …
+    </div>
+
+    <!-- 成果物 -->
+    <div class="section-title"><div class="dot"></div>生成されたファイル</div>
+    <div class="outputs">
+      <div class="output-card">
+        <div class="out-icon">📄</div>
+        <h4>popup.html</h4>
+        <p>UI画面<br>シート一覧と<br>リンクを表示</p>
+      </div>
+      <div class="output-card">
+        <div class="out-icon">⚙️</div>
+        <h4>manifest.json</h4>
+        <p>Chrome拡張の<br>設定ファイル</p>
+      </div>
+      <div class="output-card">
+        <div class="out-icon">🎨</div>
+        <h4>アイコン画像</h4>
+        <p>16 / 48 / 128px<br>3サイズ自動生成</p>
+      </div>
+    </div>
+
+    <!-- 時間比較 -->
+    <div class="time-compare">
+      <div class="time-box">
+        <div class="label">自分で作った場合</div>
+        <div class="value before">2〜3時間</div>
+      </div>
+      <div class="time-arrow">→</div>
+      <div class="time-box">
+        <div class="label">Claude Codeで作った場合</div>
+        <div class="value after">約5分</div>
+      </div>
+      <div class="time-saved">95%以上の時短</div>
+    </div>
+
+    <!-- ポイント -->
+    <div class="section-title"><div class="dot"></div>この事例のポイント</div>
+    <div class="points">
+      <ul>
+        <li>プログラミング知識ゼロでもChrome拡張が作れた</li>
+        <li>シートの追加・変更は「○○を追加して」と言うだけ</li>
+        <li>毎日使うものだから、小さな時短が積み重なって大きな効果に</li>
+        <li>Google Driveに保存 → 複数PCで同じ拡張を使い回せる</li>
+        <li>同じ要領で「よく使うサイト一覧」「業務リンク集」なども作れる</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Made with <strong>Claude Code</strong> | Claude Code オフ会 & Cowork
+  </div>
+</div>
+
+</body>
+</html>

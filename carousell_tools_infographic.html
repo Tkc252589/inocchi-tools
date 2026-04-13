@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude活用事例 - Carousell 5つの効率化ツール</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .card {
+    width: 800px;
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+
+  /* ===== ヘッダー ===== */
+  .header {
+    background: linear-gradient(135deg, #e8710a, #f59e0b);
+    color: #fff;
+    padding: 36px 40px 28px;
+    position: relative;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 0; right: 0;
+    height: 40px;
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+  }
+  .header-label {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+  .header p {
+    font-size: 14px;
+    opacity: 0.9;
+  }
+
+  .body { padding: 20px 40px 36px; }
+
+  /* ===== ツールカード ===== */
+  .tool-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .tool-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+  .tool-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e8710a, #f59e0b);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .tool-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1f2937;
+  }
+  .tool-desc {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 16px;
+    padding-left: 50px;
+  }
+
+  /* ===== フロー図 ===== */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .flow-step {
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #92400e;
+    text-align: center;
+    min-width: 120px;
+    max-width: 200px;
+    line-height: 1.5;
+  }
+  .flow-step.step-gas {
+    background: #dbeafe;
+    border-color: #60a5fa;
+    color: #1e40af;
+  }
+  .flow-step.step-result {
+    background: #d1fae5;
+    border-color: #34d399;
+    color: #065f46;
+  }
+  .flow-arrow {
+    font-size: 18px;
+    color: #9ca3af;
+    padding: 0 6px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ===== 作り方セクション ===== */
+  .howto {
+    background: #f0fdf4;
+    border-radius: 12px;
+    padding: 16px 20px;
+    border-left: 4px solid #22c55e;
+  }
+  .howto-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #15803d;
+    margin-bottom: 8px;
+  }
+  .howto ul {
+    list-style: none;
+    padding: 0;
+  }
+  .howto li {
+    font-size: 12.5px;
+    color: #374151;
+    padding: 3px 0;
+    padding-left: 18px;
+    position: relative;
+    line-height: 1.6;
+  }
+  .howto li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: #22c55e;
+    font-weight: 700;
+  }
+
+  /* ===== 技術タグ ===== */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+    padding-left: 0;
+  }
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: #f3f4f6;
+    color: #4b5563;
+  }
+  .tag.tag-gas {
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+  .tag.tag-ext {
+    background: #fef3c7;
+    color: #b45309;
+  }
+  .tag.tag-claude {
+    background: #ede9fe;
+    color: #6d28d9;
+  }
+  .tag.tag-web {
+    background: #d1fae5;
+    color: #047857;
+  }
+
+  /* ===== フッター ===== */
+  .footer {
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    padding: 18px;
+    font-size: 12px;
+    color: #9ca3af;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- ヘッダー -->
+  <div class="header">
+    <div class="header-label">リベシティ eBay/Carousellせどり</div>
+    <h1>Carousell 5つの効率化ツール</h1>
+    <p>いのっちのClaude Code活用事例 ── 仕組みと作り方を図解</p>
+  </div>
+
+  <div class="body">
+
+    <!-- ===== Tool 1 ===== -->
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-number">1</div>
+        <div class="tool-title">在庫一括削除</div>
+      </div>
+      <div class="tool-desc">Carousellの在庫を一括で削除するツール。スプシで対象を選んでまとめて実行。</div>
+      <div class="flow">
+        <div class="flow-step">スプシで<br>削除対象を選択</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step step-gas">GAS / Chrome拡張<br>で一括実行</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step step-result">Carousell上の<br>出品を自動削除</div>
+      </div>
+      <div class="howto">
+        <div class="howto-title">作り方</div>
+        <ul>
+          <li>Chrome拡張でCarousellのページを操作、またはCarousellのAPI（非公式）を利用</li>
+          <li>Claude Codeでコード生成</li>
+        </ul>
+      </div>
+      <div class="tags">
+        <span class="tag tag-gas">GAS</span>
+        <span class="tag tag-ext">Chrome拡張</span>
+        <span class="tag tag-claude">Claude Code</span>
+      </div>
+    </div>
+
+    <!-- ===== Tool 2 ===== -->
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-number">2</div>
+        <div class="tool-title">顧客対応管理表に1クリック保存</div>
+      </div>
+      <div class="tool-desc">Carousellの顧客とのやり取りをGoogleスプレッドシートの管理表にワンクリックで保存。</div>
+      <div class="flow">
+        <div class="flow-step">Carousellの<br>チャット画面</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step step-gas">Chrome拡張の<br>ボタンをクリック</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step step-result">顧客名・商品名・日時<br>をスプシに自動保存</div>
+      </div>
+      <div class="howto">
+        <div class="howto-title">作り方</div>
+        <ul>
+          <li>Chrome拡張でページのDOM要素から顧客情報を抽出</li>
+          <li>GAS WebアプリのAPIエンドポイントにPOSTで保存</li>
+        </ul>
+      </div>
+      <div class="tags">
+        <span class="tag tag-ext">Chrome拡張</span>
+        <span class="tag tag-gas">GAS Webアプリ</span>
+        <span class="tag tag-claude">Claude Code</span>
+      </div>
+    </div>
+
+    <!-- ===== Tool 3 ===== -->
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-number">3</div>
+        <div class="tool-title">在庫URLの1クリックオープン</div>
+      </div>
+      <div class="tool-desc">スプレッドシートの在庫一覧から、Carousellの商品ページを1クリックで全タブ開く。</div>
+      <div class="flow">
+        <div class="flow-step">スプシの<br>在庫一覧</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step step-gas">ボタンクリック</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step step-result">全URLを新しいタブ<br>で一括オープン</div>
+      </div>
+      <div class="howto">
+        <div class="howto-title">作り方</div>
+        <ul>
+          <li>GASのカスタムメニュー or サイドバーでURL列を取得</li>
+          <li>window.openで一括オープン、またはChrome拡張で実装</li>
+        </ul>
+      </div>
+      <div class="tags">
+        <span class="tag tag-gas">GAS</span>
+        <span class="tag tag-ext">Chrome拡張</span>
+        <span class="tag tag-claude">Claude Code</span>
+      </div>
+    </div>
+
+    <!-- ===== Tool 4 ===== -->
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-number">4</div>
+        <div class="tool-title">仕入元ページ → 外注スプシへ説明文1クリック保存</div>
+      </div>
+      <div class="tool-desc">仕入元サイトの商品ページから説明文を抽出し、外注さん用のスプレッドシートにワンクリックで保存。</div>
+      <div class="flow">
+        <div class="flow-step">仕入元サイト<br>（商品ページ）</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step step-gas">Chrome拡張で<br>商品情報を抽出</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step step-result">外注スプシに<br>自動保存</div>
+      </div>
+      <div class="howto">
+        <div class="howto-title">作り方</div>
+        <ul>
+          <li>Chrome拡張のcontent scriptが仕入元ページのDOMを解析</li>
+          <li>商品名・説明文・画像URLを抽出</li>
+          <li>popup.jsのボタンでGAS WebアプリにPOST</li>
+        </ul>
+      </div>
+      <div class="tags">
+        <span class="tag tag-ext">Chrome拡張</span>
+        <span class="tag tag-gas">GAS Webアプリ</span>
+        <span class="tag">content script</span>
+        <span class="tag tag-claude">Claude Code</span>
+      </div>
+    </div>
+
+    <!-- ===== Tool 5 ===== -->
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tool-number">5</div>
+        <div class="tool-title">スマホから在庫チェック</div>
+      </div>
+      <div class="tool-desc">スマホのブラウザからGoogleスプレッドシートの在庫データを見やすいUIで確認できるWebアプリ。</div>
+      <div class="flow">
+        <div class="flow-step">スマホで<br>WebアプリURLを開く</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step step-gas">GASがスプシから<br>在庫データ取得</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step step-result">モバイル対応UIで表示<br>（検索・フィルタ付き）</div>
+      </div>
+      <div class="howto">
+        <div class="howto-title">作り方</div>
+        <ul>
+          <li>GAS doGet()でHTMLを返すWebアプリを作成</li>
+          <li>スプシからデータ取得 → レスポンシブHTMLテーブルで表示</li>
+          <li>スマホのホーム画面に追加でアプリ風に使える</li>
+        </ul>
+      </div>
+      <div class="tags">
+        <span class="tag tag-gas">GAS Webアプリ</span>
+        <span class="tag tag-web">レスポンシブHTML</span>
+        <span class="tag tag-claude">Claude Code</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- フッター -->
+  <div class="footer">
+    Made with Claude Code | いのっち@eBayせどりフルタイム挑戦中
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全体・管理系ツール図解 | いのっちのClaude Code活用</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            line-height: 1.8;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6c5ce7, #a78bfa);
+            color: white;
+            text-align: center;
+            padding: 48px 24px 40px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 1.05rem;
+            opacity: 0.92;
+        }
+
+        .header .subtitle {
+            display: inline-block;
+            background: rgba(255,255,255,0.18);
+            padding: 6px 18px;
+            border-radius: 30px;
+            margin-top: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 32px 16px 48px;
+        }
+
+        .tool-card {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+            margin-bottom: 32px;
+            overflow: hidden;
+        }
+
+        .tool-card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 24px 28px 16px;
+        }
+
+        .tool-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .tool-card:nth-child(1) .tool-number { background: linear-gradient(135deg, #6c5ce7, #a78bfa); }
+        .tool-card:nth-child(2) .tool-number { background: linear-gradient(135deg, #0984e3, #74b9ff); }
+        .tool-card:nth-child(3) .tool-number { background: linear-gradient(135deg, #00b894, #55efc4); }
+        .tool-card:nth-child(4) .tool-number { background: linear-gradient(135deg, #e17055, #fab1a0); }
+
+        .tool-card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .tool-body {
+            padding: 0 28px 28px;
+        }
+
+        .tool-description {
+            font-size: 0.95rem;
+            color: #555;
+            margin-bottom: 20px;
+            padding-left: 4px;
+        }
+
+        /* Tags */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: #fff;
+        }
+
+        .tag-gas        { background: #0984e3; }
+        .tag-chrome     { background: #fdcb6e; color: #333; }
+        .tag-claude     { background: #6c5ce7; }
+        .tag-claudecode { background: #d63031; }
+        .tag-spreadsheet{ background: #00b894; }
+        .tag-mac        { background: #636e72; }
+        .tag-projects   { background: #e17055; }
+
+        /* Flow */
+        .section-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #6c5ce7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .flow-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 22px;
+        }
+
+        .flow-step {
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-align: center;
+            flex: 1 1 auto;
+            min-width: 120px;
+        }
+
+        .tool-card:nth-child(1) .flow-step { background: #ede9fe; color: #5b21b6; }
+        .tool-card:nth-child(2) .flow-step { background: #dbeafe; color: #1e40af; }
+        .tool-card:nth-child(3) .flow-step { background: #d1fae5; color: #065f46; }
+        .tool-card:nth-child(4) .flow-step { background: #fee2e2; color: #991b1b; }
+
+        .flow-arrow {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #aaa;
+            padding: 0 6px;
+            flex-shrink: 0;
+        }
+
+        /* How to make */
+        .howto {
+            background: #f0fdf4;
+            border-radius: 14px;
+            padding: 18px 22px;
+            border-left: 4px solid #22c55e;
+        }
+
+        .howto-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #16a34a;
+            margin-bottom: 8px;
+        }
+
+        .howto ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .howto ul li {
+            font-size: 0.88rem;
+            color: #444;
+            padding: 3px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .howto ul li::before {
+            content: "\2714";
+            position: absolute;
+            left: 0;
+            color: #22c55e;
+            font-weight: 700;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 32px 16px 40px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .footer span {
+            color: #6c5ce7;
+            font-weight: 700;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .header h1 { font-size: 1.4rem; }
+            .flow-container { flex-direction: column; align-items: stretch; }
+            .flow-arrow { transform: rotate(90deg); text-align: center; padding: 2px 0; }
+            .flow-step { min-width: unset; }
+            .tool-body { padding: 0 18px 22px; }
+            .tool-card-header { padding: 18px 18px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>全体・管理系ツール 図解</h1>
+    <p>いのっちのClaude Code活用事例 -- eBay/Carousellせどり</p>
+    <div class="subtitle">リベシティ発 -- 4つのツールの仕組みと作り方</div>
+</div>
+
+<div class="container">
+
+    <!-- Tool 1 -->
+    <div class="tool-card">
+        <div class="tool-card-header">
+            <div class="tool-number">1</div>
+            <h2>AI戦略会議チーム</h2>
+        </div>
+        <div class="tool-body">
+            <div class="tags">
+                <span class="tag tag-claude">Claude</span>
+                <span class="tag tag-projects">Projects</span>
+            </div>
+            <p class="tool-description">Claude上にCEO・eBay専門家・経理・リスク管理・AI効率化・投資家・リアリストの7役のペルソナを設定し、事業の意思決定をAIチームで壁打ちする。</p>
+
+            <div class="section-label">フロー</div>
+            <div class="flow-container">
+                <div class="flow-step">議題を投げる</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">7人のAIが各役割の視点でコメント</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">多角的な意見が出揃う</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">意思決定</div>
+            </div>
+
+            <div class="howto">
+                <div class="howto-title">作り方</div>
+                <ul>
+                    <li>Claude Projectsに7つのペルソナを設定したSystem Promptを作成</li>
+                    <li>各ペルソナに役割・性格・意見の方向性を定義</li>
+                    <li>「この議題について全員の意見を出して」と指示するだけ</li>
+                    <li>CLAUDE.mdやProject instructionsに書くのがベスト</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tool 2 -->
+    <div class="tool-card">
+        <div class="tool-card-header">
+            <div class="tool-number">2</div>
+            <h2>出品URLまとめ収集（Chrome拡張）</h2>
+        </div>
+        <div class="tool-body">
+            <div class="tags">
+                <span class="tag tag-chrome">Chrome拡張</span>
+                <span class="tag tag-gas">GAS</span>
+                <span class="tag tag-spreadsheet">スプレッドシート</span>
+                <span class="tag tag-claudecode">Claude Code</span>
+            </div>
+            <p class="tool-description">1つのブラウザウィンドウで開いている複数タブのURLをまとめて、スプレッドシートの出品リストシートに自動保存。</p>
+
+            <div class="section-label">フロー</div>
+            <div class="flow-container">
+                <div class="flow-step">複数タブで商品ページを開く</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">Chrome拡張のボタンをクリック</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">全タブのURL+タイトルを取得</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">GAS WebアプリにPOST</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">スプシに一括保存</div>
+            </div>
+
+            <div class="howto">
+                <div class="howto-title">作り方</div>
+                <ul>
+                    <li>Chrome拡張のpopup.jsでchrome.tabs.query()により全タブ情報を取得</li>
+                    <li>GASのdoPost()でスプシに書き込み</li>
+                    <li>manifest.json(v3)でtabs権限を設定</li>
+                    <li>Claude Codeでコード生成</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tool 3 -->
+    <div class="tool-card">
+        <div class="tool-card-header">
+            <div class="tool-number">3</div>
+            <h2>よく使うスプレッドシート一覧をすぐ表示（Chrome拡張）</h2>
+        </div>
+        <div class="tool-body">
+            <div class="tags">
+                <span class="tag tag-chrome">Chrome拡張</span>
+                <span class="tag tag-claudecode">Claude Code</span>
+            </div>
+            <p class="tool-description">ツールバーのアイコンをクリックするだけで、よく使うスプレッドシートの一覧が表示され、ワンクリックで開ける。</p>
+
+            <div class="section-label">フロー</div>
+            <div class="flow-container">
+                <div class="flow-step">ツールバーのアイコンをクリック</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">ポップアップにスプシ一覧が表示</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">クリックで該当スプシを新しいタブで開く</div>
+            </div>
+
+            <div class="howto">
+                <div class="howto-title">作り方</div>
+                <ul>
+                    <li>Chrome拡張のpopup.htmlにスプシ名とURLのリストをハードコード</li>
+                    <li>シンプルなHTMLとCSSだけで構成</li>
+                    <li>追加・変更は「○○を追加して」とClaude Codeに言うだけ</li>
+                    <li>ファイルはGoogle Driveに保存 → 複数PCで共有</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tool 4 -->
+    <div class="tool-card">
+        <div class="tool-card-header">
+            <div class="tool-number">4</div>
+            <h2>Mac mini ストレージ整理</h2>
+        </div>
+        <div class="tool-body">
+            <div class="tags">
+                <span class="tag tag-claudecode">Claude Code</span>
+                <span class="tag tag-mac">Mac</span>
+            </div>
+            <p class="tool-description">Claude Codeにストレージの分析と整理を依頼し、1.2GB → 75GBまで空き容量を回復。</p>
+
+            <div class="section-label">フロー</div>
+            <div class="flow-container">
+                <div class="flow-step">Claude Codeに「ストレージ整理して」と依頼</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">ディスク使用量を分析</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">バックアップ・写真をSSDへ移動提案</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">VM・キャッシュ・ログ類を削除</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">+74GB回復</div>
+            </div>
+
+            <div class="howto">
+                <div class="howto-title">作り方</div>
+                <ul>
+                    <li>Claude Codeに「Macのストレージを分析して、不要なファイルを特定して整理して」と依頼</li>
+                    <li>du -shやfindコマンドで大容量ファイルを特定</li>
+                    <li>移動・削除の提案を確認して承認・実行</li>
+                    <li>プログラミング不要、Claude Codeとの対話だけで完結</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="footer">
+    Made with <span>Claude Code</span> | いのっち@eBayせどりフルタイム挑戦中
+</div>
+
+</body>
+</html>

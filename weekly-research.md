@@ -15,6 +15,7 @@
 - Claude部（クロードぶ）: https://libecity.com/room_list?room_id=GHpVBIsVIHdB2seJlnj8
 - ClaudeCodeチャット: https://libecity.com/room_list?room_id=z8uDdhQxdlMzEBop9JUf
 - 輸出入部ebay輸出分室: https://libecity.com/room_list?room_id=GVll0aSf9EhA32IzEanB
+- せどり部: https://libecity.com/room_list?room_id=i7GQ68zkGFMG5AlCIXr0fGZ0hji1
 
 各チャットルームについて：
 1. ChromeのAppleScript経由でURLを開く

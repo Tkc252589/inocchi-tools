@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude活用事例 - 週次コミュニティリサーチ自動化</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+  .card {
+    width: 800px;
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+  .header {
+    background: linear-gradient(135deg, #6c5ce7, #1a73e8);
+    color: #fff;
+    padding: 36px 40px 28px;
+    position: relative;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 0; right: 0;
+    height: 40px;
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+  }
+  .header-label {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .header h1 { font-size: 24px; font-weight: 900; line-height: 1.4; margin-bottom: 6px; }
+  .header p { font-size: 14px; opacity: 0.85; }
+  .body { padding: 20px 40px 36px; }
+
+  .problem {
+    background: #fff3e0;
+    border-left: 4px solid #f9ab00;
+    border-radius: 0 12px 12px 0;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+  }
+  .problem-title { font-weight: 700; font-size: 15px; color: #e65100; margin-bottom: 8px; }
+  .problem ul { list-style: none; }
+  .problem li { font-size: 14px; color: #555; padding: 3px 0 3px 20px; position: relative; }
+  .problem li::before { content: '>'; position: absolute; left: 0; color: #f9ab00; font-weight: 700; }
+
+  .section-title {
+    font-size: 16px; font-weight: 700; color: #333; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title .dot { width: 8px; height: 8px; background: #6c5ce7; border-radius: 50%; }
+
+  .flow {
+    display: flex; gap: 10px; margin-bottom: 28px; align-items: stretch;
+  }
+  .flow-step {
+    flex: 1; background: #f8f9fa; border-radius: 14px;
+    padding: 18px 14px; text-align: center;
+  }
+  .flow-step.highlight { background: #ede7f6; border: 2px solid #6c5ce7; }
+  .flow-icon { font-size: 28px; margin-bottom: 6px; }
+  .flow-step h3 { font-size: 13px; font-weight: 700; color: #333; margin-bottom: 4px; }
+  .flow-step p { font-size: 11px; color: #666; line-height: 1.5; }
+  .flow-arrow { display: flex; align-items: center; font-size: 18px; color: #6c5ce7; font-weight: 700; flex-shrink: 0; }
+
+  .targets {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 28px;
+  }
+  .target {
+    background: #f8f9fa; border-radius: 10px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .target-icon { font-size: 24px; flex-shrink: 0; }
+  .target-name { font-size: 13px; font-weight: 600; color: #333; }
+  .target-sub { font-size: 11px; color: #888; }
+
+  .kpi-row { display: flex; gap: 10px; margin-bottom: 28px; }
+  .kpi {
+    flex: 1; text-align: center;
+    background: linear-gradient(135deg, #f8f9fa, #ede7f6);
+    border-radius: 12px; padding: 14px 8px;
+  }
+  .kpi-value { font-size: 26px; font-weight: 900; color: #6c5ce7; }
+  .kpi-label { font-size: 10px; color: #888; margin-top: 4px; }
+
+  .output-section { margin-bottom: 28px; }
+  .output-card {
+    background: #f8f9fa; border-radius: 12px; padding: 16px 20px;
+    margin-bottom: 8px; border-left: 4px solid;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .output-card:nth-child(1) { border-color: #6c5ce7; }
+  .output-card:nth-child(2) { border-color: #1a73e8; }
+  .output-card:nth-child(3) { border-color: #0f9d58; }
+  .output-card .out-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+  .output-card h4 { font-size: 13px; font-weight: 700; color: #333; margin-bottom: 2px; }
+  .output-card p { font-size: 11px; color: #666; line-height: 1.5; }
+
+  .prompt-box {
+    background: #1e1e1e; color: #e0e0e0; border-radius: 12px;
+    padding: 20px 24px; font-size: 13px; line-height: 1.7;
+    position: relative; margin-bottom: 28px;
+  }
+  .prompt-box::before {
+    content: 'Claude Code で入力するだけ';
+    position: absolute; top: -10px; left: 16px;
+    background: #6c5ce7; color: #fff; font-size: 11px;
+    padding: 2px 12px; border-radius: 10px; font-weight: 500;
+  }
+  .hl { color: #b39ddb; }
+
+  .time-compare {
+    display: flex; align-items: center; justify-content: center; gap: 24px;
+    background: #f0fdf4; border-radius: 14px; padding: 20px; margin-bottom: 28px;
+  }
+  .time-box { text-align: center; }
+  .time-box .label { font-size: 12px; color: #888; margin-bottom: 4px; }
+  .time-box .value { font-size: 24px; font-weight: 900; }
+  .time-box .value.before { color: #999; }
+  .time-box .value.after { color: #0d904f; }
+  .time-arrow { font-size: 28px; color: #0d904f; }
+  .time-saved { background: #0d904f; color: #fff; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; }
+
+  .points { background: #f8f9fa; border-radius: 14px; padding: 22px 24px; margin-bottom: 24px; }
+  .points ul { list-style: none; }
+  .points li { font-size: 14px; color: #444; padding: 6px 0 6px 28px; position: relative; line-height: 1.6; }
+  .points li::before { content: '✓'; position: absolute; left: 0; color: #6c5ce7; font-weight: 700; font-size: 16px; }
+
+  .howto {
+    background: #ede7f6; border-radius: 14px; padding: 22px 24px; margin-bottom: 24px;
+  }
+  .howto h3 { font-size: 15px; font-weight: 700; color: #6c5ce7; margin-bottom: 12px; }
+  .howto ol { padding-left: 20px; }
+  .howto li { font-size: 13px; color: #444; padding: 4px 0; line-height: 1.6; }
+  .howto code {
+    background: #1e1e1e; color: #b39ddb; padding: 2px 8px;
+    border-radius: 4px; font-size: 12px;
+  }
+
+  .footer {
+    text-align: center; padding: 20px;
+    border-top: 1px solid #eee; color: #aaa; font-size: 12px;
+  }
+  .footer strong { color: #6c5ce7; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <div class="header-label">Claude Code 活用事例</div>
+    <h1>コミュニティの活用事例を<br>毎週自動でリサーチ＆まとめる仕組み</h1>
+    <p>Claude Code × Chrome連携で、リベシティのチャット5部屋を自動巡回</p>
+  </div>
+
+  <div class="body">
+    <div class="problem">
+      <div class="problem-title">こんな課題がありました</div>
+      <ul>
+        <li>コミュニティに有益な活用事例が散らばっているが、追いきれない</li>
+        <li>どのチャットに何が投稿されたか把握しきれない</li>
+        <li>自分の事業に関連する事例だけを効率よく収集したい</li>
+        <li>スキルマーケットやオフ会に活かせるネタを定期的に仕入れたい</li>
+      </ul>
+    </div>
+
+    <div class="section-title"><div class="dot"></div>巡回するチャット（5部屋）</div>
+    <div class="targets">
+      <div class="target">
+        <div class="target-icon">💬</div>
+        <div>
+          <div class="target-name">eBay x Claude チャット</div>
+          <div class="target-sub">eBay効率化の最前線</div>
+        </div>
+      </div>
+      <div class="target">
+        <div class="target-icon">🤖</div>
+        <div>
+          <div class="target-name">Claude部（クロードぶ）</div>
+          <div class="target-sub">全ジャンルのClaude活用</div>
+        </div>
+      </div>
+      <div class="target">
+        <div class="target-icon">💻</div>
+        <div>
+          <div class="target-name">ClaudeCodeチャット</div>
+          <div class="target-sub">Claude Code技術情報</div>
+        </div>
+      </div>
+      <div class="target">
+        <div class="target-icon">📦</div>
+        <div>
+          <div class="target-name">輸出入部 eBay輸出分室</div>
+          <div class="target-sub">中古せどり自動化コミュニティ</div>
+        </div>
+      </div>
+      <div class="target">
+        <div class="target-icon">🏷️</div>
+        <div>
+          <div class="target-name">せどり部</div>
+          <div class="target-sub">せどり全般の情報交換</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title"><div class="dot"></div>やったこと（3ステップ）</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-icon">🔑</div>
+        <h3>STEP 1</h3>
+        <h3>Chromeでログイン</h3>
+        <p>リベシティに<br>ログインしておく</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step highlight">
+        <div class="flow-icon">🤖</div>
+        <h3>STEP 2</h3>
+        <h3>コマンド1行</h3>
+        <p>/user:weekly-research<br>と入力するだけ</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">📊</div>
+        <h3>STEP 3</h3>
+        <h3>まとめ完成</h3>
+        <p>リンク付きHTMLで<br>活用事例一覧が完成</p>
+      </div>
+    </div>
+
+    <div class="section-title"><div class="dot"></div>実際のコマンド</div>
+    <div class="prompt-box">
+      <span class="hl">/user:weekly-research</span><br><br>
+      これだけで Claude Code が自動的に：<br>
+      1. Chromeの5つのチャットルームを巡回<br>
+      2. 物販関連キーワードで投稿を抽出<br>
+      3. 優先度・関連度付きでHTMLにまとめ<br>
+      4. 各投稿への検索ヒント付きリンクを生成
+    </div>
+
+    <div class="section-title"><div class="dot"></div>初回調査の結果（サンプル）</div>
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-value">5</div>
+        <div class="kpi-label">巡回チャット</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">19</div>
+        <div class="kpi-label">抽出した活用事例</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">6</div>
+        <div class="kpi-label">未解決の課題</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">11</div>
+        <div class="kpi-label">図書館関連記事</div>
+      </div>
+    </div>
+
+    <div class="section-title"><div class="dot"></div>生成されるまとめページ</div>
+    <div class="output-section">
+      <div class="output-card">
+        <div class="out-icon">📋</div>
+        <div>
+          <h4>活用事例カード（リンク＆検索ヒント付き）</h4>
+          <p>投稿者・日付・内容・関連度★をカード形式で一覧表示。<br>「チャットを開く →」+「🔍 チャット内検索: キーワード」で該当投稿にすぐたどり着ける</p>
+        </div>
+      </div>
+      <div class="output-card">
+        <div class="out-icon">💡</div>
+        <div>
+          <h4>未解決課題リスト（= ビジネスチャンス）</h4>
+          <p>コミュニティで困っている人の課題を可視化。スキルマーケットやオフ会のネタに直結</p>
+        </div>
+      </div>
+      <div class="output-card">
+        <div class="out-icon">🎯</div>
+        <div>
+          <h4>アクションプラン（優先順位付き）</h4>
+          <p>今すぐ・今週中・来週・今月中の4段階で、次にやるべきことを整理</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="time-compare">
+      <div class="time-box">
+        <div class="label">手作業で5部屋チェック</div>
+        <div class="value before">1〜2時間</div>
+      </div>
+      <div class="time-arrow">→</div>
+      <div class="time-box">
+        <div class="label">Claude Codeで自動巡回</div>
+        <div class="value after">約5分</div>
+      </div>
+      <div class="time-saved">90%以上の時短</div>
+    </div>
+
+    <div class="section-title"><div class="dot"></div>この事例のポイント</div>
+    <div class="points">
+      <ul>
+        <li>Chrome × AppleScriptでログイン済みのページを自動読み取り</li>
+        <li>物販関連の30以上のキーワードで自動フィルタリング</li>
+        <li>毎週コマンド1行で最新の活用事例を収集できる</li>
+        <li>まとめページから元の投稿に検索ヒント付きで飛べる</li>
+        <li>GitHub Pagesで公開 → チームメンバーにURLを共有するだけ</li>
+      </ul>
+    </div>
+
+    <div class="howto">
+      <h3>自分でも使いたい人へ（セットアップ手順）</h3>
+      <ol>
+        <li>Claude Code をインストール</li>
+        <li><code>~/.claude/commands/</code> フォルダに <a href="https://tkc252589.github.io/inocchi-tools/weekly-research.md" target="_blank" style="color:#6c5ce7;">weekly-research.md</a> を保存</li>
+        <li>Chrome → 表示 → デベロッパー → 「Apple EventsからのJavaScriptを許可」をON</li>
+        <li>Chromeでリベシティにログインした状態で <code>/user:weekly-research</code> を実行</li>
+      </ol>
+    </div>
+
+  </div>
+  <div class="footer">
+    Made with <strong>Claude Code</strong> | Claude Code オフ会 & Cowork
+  </div>
+</div>
+</body>
+</html>

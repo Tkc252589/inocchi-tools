@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude オフ会ガイド｜いのっち</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card2: #162032;
+    --teal: #06b6d4;
+    --orange: #f59e0b;
+    --green: #10b981;
+    --pink: #f472b6;
+    --yellow: #fbbf24;
+    --red: #ef4444;
+    --purple: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #334155;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Hiragino Kaku Gothic Pro", "Yu Gothic", "Meiryo", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* ===== スライド共通 ===== */
+  .slide {
+    max-width: 960px;
+    margin: 0 auto 3px;
+    padding: 48px 44px;
+    background: var(--card);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+  .slide-num {
+    position: absolute;
+    top: 16px; right: 24px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .slide-tag {
+    position: absolute;
+    top: 16px; left: 24px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 20px;
+    background: var(--card2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  h1 { font-size: 42px; font-weight: 800; line-height: 1.3; margin-bottom: 16px; }
+  h2 {
+    font-size: 28px; font-weight: 700;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid var(--teal);
+  }
+  h3 { font-size: 20px; font-weight: 700; margin: 20px 0 10px; }
+  .sub { font-size: 18px; color: var(--muted); margin-bottom: 20px; }
+  .accent { color: var(--teal); }
+  .orange { color: var(--orange); }
+  .green { color: var(--green); }
+  .pink { color: var(--pink); }
+  .yellow { color: var(--yellow); }
+  .red { color: var(--red); }
+  .purple { color: var(--purple); }
+  .bold { font-weight: 700; }
+  .big { font-size: 28px; font-weight: 700; }
+
+  /* カード */
+  .card {
+    background: var(--card2);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 10px 0;
+    border-left: 4px solid var(--teal);
+  }
+  .card.orange-l { border-left-color: var(--orange); }
+  .card.green-l  { border-left-color: var(--green); }
+  .card.pink-l   { border-left-color: var(--pink); }
+  .card.yellow-l { border-left-color: var(--yellow); }
+  .card.red-l    { border-left-color: var(--red); }
+  .card.purple-l { border-left-color: var(--purple); }
+
+  /* グリッド */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) {
+    .grid2, .grid3 { grid-template-columns: 1fr; }
+    h1 { font-size: 30px; }
+    .slide { padding: 32px 20px; }
+  }
+
+  /* テーブル */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { background: #0f172a; color: var(--teal); font-weight: 700; font-size: 13px; }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+  /* プロンプト枠 */
+  .prompt {
+    background: #0c1524;
+    border-left: 4px solid var(--teal);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 12px 0;
+    font-size: 15px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+  }
+  .prompt.or { border-left-color: var(--orange); }
+
+  /* ステップ */
+  .step { display: flex; align-items: flex-start; gap: 16px; margin: 12px 0; }
+  .step-num {
+    flex-shrink: 0;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 18px; color: #0f172a;
+  }
+  .step-num.teal   { background: var(--teal); }
+  .step-num.orange { background: var(--orange); }
+  .step-num.green  { background: var(--green); }
+  .step-num.purple { background: var(--purple); }
+
+  /* 問題→解決 */
+  .qa-row { display: flex; gap: 12px; align-items: stretch; margin: 10px 0; }
+  .qa-q, .qa-a { flex: 1; padding: 14px 18px; border-radius: 8px; font-size: 15px; }
+  .qa-q { background: #1c0a0a; border-left: 4px solid var(--red); }
+  .qa-a { background: #0a1c10; border-left: 4px solid var(--green); }
+  .qa-arrow { display: flex; align-items: center; font-size: 24px; color: var(--orange); font-weight: 700; }
+
+  /* フッター */
+  .footer {
+    margin-top: 24px; padding: 14px 20px;
+    border-radius: 8px; text-align: center; font-weight: 700; font-size: 15px;
+  }
+  .footer.teal   { background: rgba(6,182,212,0.15);   color: var(--teal); }
+  .footer.orange { background: rgba(245,158,11,0.15);  color: var(--orange); }
+  .footer.green  { background: rgba(16,185,129,0.15);  color: var(--green); }
+  .footer.purple { background: rgba(167,139,250,0.15); color: var(--purple); }
+
+  /* note */
+  .note {
+    margin-top: 20px; padding: 12px 18px;
+    background: rgba(148,163,184,0.08);
+    border-radius: 6px; font-size: 13px; color: var(--muted);
+  }
+  .note::before { content: "📝 メモ："; font-weight: 700; }
+
+  /* badge */
+  .badge {
+    display: inline-block;
+    padding: 4px 14px; border-radius: 20px;
+    font-size: 13px; font-weight: 700;
+  }
+
+  /* Before/After */
+  .ba-grid { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; margin: 8px 0; }
+  .ba-before { background: #1c0a0a; border: 1px solid var(--red); border-radius: 10px; padding: 14px; text-align: center; }
+  .ba-after  { background: #0a1c10; border: 1px solid var(--green); border-radius: 10px; padding: 14px; text-align: center; }
+  .ba-before .time { font-size: 1.8em; font-weight: 700; color: var(--red); }
+  .ba-after  .time { font-size: 1.8em; font-weight: 700; color: var(--green); }
+  .ba-label { font-size: 0.8em; color: var(--muted); margin-top: 2px; }
+  .ba-arrow { font-size: 1.8em; color: var(--orange); font-weight: 700; text-align: center; }
+
+  /* 設定ON/OFF */
+  .setting-row { display: flex; align-items: flex-start; gap: 14px; padding: 14px 18px; border-radius: 8px; margin: 8px 0; }
+  .setting-row.off { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); }
+  .setting-row.on  { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); }
+  .s-toggle { font-size: 1.3em; flex-shrink: 0; margin-top: 2px; min-width: 36px; text-align: center; }
+  .s-text h4 { font-size: 0.95em; margin-bottom: 3px; }
+  .s-text p  { font-size: 0.82em; color: var(--muted); }
+
+  /* sharing card */
+  .share-example {
+    background: #0c1a2e;
+    border: 2px solid var(--teal);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin: 12px 0;
+  }
+  .share-example .se-title {
+    font-size: 1em; font-weight: 700; color: var(--teal);
+    margin-bottom: 12px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .share-example.orange-b { border-color: var(--orange); }
+  .share-example.orange-b .se-title { color: var(--orange); }
+  .share-example.green-b { border-color: var(--green); }
+  .share-example.green-b .se-title { color: var(--green); }
+
+  /* キーワードカード */
+  .kw-card {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 18px 20px; border-radius: 10px; margin: 10px 0;
+  }
+  .kw-card.blue   { background: #0d1f38; border-left: 4px solid #4299e1; }
+  .kw-card.green  { background: #0a1c10; border-left: 4px solid var(--green); }
+  .kw-card.orange { background: #1c1000; border-left: 4px solid var(--orange); }
+  .kw-card.purple { background: #150d2a; border-left: 4px solid var(--purple); }
+  .kw-icon { font-size: 2em; flex-shrink: 0; }
+  .kw-body h3 { font-size: 1.05em; margin-bottom: 4px; }
+  .kw-analogy {
+    display: inline-block;
+    background: rgba(255,255,255,0.06);
+    padding: 2px 10px; border-radius: 20px;
+    font-size: 0.78em; color: var(--muted); margin-top: 6px;
+  }
+
+  /* 組織図 */
+  .org-wrap { text-align: center; padding: 8px; }
+  .org-node {
+    display: inline-block; padding: 12px 20px;
+    border-radius: 10px; font-weight: 600; font-size: 0.9em;
+  }
+  .org-me   { background: #0d1f38; border: 2px solid #4299e1; color: #63b3ed; }
+  .org-boss { background: #150d2a; border: 2px solid var(--purple); color: var(--purple); }
+  .org-staff { background: #0a1c10; border: 2px solid var(--green); color: var(--green); }
+  .org-row { display: flex; justify-content: center; gap: 12px; margin: 8px 0; flex-wrap: wrap; }
+  .org-line { text-align: center; color: var(--border); font-size: 1.5em; }
+  .skill-tag {
+    display: inline-block; background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border); border-radius: 5px;
+    padding: 1px 7px; font-size: 0.75em; color: var(--muted); margin: 2px;
+  }
+
+  /* プロフ */
+  .profile-hero {
+    background: linear-gradient(135deg, #0d1f38 0%, #150d2a 100%);
+    border-radius: 16px;
+    padding: 32px 36px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .profile-hero::before {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(6,182,212,0.15), transparent 70%);
+    border-radius: 50%;
+  }
+  .profile-avatar {
+    width: 88px; height: 88px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 16px;
+    background: #fff;
+    border: 3px solid rgba(6,182,212,0.4);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .profile-avatar svg {
+    width: 100%; height: 100%;
+  }
+  .profile-name { font-size: 1.6em; font-weight: 800; margin-bottom: 4px; }
+  .profile-sub  { font-size: 0.9em; color: var(--muted); margin-bottom: 16px; }
+  .timeline {
+    display: flex; flex-direction: column; gap: 0;
+    border-left: 2px solid var(--border); padding-left: 20px; margin-top: 16px;
+  }
+  .tl-item { position: relative; padding: 8px 0 8px; font-size: 0.88em; }
+  .tl-item::before {
+    content: '';
+    position: absolute; left: -26px; top: 14px;
+    width: 10px; height: 10px;
+    border-radius: 50%; background: var(--teal); border: 2px solid var(--bg);
+  }
+  .tl-item.current::before { background: var(--orange); }
+  .tl-date { color: var(--muted); font-size: 0.85em; margin-bottom: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ===== Slide 0: タイトル ===== -->
+<div class="slide" style="text-align:center; justify-content:center; background: linear-gradient(160deg, #0f172a 0%, #1a1040 100%);">
+  <div class="slide-num">0 / 16</div>
+  <div style="margin-bottom:16px;">
+    <span class="badge" style="background:rgba(6,182,212,0.2); color:var(--teal); border:1px solid var(--teal);">🤖 Claude オフ会</span>
+  </div>
+  <h1 style="font-size:38px;">Claude で<br><span class="accent">業務を楽にする</span><br>みんなで図解シェア会</h1>
+  <p class="sub" style="margin-top:16px;">Chat → Cowork → Code → Terminal まで一通り触った話と<br>今日やること・使い方ガイド</p>
+  <div style="display:flex; justify-content:center; gap:12px; margin:24px 0; flex-wrap:wrap;">
+    <span class="badge" style="background:var(--card2); border:1px solid var(--border);">Chat</span>
+    <span class="badge" style="background:var(--card2); border:1px solid var(--orange);">Cowork</span>
+    <span class="badge" style="background:var(--card2); border:1px solid var(--pink);">Code</span>
+    <span class="badge" style="background:var(--card2); border:1px solid var(--muted);">Terminal</span>
+    <span class="badge" style="background:var(--card2); border:1px solid var(--yellow);">Chrome</span>
+  </div>
+  <p style="color:var(--yellow); font-style:italic;">「PCに秘書チームが住み着いてくれるようなもの」🧚</p>
+</div>
+
+<!-- ===== Slide 1: 自己紹介 ===== -->
+<div class="slide">
+  <div class="slide-num">1 / 16</div>
+  <div class="slide-tag">自己紹介</div>
+
+  <h2>はじめまして！</h2>
+
+  <div class="profile-hero">
+    <div class="profile-avatar">
+      <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#4caf87" stroke-linecap="round" stroke-linejoin="round">
+        <!-- hair -->
+        <path d="M60 75 Q55 40 80 30 Q100 20 125 28 Q150 36 148 65" stroke-width="4.5" fill="#a8e6c8"/>
+        <path d="M58 72 Q50 55 62 40 Q72 28 90 24" stroke-width="3.5"/>
+        <path d="M148 65 Q155 50 148 38 Q138 25 122 22" stroke-width="3.5"/>
+        <path d="M62 68 Q60 48 72 36 Q85 24 105 22 Q128 21 142 34 Q154 46 150 66" stroke-width="3"/>
+        <!-- ears -->
+        <path d="M60 105 Q48 105 47 115 Q46 125 58 127" stroke-width="4"/>
+        <path d="M140 105 Q152 105 153 115 Q154 125 142 127" stroke-width="4"/>
+        <!-- head outline -->
+        <path d="M60 80 Q56 140 65 160 Q78 185 100 188 Q122 185 135 160 Q144 140 140 80 Q130 65 100 63 Q70 65 60 80Z" stroke-width="4.5"/>
+        <!-- eyes -->
+        <ellipse cx="83" cy="115" rx="4" ry="4.5" fill="#4caf87" stroke="none"/>
+        <ellipse cx="117" cy="115" rx="4" ry="4.5" fill="#4caf87" stroke="none"/>
+        <!-- nose -->
+        <ellipse cx="100" cy="132" rx="2.5" ry="2.5" fill="#4caf87" stroke="none"/>
+        <!-- smile -->
+        <path d="M78 148 Q100 168 122 148" stroke-width="4.5"/>
+        <!-- neck -->
+        <path d="M85 187 Q80 200 75 210" stroke-width="4"/>
+        <path d="M115 187 Q120 200 125 210" stroke-width="4"/>
+        <!-- shoulders -->
+        <path d="M75 210 Q50 215 30 225" stroke-width="4.5"/>
+        <path d="M125 210 Q150 215 170 225" stroke-width="4.5"/>
+      </svg>
+    </div>
+    <div class="profile-name">いのっち</div>
+    <div class="profile-sub">eBayせどり フルタイム挑戦中</div>
+
+    <div class="grid2" style="margin-bottom:20px;">
+      <div>
+        <div class="card" style="margin:0; padding:14px 16px;">
+          <p style="font-size:0.82em; color:var(--muted); margin-bottom:4px;">サラリーマン時代</p>
+          <p style="font-size:0.93em;">業務効率化・改善プロジェクトに<br>エンジニアとしてではなく<br><span class="orange bold">現場担当者として関わる</span></p>
+        </div>
+      </div>
+      <div>
+        <div class="card orange-l" style="margin:0; padding:14px 16px;">
+          <p style="font-size:0.82em; color:var(--muted); margin-bottom:4px;">今</p>
+          <p style="font-size:0.93em;">eBayせどりで稼ぎながら<br>Claudeをフル活用して<br><span class="orange bold">雑事をどんどん任せてる</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-date">〜 2025年10月</div>
+        ChatGPT使いながらeBayせどり試行錯誤中
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2025年11月</div>
+        <span class="accent bold">Claudeを触り始める</span>（まずclaude.aiでチャット）
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2025年12月〜</div>
+        <span class="orange bold">Cowork</span> でファイル整理・情報収集を自動化
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2026年1〜2月</div>
+        <span class="pink bold">Claude Code</span>（デスクトップ）で本格的な業務自動化へ
+      </div>
+      <div class="tl-item current">
+        <div class="tl-date">2026年3〜4月（今）</div>
+        <span class="yellow bold">Terminal版 ＋ Claude in Chrome</span> まで一通り制覇！
+      </div>
+    </div>
+  </div>
+
+  <div class="footer teal">非エンジニアでも、触ってれば半年でここまで来れた！</div>
+</div>
+
+<!-- ===== Slide 2: 今日やること ===== -->
+<div class="slide">
+  <div class="slide-num">2 / 16</div>
+  <div class="slide-tag">今日のテーマ</div>
+  <h2>今日やること</h2>
+
+  <!-- BIG FLOW -->
+  <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin:0 0 28px; flex-wrap:wrap;">
+    <div style="text-align:center; background:#0d1f38; border:2px solid #4299e1; border-radius:14px; padding:18px 22px; min-width:140px;">
+      <div style="font-size:2em; margin-bottom:6px;">🙋</div>
+      <p style="font-weight:700; color:#63b3ed; font-size:0.95em;">自分の体験</p>
+      <p style="font-size:0.78em; color:var(--muted); margin-top:4px;">Claudeを使って<br>やってみたこと</p>
+    </div>
+    <div style="font-size:2em; color:var(--orange); font-weight:700;">→</div>
+    <div style="text-align:center; background:#1c1000; border:2px solid var(--orange); border-radius:14px; padding:18px 22px; min-width:140px;">
+      <div style="font-size:2em; margin-bottom:6px;">📇</div>
+      <p style="font-weight:700; color:var(--orange); font-size:0.95em;">カード1枚に<br>まとめる</p>
+      <p style="font-size:0.78em; color:var(--muted); margin-top:4px;">4つの項目を<br>埋めるだけ</p>
+    </div>
+    <div style="font-size:2em; color:var(--orange); font-weight:700;">→</div>
+    <div style="text-align:center; background:#0a1c10; border:2px solid var(--green); border-radius:14px; padding:18px 22px; min-width:140px;">
+      <div style="font-size:2em; margin-bottom:6px;">📢</div>
+      <p style="font-weight:700; color:var(--green); font-size:0.95em;">コミュに<br>シェア！</p>
+      <p style="font-size:0.78em; color:var(--muted); margin-top:4px;">リベシティに<br>投稿</p>
+    </div>
+  </div>
+
+  <!-- WHAT TO SHARE -->
+  <p style="color:var(--yellow); font-weight:700; font-size:1em; margin-bottom:10px;">✅ 何を共有すればいいの？→ これだけ！</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+    <div style="background:#1c1000; border-left:4px solid var(--orange); border-radius:8px; padding:14px 16px; font-size:0.88em;">
+      <p class="orange bold" style="margin-bottom:4px;">① 何をやったか</p>
+      <p style="color:var(--muted);">「メール下書きを頼んだ」<br>「在庫リストを作ってもらった」</p>
+    </div>
+    <div style="background:#0a1c10; border-left:4px solid var(--green); border-radius:8px; padding:14px 16px; font-size:0.88em;">
+      <p class="green bold" style="margin-bottom:4px;">② どう変わったか</p>
+      <p style="color:var(--muted);">「30分 → 2分になった」<br>「毎回やってた作業が消えた」</p>
+    </div>
+    <div style="background:#0d1f38; border-left:4px solid #4299e1; border-radius:8px; padding:14px 16px; font-size:0.88em;">
+      <p style="color:#63b3ed; font-weight:700; margin-bottom:4px;">③ 使ったモード</p>
+      <p style="color:var(--muted);">Chat / Cowork / Code<br>Terminal / Chrome　どれでもOK</p>
+    </div>
+    <div style="background:#150d2a; border-left:4px solid var(--purple); border-radius:8px; padding:14px 16px; font-size:0.88em;">
+      <p class="purple bold" style="margin-bottom:4px;">④ ひとこと感想</p>
+      <p style="color:var(--muted);">「最初は難しかったけど…」<br>「こうしたら上手くいった！」</p>
+    </div>
+  </div>
+
+  <div style="background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.3); border-radius:10px; padding:12px 16px; margin-top:14px; font-size:0.88em;">
+    <span class="yellow bold">💡 「大した話じゃない…」は全員が思う。でもその小さな体験が一番参考になる！</span>
+  </div>
+
+  <div class="footer purple">次のスライドで「記入例」を見てみよう →</div>
+</div>
+
+<!-- ===== Slide 3: 図解テンプレート ===== -->
+<div class="slide">
+  <div class="slide-num">3 / 16</div>
+  <div class="slide-tag">記入テンプレート</div>
+  <h2>📇 シェアカードのテンプレート</h2>
+  <p style="color:var(--muted); margin-bottom:18px;">この4項目を埋めるだけ。むずかしく考えなくてOK！</p>
+
+  <!-- TEMPLATE CARD -->
+  <div style="background:#0c1a2e; border:2px solid var(--teal); border-radius:16px; padding:24px; position:relative;">
+    <div style="position:absolute; top:-14px; left:24px; background:var(--teal); color:#0f172a; font-weight:700; font-size:0.82em; padding:4px 16px; border-radius:20px;">シェアカード テンプレート</div>
+
+    <!-- Item 1 -->
+    <div style="display:flex; gap:12px; align-items:flex-start; margin-bottom:14px;">
+      <div style="background:var(--orange); color:#0f172a; font-weight:800; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0.9em;">①</div>
+      <div style="flex:1;">
+        <p style="font-weight:700; color:var(--orange); font-size:0.9em; margin-bottom:4px;">何をやったか（1行でOK）</p>
+        <div style="background:#1c1000; border:1px dashed rgba(245,158,11,0.4); border-radius:6px; padding:10px 14px; font-size:0.88em; color:var(--muted);">例：「毎朝のメールチェックをClaudeに任せた」</div>
+      </div>
+    </div>
+
+    <!-- Item 2 -->
+    <div style="display:flex; gap:12px; align-items:flex-start; margin-bottom:14px;">
+      <div style="background:var(--green); color:#0f172a; font-weight:800; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0.9em;">②</div>
+      <div style="flex:1;">
+        <p style="font-weight:700; color:var(--green); font-size:0.9em; margin-bottom:4px;">Before → After（時間や手間がどう変わったか）</p>
+        <div style="background:#0a1c10; border:1px dashed rgba(16,185,129,0.4); border-radius:6px; padding:10px 14px; display:flex; gap:10px; align-items:center; font-size:0.88em;">
+          <div style="text-align:center; color:var(--red);">以前<br><span style="font-size:1.5em; font-weight:700;">__分</span></div>
+          <div style="color:var(--orange); font-size:1.5em; font-weight:700;">→</div>
+          <div style="text-align:center; color:var(--green);">今<br><span style="font-size:1.5em; font-weight:700;">__分</span></div>
+          <div style="color:var(--muted); font-size:0.85em;">（「楽になった」だけでもOK）</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item 3 -->
+    <div style="display:flex; gap:12px; align-items:flex-start; margin-bottom:14px;">
+      <div style="background:#4299e1; color:#0f172a; font-weight:800; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0.9em;">③</div>
+      <div style="flex:1;">
+        <p style="font-weight:700; color:#63b3ed; font-size:0.9em; margin-bottom:4px;">使ったモード</p>
+        <div style="background:#0d1f38; border:1px dashed rgba(66,153,225,0.4); border-radius:6px; padding:10px 14px; display:flex; gap:8px; flex-wrap:wrap; font-size:0.82em;">
+          <span style="padding:3px 12px; border-radius:20px; border:1px solid var(--border); color:var(--muted);">Chat</span>
+          <span style="padding:3px 12px; border-radius:20px; border:1px solid var(--orange); color:var(--orange);">Cowork</span>
+          <span style="padding:3px 12px; border-radius:20px; border:1px solid var(--pink); color:var(--pink);">Code</span>
+          <span style="padding:3px 12px; border-radius:20px; border:1px solid var(--muted); color:var(--muted);">Terminal</span>
+          <span style="padding:3px 12px; border-radius:20px; border:1px solid var(--yellow); color:var(--yellow);">Chrome</span>
+          <span style="color:var(--muted); font-size:0.9em; align-self:center;">← 使ったものを丸で囲む</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item 4 -->
+    <div style="display:flex; gap:12px; align-items:flex-start;">
+      <div style="background:var(--purple); color:#0f172a; font-weight:800; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0.9em;">④</div>
+      <div style="flex:1;">
+        <p style="font-weight:700; color:var(--purple); font-size:0.9em; margin-bottom:4px;">ひとこと（気づき・コツ・感想 なんでも）</p>
+        <div style="background:#150d2a; border:1px dashed rgba(167,139,250,0.4); border-radius:6px; padding:10px 14px; font-size:0.88em; color:var(--muted);">例：「最初は失敗したけど、○○したらうまくいった」</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer orange" style="margin-top:16px;">次のスライドで「記入済みの例」を見てみよう →</div>
+</div>
+
+<!-- ===== Slide 4: 図解例（記入済み） ===== -->
+<div class="slide">
+  <div class="slide-num">4 / 16</div>
+  <div class="slide-tag">記入例</div>
+  <h2>📝 記入例を見てみよう！</h2>
+  <p style="color:var(--muted); font-size:0.88em; margin-bottom:16px;">大がかりじゃなくてOK。こんな小さな体験でも十分！</p>
+
+  <!-- 例1 -->
+  <div style="background:#0c1a2e; border:2px solid var(--teal); border-radius:12px; padding:18px 20px; margin-bottom:12px;">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+      <span style="background:var(--teal); color:#0f172a; font-size:0.75em; font-weight:700; padding:3px 12px; border-radius:20px;">記入例①</span>
+      <span style="font-size:0.9em; font-weight:700;">メール下書きを頼んでみた</span>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.83em;">
+      <div style="background:#1c1000; padding:10px 12px; border-radius:8px;">
+        <span class="orange bold">① やったこと：</span><br>取引先へのお礼メールを Cowork に作ってもらった
+      </div>
+      <div style="background:#0a1c10; padding:10px 12px; border-radius:8px;">
+        <span class="green bold">② Before→After：</span><br>
+        <span style="color:var(--red);">20分</span> → <span style="color:var(--green); font-weight:700;">30秒</span>（下書き完成）
+      </div>
+      <div style="background:#0d1f38; padding:10px 12px; border-radius:8px;">
+        <span style="color:#63b3ed; font-weight:700;">③ 使ったモード：</span><br>
+        <span style="color:var(--orange); font-weight:700;">Cowork</span>
+      </div>
+      <div style="background:#150d2a; padding:10px 12px; border-radius:8px;">
+        <span class="purple bold">④ ひとこと：</span><br>最初英語で返ってきた。「日本語で」と足したら解決！
+      </div>
+    </div>
+  </div>
+
+  <!-- 例2 -->
+  <div style="background:#0c1a2e; border:2px solid var(--orange); border-radius:12px; padding:18px 20px; margin-bottom:12px;">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+      <span style="background:var(--orange); color:#0f172a; font-size:0.75em; font-weight:700; padding:3px 12px; border-radius:20px;">記入例②</span>
+      <span style="font-size:0.9em; font-weight:700;">商品の在庫リストを作ってもらった</span>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.83em;">
+      <div style="background:#1c1000; padding:10px 12px; border-radius:8px;">
+        <span class="orange bold">① やったこと：</span><br>eBayの在庫データをCSV形式にまとめてもらった
+      </div>
+      <div style="background:#0a1c10; padding:10px 12px; border-radius:8px;">
+        <span class="green bold">② Before→After：</span><br>
+        <span style="color:var(--red);">1時間</span> → <span style="color:var(--green); font-weight:700;">5分</span>（自動生成）
+      </div>
+      <div style="background:#0d1f38; padding:10px 12px; border-radius:8px;">
+        <span style="color:#63b3ed; font-weight:700;">③ 使ったモード：</span><br>
+        <span style="color:var(--pink); font-weight:700;">Code（デスクトップ）</span>
+      </div>
+      <div style="background:#150d2a; padding:10px 12px; border-radius:8px;">
+        <span class="purple bold">④ ひとこと：</span><br>列名を具体的に書いたら一発でOKだった
+      </div>
+    </div>
+  </div>
+
+  <!-- 例3 シンプル -->
+  <div style="background:#0c1a2e; border:2px solid var(--green); border-radius:12px; padding:18px 20px;">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+      <span style="background:var(--green); color:#0f172a; font-size:0.75em; font-weight:700; padding:3px 12px; border-radius:20px;">記入例③ ミニサイズ版もOK！</span>
+      <span style="font-size:0.9em; font-weight:700;">議事録を整理してもらった</span>
+    </div>
+    <p style="font-size:0.88em; color:var(--muted);">
+      <span class="orange">①</span> 会議メモをそのままコピペして整理を頼んだ　／
+      <span class="green">②</span> 15分 → 1分　／
+      <span style="color:#63b3ed;">③</span> Chat　／
+      <span class="purple">④</span> 箇条書きのメモでも全然OK！
+    </p>
+  </div>
+
+  <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
+    <a href="https://claude.ai/public/artifacts/3468bbab-b247-4824-a9be-b2b54da15c3f" target="_blank"
+       style="display:inline-flex; align-items:center; gap:8px; background:#0c1a2e; border:1px solid var(--teal); color:var(--teal); padding:10px 18px; border-radius:8px; text-decoration:none; font-size:0.85em; font-weight:700;">
+      🖼️ いのっちの図解サンプルを見る ↗
+    </a>
+    <a href="https://libecity.com/room_list?room_id=NrH0bc7t0m0vCgR2HC95" target="_blank"
+       style="display:inline-flex; align-items:center; gap:8px; background:#1c1000; border:1px solid var(--orange); color:var(--orange); padding:10px 18px; border-radius:8px; text-decoration:none; font-size:0.85em; font-weight:700;">
+      🏠 リベシティ シェア部屋① ↗
+    </a>
+    <a href="https://libecity.com/room_list?room_id=e0rPIXcZ7PTWUzHVE1JL" target="_blank"
+       style="display:inline-flex; align-items:center; gap:8px; background:#0a1c10; border:1px solid var(--green); color:var(--green); padding:10px 18px; border-radius:8px; text-decoration:none; font-size:0.85em; font-weight:700;">
+      🏠 リベシティ シェア部屋② ↗
+    </a>
+  </div>
+</div>
+
+<!-- ===== Slide 5: Claudeの3つのモード ===== -->
+<div class="slide">
+  <div class="slide-num">5 / 16</div>
+  <div class="slide-tag">基礎知識</div>
+  <h2>Claudeには3つ＋αのモードがある</h2>
+  <p style="color:var(--yellow); margin-bottom:20px;">役割がかなり違うので、最初に整理しておこう</p>
+
+  <div class="grid3">
+    <div class="card" style="border-left-color:var(--muted);">
+      <h3 style="color:var(--muted);">🧠 Chat</h3>
+      <p style="font-size:14px; margin-bottom:10px;">相談役。質問・壁打ち・文章作成。作業は自分でやる。</p>
+      <div style="background:rgba(148,163,184,0.1); padding:8px; border-radius:6px; text-align:center; font-size:13px; color:var(--muted);">考える</div>
+    </div>
+    <div class="card orange-l">
+      <h3 class="orange">⚡ Cowork</h3>
+      <p style="font-size:14px; margin-bottom:10px;">相談＋実際の作業まで進めてくれる。初心者に最おすすめ！</p>
+      <div style="background:rgba(245,158,11,0.1); padding:8px; border-radius:6px; text-align:center; font-size:13px; color:var(--orange);">進める</div>
+    </div>
+    <div class="card pink-l">
+      <h3 class="pink">🔧 Code</h3>
+      <p style="font-size:14px; margin-bottom:10px;">Coworkより高機能。複雑な業務・自動化に強い。中〜上級者向き。</p>
+      <div style="background:rgba(244,114,182,0.1); padding:8px; border-radius:6px; text-align:center; font-size:13px; color:var(--pink);">深く触る</div>
+    </div>
+  </div>
+
+  <div class="card yellow-l" style="margin-top:14px;">
+    <p class="yellow bold">💡 ＋α の使い方</p>
+    <p style="font-size:13px; color:var(--muted);">
+      <span class="bold text-white" style="color:var(--text);">Claude in Chrome：</span>ブラウザ拡張機能。開いているページをそのまま読んで作業できる<br>
+      <span class="bold" style="color:var(--text);">Terminal（CLI）版：</span>コマンドラインから使う。自動化・複数工程の処理に最強
+    </p>
+  </div>
+
+  <div class="footer teal">まずCoworkから → 慣れたらCode → 極めたいならTerminal</div>
+</div>
+
+<!-- ===== Slide 6: 比較表 ===== -->
+<div class="slide">
+  <div class="slide-num">6 / 16</div>
+  <div class="slide-tag">基礎知識</div>
+  <h2>5つのモード 全比較</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>モード</th>
+        <th>使いやすさ</th>
+        <th>向いている人</th>
+        <th>主なできること</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="color:var(--muted); font-weight:700;">Chat</td>
+        <td><span class="green">★★★ 高</span></td>
+        <td>相談・質問したい人</td>
+        <td>壁打ち・文章生成・調査</td>
+      </tr>
+      <tr style="background:rgba(245,158,11,0.05);">
+        <td class="orange bold">Cowork</td>
+        <td><span class="green">★★★ 高</span></td>
+        <td>初心者・まず試したい人</td>
+        <td>ファイル整理・情報収集・実務サポート</td>
+      </tr>
+      <tr>
+        <td class="pink bold">Code（デスクトップ）</td>
+        <td><span class="yellow">★★ 中</span></td>
+        <td>複雑な仕事を任せたい人</td>
+        <td>業務自動化・スキル登録・エージェント構築</td>
+      </tr>
+      <tr>
+        <td style="color:var(--muted); font-weight:700;">Code（CLI）</td>
+        <td style="color:var(--muted);">★ 低</td>
+        <td>上級者・自動化を極めたい人</td>
+        <td>複数工程の自動化・PC作業全体</td>
+      </tr>
+      <tr>
+        <td class="yellow bold">Claude in Chrome</td>
+        <td><span class="green">★★★ 高</span></td>
+        <td>ブラウザ情報を使いたい人</td>
+        <td>ページ要約・情報抽出・ブラウザ操作</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer orange">今日の参加者は「触ってみた人〜使いこなし中の人」まで様々。どのモードでもOK！</div>
+</div>
+
+<!-- ===== Slide 7: Before/After ===== -->
+<div class="slide">
+  <div class="slide-num">7 / 16</div>
+  <div class="slide-tag">効果</div>
+  <h2>実際どれくらい時短になるの？</h2>
+  <p style="color:var(--muted); margin-bottom:16px;">Claude Code を実務で使った実績</p>
+
+  <div class="ba-grid" style="margin-bottom:8px;">
+    <div class="ba-before"><div class="ba-label">朝の業務確認</div><div class="time">30分</div></div>
+    <div class="ba-arrow">→</div>
+    <div class="ba-after"><div class="time">1分</div><div style="font-size:0.75em; background:var(--green); color:#0f172a; padding:2px 8px; border-radius:10px; margin-top:4px; display:inline-block; font-weight:700;">▲29分削減</div></div>
+  </div>
+  <div class="ba-grid" style="margin-bottom:8px;">
+    <div class="ba-before"><div class="ba-label">請求書作成・送付準備</div><div class="time">60分</div></div>
+    <div class="ba-arrow">→</div>
+    <div class="ba-after"><div class="time">2分</div><div style="font-size:0.75em; background:var(--green); color:#0f172a; padding:2px 8px; border-radius:10px; margin-top:4px; display:inline-block; font-weight:700;">▲58分削減</div></div>
+  </div>
+  <div class="ba-grid" style="margin-bottom:8px;">
+    <div class="ba-before"><div class="ba-label">SNS投稿の文案作成</div><div class="time">60分</div></div>
+    <div class="ba-arrow">→</div>
+    <div class="ba-after"><div class="time">5分</div><div style="font-size:0.75em; background:var(--green); color:#0f172a; padding:2px 8px; border-radius:10px; margin-top:4px; display:inline-block; font-weight:700;">▲55分削減</div></div>
+  </div>
+  <div class="ba-grid">
+    <div class="ba-before"><div class="ba-label">顧客への提案書作成</div><div class="time">2時間</div></div>
+    <div class="ba-arrow">→</div>
+    <div class="ba-after"><div class="time">10分</div><div style="font-size:0.75em; background:var(--green); color:#0f172a; padding:2px 8px; border-radius:10px; margin-top:4px; display:inline-block; font-weight:700;">▲1時間50分削減</div></div>
+  </div>
+
+  <div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:12px; padding:20px; text-align:center; margin-top:16px;">
+    <span class="big orange">月に20〜30時間</span>
+    <p style="color:var(--muted); font-size:0.88em; margin-top:4px;">の空き時間が生まれている</p>
+  </div>
+</div>
+
+<!-- ===== Slide 8: 4つのキーワード ===== -->
+<div class="slide">
+  <div class="slide-num">8 / 16</div>
+  <div class="slide-tag">基礎知識</div>
+  <h2>Claude Codeを使うのに覚える言葉は4つ</h2>
+
+  <div class="kw-card blue">
+    <div class="kw-icon">📋</div>
+    <div class="kw-body">
+      <h3>① スキル ＝ 仕事のマニュアル</h3>
+      <p style="font-size:0.88em; color:var(--muted);">業務手順を日本語で書いたファイル。「毎朝これをやってね」という指示書。</p>
+      <span class="kw-analogy">💡 新人バイトへの業務マニュアル</span>
+    </div>
+  </div>
+  <div class="kw-card green">
+    <div class="kw-icon">🧑‍💼</div>
+    <div class="kw-body">
+      <h3>② エージェント ＝ 担当者</h3>
+      <p style="font-size:0.88em; color:var(--muted);">スキル（マニュアル）を持って働く担当者。「朝会担当」「SNS担当」など役割ごとに作れる。</p>
+      <span class="kw-analogy">💡 マニュアルを受け取って動くスタッフ</span>
+    </div>
+  </div>
+  <div class="kw-card orange">
+    <div class="kw-icon">🔑</div>
+    <div class="kw-body">
+      <h3>③ API ＝ 鍵と鍵穴</h3>
+      <p style="font-size:0.88em; color:var(--muted);">外部サービス（Gmail・Chatworkなど）とClaudeをつなぐ接続権限のこと。</p>
+      <span class="kw-analogy">💡 ホテルの部屋のルームキー</span>
+    </div>
+  </div>
+  <div class="kw-card purple">
+    <div class="kw-icon">🗝️</div>
+    <div class="kw-body">
+      <h3>④ MCP ＝ マスターキー</h3>
+      <p style="font-size:0.88em; color:var(--muted);">複数のAPI（Google全サービスなど）をまとめてClaudeに渡す仕組み。一本で複数の部屋が開く。</p>
+      <span class="kw-analogy">💡 ホテルのマスターキー</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Slide 9: AI秘書チーム組織図 ===== -->
+<div class="slide">
+  <div class="slide-num">9 / 16</div>
+  <div class="slide-tag">基礎知識</div>
+  <h2>AI秘書チームのイメージ</h2>
+
+  <div class="org-wrap" style="margin: 16px 0;">
+    <div class="org-row">
+      <div class="org-node org-me">👤 あなた（社長）</div>
+    </div>
+    <div class="org-line">↕</div>
+    <div class="org-row">
+      <div class="org-node org-boss" style="min-width:200px;">
+        🤖 経営者AI（司令塔）<br>
+        <span style="font-size:0.8em; font-weight:400;">「おはよう」→ タスクを各担当に振り分け</span>
+      </div>
+    </div>
+    <div class="org-line">↕</div>
+    <div class="org-row">
+      <div class="org-node org-staff" style="text-align:center;">
+        📅 スケジュール担当<br>
+        <span class="skill-tag">朝会スキル</span>
+        <span class="skill-tag">日程調整スキル</span>
+      </div>
+      <div class="org-node org-staff" style="text-align:center;">
+        📧 メール担当<br>
+        <span class="skill-tag">返信スキル</span>
+        <span class="skill-tag">仕分けスキル</span>
+      </div>
+      <div class="org-node org-staff" style="text-align:center;">
+        📦 リサーチ担当<br>
+        <span class="skill-tag">商品調査スキル</span>
+        <span class="skill-tag">競合分析スキル</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="font-size:0.88em; text-align:center;">
+    「おはよう」と打つだけで 経営者AI → 各担当 → スキル実行 まで自動で動く
+  </div>
+  <div class="footer teal">プログラミング不要。スキル（日本語の指示書）を書くだけ！</div>
+</div>
+
+<!-- ===== Slide 10: AIへの頼み方 ===== -->
+<div class="slide">
+  <div class="slide-num">10 / 16</div>
+  <div class="slide-tag">使い方</div>
+  <h2>AIへの頼み方、これだけ覚えればOK！</h2>
+
+  <div style="text-align:center; background:#1a0a00; padding:20px; border-radius:10px; border-top:4px solid var(--orange); margin-bottom:20px;">
+    <span class="big orange">ゴール ＋ 制約 ＝ 完璧な依頼</span>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <h3 class="red">❌ NG な頼み方</h3>
+      <div class="card red-l" style="font-size:15px;">
+        「メール書いて」<br><br>
+        <span style="color:var(--muted); font-size:0.9em;">→ ゴールだけ。何文字？誰向け？トーンは？が伝わらない</span>
+      </div>
+    </div>
+    <div>
+      <h3 class="green">✅ OK な頼み方</h3>
+      <div class="card green-l" style="font-size:15px;">
+        「取引先の田中様へお礼メールを<br>
+        　200文字以内・丁寧な敬語で<br>
+        　打ち合わせで決まった新PJの件」
+      </div>
+    </div>
+  </div>
+
+  <div class="card yellow-l" style="margin-top:16px;">
+    <p class="yellow bold">💡 「質問じゃなく、依頼する」</p>
+    <p style="font-size:14px; color:var(--muted);">答えを聞くのではなく、作業を任せるイメージで</p>
+  </div>
+  <div class="card yellow-l">
+    <p class="yellow bold">💡 「最初から全部任せない」</p>
+    <p style="font-size:14px; color:var(--muted);">1ステップずつ確認しながら進めるのがコツ</p>
+  </div>
+</div>
+
+<!-- ===== Slide 11: 初期設定 ===== -->
+<div class="slide">
+  <div class="slide-num">11 / 16</div>
+  <div class="slide-tag">設定</div>
+  <h2>最初にやる設定（5分で完了）</h2>
+  <p style="color:var(--muted); margin-bottom:16px;">強力なツールだからこそ設定が大事。特に🚨は必ず確認！</p>
+
+  <div class="card red-l" style="margin-bottom:16px; display:flex; gap:14px; align-items:flex-start;">
+    <span style="font-size:1.8em; flex-shrink:0;">🚨</span>
+    <div>
+      <p class="red bold">絶対にオフにしてほしい設定が2つあります</p>
+      <p style="font-size:0.85em; color:var(--muted);">オンにすると意図しないファイル削除・危険な操作が確認なしに実行される可能性があります</p>
+    </div>
+  </div>
+
+  <h3 class="red" style="margin-bottom:8px;">❌ 絶対 OFF</h3>
+  <div class="setting-row off">
+    <div class="s-toggle">❌</div>
+    <div class="s-text">
+      <h4>バイパス権限モードを許可</h4>
+      <p>場所：設定 ＞ Claude Code｜危険なコマンドを確認なしに実行してしまう</p>
+    </div>
+  </div>
+  <div class="setting-row off">
+    <div class="s-toggle">❌</div>
+    <div class="s-text">
+      <h4>すべてのブラウザアクションを許可</h4>
+      <p>場所：デスクトップアプリ ＞ 一般｜Claudeがブラウザを自由に操作できてしまう</p>
+    </div>
+  </div>
+  <div class="setting-row off">
+    <div class="s-toggle">❌</div>
+    <div class="s-text">
+      <h4>ロケーションメタデータ ／ Claudeの改善にご協力</h4>
+      <p>場所：設定 ＞ プライバシー｜位置情報・会話内容がAnthropicに送信される</p>
+    </div>
+  </div>
+
+  <h3 class="green" style="margin: 14px 0 8px;">✅ ON にすること</h3>
+  <div class="setting-row on">
+    <div class="s-toggle">✅</div>
+    <div class="s-text">
+      <h4>コード実行</h4>
+      <p>場所：設定 ＞ 機能｜これがないとClaude Codeが本来の力を発揮できない</p>
+    </div>
+  </div>
+  <div class="setting-row on">
+    <div class="s-toggle">✅</div>
+    <div class="s-text">
+      <h4>Claude in Chrome（コネクタ）</h4>
+      <p>場所：設定 ＞ コネクタ｜「Webページを見て調べてきて」が使えるようになる</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Slide 12: よくある質問 ===== -->
+<div class="slide">
+  <div class="slide-num">12 / 16</div>
+  <div class="slide-tag">FAQ</div>
+  <h2>よくある質問</h2>
+
+  <div class="qa-row">
+    <div class="qa-q">❓ 無料で使えないの？</div>
+    <div class="qa-arrow">→</div>
+    <div class="qa-a">✅ まず Pro（月$22 / 約3,000円）から。「優秀な作業パートナーを雇う」感覚で考えよう</div>
+  </div>
+  <div class="qa-row">
+    <div class="qa-q">❓ スマホだけで使えない？</div>
+    <div class="qa-arrow">→</div>
+    <div class="qa-a">✅ CoworkはPC前提。「Coworkを使うならPCは必須」と最初から割り切ろう</div>
+  </div>
+  <div class="qa-row">
+    <div class="qa-q">❓ CoworkとCodeは何が違うの？</div>
+    <div class="qa-arrow">→</div>
+    <div class="qa-a">✅ Coworkの方が入りやすい。初心者はCoworkで十分。困ってからCodeに移ればOK</div>
+  </div>
+  <div class="qa-row">
+    <div class="qa-q">❓ ChatGPTは解約しないとダメ？</div>
+    <div class="qa-arrow">→</div>
+    <div class="qa-a">✅ 全然OK。ChatGPTは相談用・Claudeは実行用と使い分けが自然。役割を増やす感覚で</div>
+  </div>
+  <div class="qa-row">
+    <div class="qa-q">❓ MacとWindows、どっちがいい？</div>
+    <div class="qa-arrow">→</div>
+    <div class="qa-a">✅ Macの方が圧倒的に快適。Windowsも使えるが追加設定が必要。Macを持っている方はMacで</div>
+  </div>
+</div>
+
+<!-- ===== Slide 13: 注意点 ===== -->
+<div class="slide">
+  <div class="slide-num">13 / 16</div>
+  <div class="slide-tag">注意点</div>
+  <h2>最初に知っておく注意点</h2>
+
+  <div class="card orange-l"><p class="orange bold">⚠️ 本番データで最初から試さない</p><p style="font-size:14px; color:var(--muted);">→ テスト用のサンプルデータで練習してから</p></div>
+  <div class="card orange-l"><p class="orange bold">⚠️ 大事なファイルはバックアップしてから</p><p style="font-size:14px; color:var(--muted);">→ コピーを作ってから渡すのが安心</p></div>
+  <div class="card orange-l"><p class="orange bold">⚠️ 「なんでも許可」設定はしない</p><p style="font-size:14px; color:var(--muted);">→ AIが何をしているか確認できる状態を保つ</p></div>
+  <div class="card orange-l"><p class="orange bold">⚠️ アウトプットは必ず確認する</p><p style="font-size:14px; color:var(--muted);">→ AIのアウトプットは100%正しくないこともある</p></div>
+
+  <div class="footer orange">😊 AIは優秀だけど、ミスもする。確認の習慣が大事！</div>
+</div>
+
+<!-- ===== Slide 14: 今日の作業タイム ===== -->
+<div class="slide">
+  <div class="slide-num">14 / 16</div>
+  <div class="slide-tag">作業タイム</div>
+  <h2>🖊️ 自分のカードを作ってみよう！</h2>
+  <p style="color:var(--yellow); margin-bottom:16px; font-size:0.9em;">この4項目を埋めるだけ。「小さな体験」でOK！</p>
+
+  <!-- 自分のシェアカード（記入式） -->
+  <div style="background:#0c1a2e; border:2px solid var(--teal); border-radius:16px; padding:22px; position:relative;">
+    <div style="position:absolute; top:-14px; left:24px; background:var(--teal); color:#0f172a; font-weight:700; font-size:0.8em; padding:3px 16px; border-radius:20px;">自分のシェアカード</div>
+
+    <div style="display:flex; gap:10px; align-items:flex-start; margin-bottom:12px;">
+      <div style="background:var(--orange); color:#0f172a; font-weight:800; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0.85em;">①</div>
+      <div style="flex:1; background:#1c1000; border:1px dashed rgba(245,158,11,0.4); border-radius:6px; padding:10px 14px; min-height:38px; font-size:0.88em; color:var(--muted);">
+        <span class="orange">何をやったか：</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; align-items:flex-start; margin-bottom:12px;">
+      <div style="background:var(--green); color:#0f172a; font-weight:800; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0.85em;">②</div>
+      <div style="flex:1; display:flex; gap:8px; align-items:center; background:#0a1c10; border:1px dashed rgba(16,185,129,0.4); border-radius:6px; padding:10px 14px; min-height:38px; font-size:0.88em; color:var(--muted);">
+        <span class="green">Before：</span><span style="color:var(--red);">___分</span>
+        <span style="color:var(--orange); font-weight:700; font-size:1.2em;">→</span>
+        <span class="green">After：</span><span style="color:var(--green);">___分</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; align-items:flex-start; margin-bottom:12px;">
+      <div style="background:#4299e1; color:#0f172a; font-weight:800; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0.85em;">③</div>
+      <div style="flex:1; background:#0d1f38; border:1px dashed rgba(66,153,225,0.4); border-radius:6px; padding:10px 14px; display:flex; gap:6px; flex-wrap:wrap; font-size:0.8em;">
+        <span style="padding:3px 10px; border-radius:20px; border:1px solid var(--border); color:var(--muted);">Chat</span>
+        <span style="padding:3px 10px; border-radius:20px; border:1px solid var(--orange); color:var(--orange);">Cowork</span>
+        <span style="padding:3px 10px; border-radius:20px; border:1px solid var(--pink); color:var(--pink);">Code</span>
+        <span style="padding:3px 10px; border-radius:20px; border:1px solid var(--muted); color:var(--muted);">Terminal</span>
+        <span style="padding:3px 10px; border-radius:20px; border:1px solid var(--yellow); color:var(--yellow);">Chrome</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; align-items:flex-start;">
+      <div style="background:var(--purple); color:#0f172a; font-weight:800; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0.85em;">④</div>
+      <div style="flex:1; background:#150d2a; border:1px dashed rgba(167,139,250,0.4); border-radius:6px; padding:10px 14px; min-height:38px; font-size:0.88em; color:var(--muted);">
+        <span class="purple">ひとこと：</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHARE LINKS -->
+  <p style="margin-top:18px; margin-bottom:10px; font-weight:700; color:var(--teal); font-size:0.9em;">📤 まとめたらここに投稿しよう！</p>
+  <div style="display:flex; flex-direction:column; gap:8px;">
+    <a href="https://libecity.com/room_list?room_id=NrH0bc7t0m0vCgR2HC95" target="_blank"
+       style="display:flex; align-items:center; gap:10px; background:#1c1000; border:1px solid var(--orange); color:var(--orange); padding:12px 18px; border-radius:8px; text-decoration:none; font-size:0.88em; font-weight:700;">
+      <span style="font-size:1.3em;">🏠</span>
+      <div><div>リベシティ シェア部屋①</div><div style="font-size:0.78em; color:var(--muted); font-weight:400;">libecity.com/room_list?room_id=NrH0bc7t0m0vCgR2HC95</div></div>
+      <span style="margin-left:auto; font-size:0.9em; opacity:0.7;">↗</span>
+    </a>
+    <a href="https://libecity.com/room_list?room_id=e0rPIXcZ7PTWUzHVE1JL" target="_blank"
+       style="display:flex; align-items:center; gap:10px; background:#0a1c10; border:1px solid var(--green); color:var(--green); padding:12px 18px; border-radius:8px; text-decoration:none; font-size:0.88em; font-weight:700;">
+      <span style="font-size:1.3em;">🏠</span>
+      <div><div>リベシティ シェア部屋②</div><div style="font-size:0.78em; color:var(--muted); font-weight:400;">libecity.com/room_list?room_id=e0rPIXcZ7PTWUzHVE1JL</div></div>
+      <span style="margin-left:auto; font-size:0.9em; opacity:0.7;">↗</span>
+    </a>
+    <a href="https://claude.ai/public/artifacts/3468bbab-b247-4824-a9be-b2b54da15c3f" target="_blank"
+       style="display:flex; align-items:center; gap:10px; background:#0c1a2e; border:1px solid var(--teal); color:var(--teal); padding:12px 18px; border-radius:8px; text-decoration:none; font-size:0.88em; font-weight:700;">
+      <span style="font-size:1.3em;">🖼️</span>
+      <div><div>いのっちの図解サンプル（参考）</div><div style="font-size:0.78em; color:var(--muted); font-weight:400;">claude.ai/public/artifacts/3468bbab…</div></div>
+      <span style="margin-left:auto; font-size:0.9em; opacity:0.7;">↗</span>
+    </a>
+  </div>
+</div>
+
+<!-- ===== Slide 15: 次のステップ ===== -->
+<div class="slide">
+  <div class="slide-num">15 / 16</div>
+  <div class="slide-tag">ネクストステップ</div>
+  <h2>今日から試してほしいこと</h2>
+
+  <div class="step">
+    <div class="step-num teal">1</div>
+    <div>
+      <p class="bold accent" style="font-size:17px;">業務の棚卸しをしてみよう</p>
+      <p style="color:var(--muted); font-size:14px;">「毎週やっている作業」を5つ書き出すだけ。書けたら準備完了！</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num orange">2</div>
+    <div>
+      <p class="bold orange" style="font-size:17px;">まずCoworkで1つ試してみる</p>
+      <p style="color:var(--muted); font-size:14px;">メール下書き・議事録整理・リサーチ、何でも小さく試してOK</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num green">3</div>
+    <div>
+      <p class="bold green" style="font-size:17px;">結果をコミュにシェアしよう</p>
+      <p style="color:var(--muted); font-size:14px;">今日作った図解カードをリベシティに投稿！ 誰かの役に立つ</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num purple">4</div>
+    <div>
+      <p class="bold purple" style="font-size:17px;">浮いた時間を稼ぎに使う</p>
+      <p style="color:var(--muted); font-size:14px;">Claudeはツール。時間が生まれたら → 仕事を取りに行く！ これで初めて稼げる</p>
+    </div>
+  </div>
+
+  <div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:12px; padding:20px; text-align:center; margin-top:20px;">
+    <p class="bold orange" style="font-size:1.1em;">Claudeだけでは稼げない</p>
+    <p style="font-size:0.88em; color:var(--muted);">業務棚卸し → 置き換え → 時間を作る → 仕事を取りに行く<br>この順番が大事！</p>
+  </div>
+</div>
+
+<!-- ===== Slide 16: まとめ ===== -->
+<div class="slide" style="text-align:center; background:linear-gradient(160deg,#0f172a 0%,#1a1040 100%);">
+  <div class="slide-num">16 / 16</div>
+  <h2 style="border-bottom-color:var(--purple);">まとめ</h2>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; text-align:left; margin:20px 0;">
+    <div class="card" style="border-left-color:var(--teal);">
+      <p class="accent bold" style="font-size:1em;">1️⃣ プログラミング不要</p>
+      <p style="font-size:0.85em; color:var(--muted); margin-top:6px;">日本語でマニュアルを書いてAIに渡すだけ</p>
+    </div>
+    <div class="card orange-l">
+      <p class="orange bold" style="font-size:1em;">2️⃣ まずCoworkから</p>
+      <p style="font-size:0.85em; color:var(--muted); margin-top:6px;">入りやすい。慣れたらCodeへ進めばOK</p>
+    </div>
+    <div class="card green-l">
+      <p class="green bold" style="font-size:1em;">3️⃣ 覚える言葉は4つ</p>
+      <p style="font-size:0.85em; color:var(--muted); margin-top:6px;">スキル・エージェント・API・MCP</p>
+    </div>
+    <div class="card yellow-l">
+      <p class="yellow bold" style="font-size:1em;">4️⃣ 業務の棚卸しが先</p>
+      <p style="font-size:0.85em; color:var(--muted); margin-top:6px;">何を任せるかが一番大事</p>
+    </div>
+  </div>
+
+  <div style="margin-top:24px; padding:24px; background:rgba(167,139,250,0.1); border-radius:12px; border:1px solid rgba(167,139,250,0.3);">
+    <p style="font-size:1.2em; font-weight:700; color:var(--purple);">今日の体験をコミュへシェア 🎉</p>
+    <p style="font-size:0.88em; color:var(--muted); margin-top:8px;">あなたの「Claude活用法」が誰かの最初の一歩になる！</p>
+  </div>
+
+  <p style="margin-top:28px; font-size:0.85em; color:var(--muted);">いのっち @eBayせどりフルタイム挑戦中 ｜ リベシティ</p>
+</div>
+
+</body>
+</html>

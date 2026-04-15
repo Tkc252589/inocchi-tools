@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>マイクロ法人シミュレーター v2｜いのっち版</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --text: #111827;
+    --text-sub: #6b7280;
+    --accent: #0f766e;
+    --accent-light: #ccfbf1;
+    --accent-dark: #134e4a;
+    --positive: #059669;
+    --negative: #dc2626;
+    --warning: #d97706;
+    --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 960px; margin: 0 auto; }
+  header {
+    text-align: center;
+    padding: 32px 16px 24px;
+  }
+  h1 {
+    font-family: 'Outfit', 'Noto Sans JP', sans-serif;
+    font-size: clamp(24px, 5vw, 32px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  h1 .accent { color: var(--accent); }
+  .subtitle { color: var(--text-sub); font-size: 14px; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent-dark);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-top: 8px;
+  }
+  .mode-tabs {
+    display: flex;
+    gap: 4px;
+    background: #f3f4f6;
+    padding: 4px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .mode-tab {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text-sub);
+    transition: all 0.15s;
+  }
+  .mode-tab.active {
+    background: white;
+    color: var(--text);
+    box-shadow: var(--shadow);
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .card h2 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card h2 .num {
+    width: 22px;
+    height: 22px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+  }
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .field .hint {
+    font-size: 11px;
+    color: var(--text-sub);
+    margin-top: 4px;
+  }
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 480px) {
+    .input-row { grid-template-columns: 1fr; }
+  }
+  input[type="number"], select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    background: white;
+    color: var(--text);
+  }
+  input[type="number"]:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .input-with-unit { position: relative; }
+  .input-with-unit .unit {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--text-sub);
+    pointer-events: none;
+  }
+  .input-with-unit input { padding-right: 40px; }
+  .toggle-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .toggle-btn {
+    flex: 1;
+    min-width: 80px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .toggle-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  .advanced-only { display: none; }
+  body.advanced .advanced-only { display: block; }
+
+  /* 業種カード */
+  .biz-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+  }
+  .biz-card {
+    border: 2px solid var(--border);
+    background: white;
+    border-radius: 10px;
+    padding: 12px 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .biz-card:hover { border-color: var(--accent); }
+  .biz-card.active {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+  .biz-card .icon { font-size: 24px; margin-bottom: 4px; }
+  .biz-card .name { font-size: 12px; font-weight: 600; }
+  .biz-card .desc { font-size: 10px; color: var(--text-sub); margin-top: 2px; }
+
+  /* 経費チェックリスト */
+  .expense-list {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .expense-category {
+    border-bottom: 1px solid var(--border);
+  }
+  .expense-category:last-child { border-bottom: none; }
+  .expense-category-header {
+    background: #f9fafb;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-sub);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .expense-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 10px 14px;
+    border-bottom: 1px solid #f3f4f6;
+    gap: 10px;
+  }
+  .expense-item:last-child { border-bottom: none; }
+  .expense-item label.cb {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    flex: 1;
+    gap: 10px;
+  }
+  .expense-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .expense-item .name {
+    font-size: 13px;
+    font-weight: 500;
+    flex: 1;
+  }
+  .expense-item .desc {
+    font-size: 11px;
+    color: var(--text-sub);
+    margin-top: 2px;
+  }
+  .expense-item .price {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .expense-item .price-input {
+    width: 80px;
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    text-align: right;
+  }
+  .expense-item .price-input:disabled {
+    background: #f3f4f6;
+    color: var(--text-sub);
+  }
+  .expense-summary {
+    background: var(--accent-light);
+    padding: 12px 14px;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: var(--accent-dark);
+  }
+  .expense-summary .total {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+  }
+
+  /* 結果カード */
+  .result-card {
+    background: linear-gradient(135deg, #134e4a 0%, #0f766e 100%);
+    color: white;
+    border: none;
+  }
+  .result-card h2 { color: white; }
+  .result-headline {
+    font-size: 13px;
+    opacity: 0.85;
+    margin-bottom: 4px;
+  }
+  .result-amount {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(32px, 8vw, 48px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+  .result-amount .unit {
+    font-size: 0.45em;
+    font-weight: 500;
+    opacity: 0.8;
+    margin-left: 4px;
+  }
+  .result-amount.positive { color: #6ee7b7; }
+  .result-amount.negative { color: #fca5a5; }
+  .result-meta { margin-top: 12px; font-size: 13px; opacity: 0.9; }
+  .optimal-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-top: 10px;
+  }
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  @media (max-width: 480px) {
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+  .compare-item {
+    background: rgba(255,255,255,0.08);
+    padding: 14px;
+    border-radius: 10px;
+  }
+  .compare-item .label { font-size: 11px; opacity: 0.8; margin-bottom: 4px; }
+  .compare-item .value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+  }
+  .compare-item .sub { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+
+  .breakdown-table {
+    width: 100%;
+    font-size: 13px;
+    border-collapse: collapse;
+  }
+  .breakdown-table th {
+    text-align: left;
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-sub);
+    text-transform: uppercase;
+  }
+  .breakdown-table th.right { text-align: right; }
+  .breakdown-table td {
+    padding: 9px 6px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .breakdown-table td.right {
+    text-align: right;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+  }
+  .breakdown-table tr.total td {
+    font-weight: 700;
+    border-top: 2px solid var(--text);
+    border-bottom: none;
+    padding-top: 12px;
+  }
+
+  details {
+    margin-top: 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  details summary {
+    padding: 12px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    background: #f9fafb;
+    list-style: none;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before {
+    content: '▶';
+    display: inline-block;
+    margin-right: 8px;
+    font-size: 9px;
+    transition: transform 0.2s;
+  }
+  details[open] summary::before { transform: rotate(90deg); }
+  details .content {
+    padding: 14px;
+    font-size: 13px;
+    color: var(--text-sub);
+  }
+  details .content ul { padding-left: 18px; margin: 6px 0; }
+  details .content li { margin-bottom: 4px; }
+
+  footer {
+    text-align: center;
+    padding: 24px 16px;
+    font-size: 11px;
+    color: var(--text-sub);
+  }
+
+  .biz-info {
+    background: #f0fdfa;
+    border-left: 3px solid var(--accent);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--accent-dark);
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>マイクロ法人 <span class="accent">節税シミュレーター</span></h1>
+    <p class="subtitle">個人事業 vs マイクロ法人併用、年間手取りを比較 | v2</p>
+    <div class="badge">⚠️ 概算ツール・正式判断は税理士にご相談を</div>
+  </header>
+
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-mode="simple">シンプル版</button>
+    <button class="mode-tab" data-mode="advanced">上級者版</button>
+  </div>
+
+  <!-- 1. 家族構成 -->
+  <div class="card">
+    <h2><span class="num">1</span>家族構成</h2>
+    <div class="input-row">
+      <div class="field">
+        <label>あなたの年齢</label>
+        <div class="input-with-unit">
+          <input type="number" id="age" value="35" min="18" max="80">
+          <span class="unit">歳</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>配偶者</label>
+        <div class="toggle-group">
+          <button type="button" class="toggle-btn active" data-target="spouse" data-value="1">あり</button>
+          <button type="button" class="toggle-btn" data-target="spouse" data-value="0">なし</button>
+        </div>
+        <input type="hidden" id="spouse" value="1">
+      </div>
+    </div>
+    <div class="input-row">
+      <div class="field">
+        <label>配偶者の年収</label>
+        <div class="input-with-unit">
+          <input type="number" id="spouseIncome" value="0" min="0" step="10">
+          <span class="unit">万円</span>
+        </div>
+        <div class="hint">130万未満なら扶養に入れる</div>
+      </div>
+      <div class="field">
+        <label>子供の人数</label>
+        <div class="input-with-unit">
+          <input type="number" id="children" value="2" min="0" max="10">
+          <span class="unit">人</span>
+        </div>
+        <div class="hint">予定があれば来年見込みでもOK</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 個人事業 -->
+  <div class="card">
+    <h2><span class="num">2</span>個人事業の状況</h2>
+    <div class="input-row">
+      <div class="field">
+        <label>年間売上</label>
+        <div class="input-with-unit">
+          <input type="number" id="revenue" value="3000" min="0" step="100">
+          <span class="unit">万円</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>年間経費</label>
+        <div class="input-with-unit">
+          <input type="number" id="expenses" value="2000" min="0" step="100">
+          <span class="unit">万円</span>
+        </div>
+      </div>
+    </div>
+    <div class="input-row">
+      <div class="field">
+        <label>消費税還付見込み</label>
+        <div class="input-with-unit">
+          <input type="number" id="vatRefund" value="150" min="0" step="10">
+          <span class="unit">万円</span>
+        </div>
+        <div class="hint">輸出免税で受けている還付額</div>
+      </div>
+      <div class="field">
+        <label>青色申告控除</label>
+        <select id="blueDeduction">
+          <option value="65">65万円（電子申告）</option>
+          <option value="55">55万円</option>
+          <option value="10">10万円</option>
+          <option value="0">適用なし</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 法人の業種 -->
+  <div class="card">
+    <h2><span class="num">3</span>マイクロ法人の業種</h2>
+    <div class="biz-grid" id="bizGrid">
+      <!-- JSで生成 -->
+    </div>
+    <input type="hidden" id="bizType" value="consulting">
+
+    <div id="bizInfo" class="biz-info"></div>
+
+    <div class="input-row" style="margin-top: 16px;">
+      <div class="field">
+        <label id="corpRevenueLabel">法人の年間売上</label>
+        <div class="input-with-unit">
+          <input type="number" id="corpRevenue" value="300" min="0" step="10">
+          <span class="unit">万円</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>法人の事業経費（士業費用は除く）</label>
+        <div class="input-with-unit">
+          <input type="number" id="corpExpenses" value="30" min="0" step="10">
+          <span class="unit">万円</span>
+        </div>
+        <div class="hint">家賃・通信・消耗品など</div>
+      </div>
+    </div>
+
+    <div class="field advanced-only">
+      <label>役員報酬を固定したい場合（月額）</label>
+      <div class="input-with-unit">
+        <input type="number" id="fixedSalary" value="0" min="0" step="0.5">
+        <span class="unit">万円</span>
+      </div>
+      <div class="hint">0のままなら自動で最適値を探索します</div>
+    </div>
+  </div>
+
+  <!-- 4. 法人運営費（士業・ツール） -->
+  <div class="card">
+    <h2><span class="num">4</span>法人運営費（チェックして選択）</h2>
+    <div style="font-size:12px;color:var(--text-sub);margin-bottom:10px;background:#f9fafb;padding:8px 10px;border-radius:6px;">
+      💡 「リベ大税理士法人（個人事業主のみ）」「一般税理士」などをチェックすると、<strong>個人事業のみシナリオ</strong>にも自動で経費反映されます。「個人＋マイクロ法人」プランは法人セット価格として法人側に計上されます。
+    </div>
+
+    <div class="expense-list" id="expenseList">
+      <!-- JSで生成 -->
+    </div>
+
+    <div class="expense-summary" style="margin-top: 12px; border-radius: 8px;">
+      <span>年間 法人運営費 合計</span>
+      <span class="total" id="totalRunningCost">0万円</span>
+    </div>
+
+    <details style="margin-top: 12px;">
+      <summary>📋 初期費用（設立時のみ）</summary>
+      <div class="content" id="setupCostInfo">
+        <p style="margin-bottom:8px;">マイクロ法人設立時に発生する一時的な費用です。</p>
+        <ul style="list-style: none; padding-left: 0;" id="setupCostList"></ul>
+      </div>
+    </details>
+  </div>
+
+  <!-- 結果 -->
+  <div class="card result-card">
+    <h2 style="border:none;">📊 シミュレーション結果</h2>
+    <div class="result-headline">マイクロ法人を作ると年間手取りが…</div>
+    <div class="result-amount" id="diffAmount">+0<span class="unit">万円</span></div>
+    <div class="result-meta" id="diffMeta">設定を入力してください</div>
+    <div class="optimal-badge" id="optimalBadge">最適役員報酬：月 0 万円</div>
+
+    <div class="compare-grid">
+      <div class="compare-item">
+        <div class="label">個人事業のみ</div>
+        <div class="value" id="soloHand">0万円</div>
+        <div class="sub">世帯手取り（年）</div>
+      </div>
+      <div class="compare-item">
+        <div class="label">個人＋マイクロ法人</div>
+        <div class="value" id="bothHand">0万円</div>
+        <div class="sub">運営費差引後（年）</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2);">
+      <div style="font-size: 12px; opacity: 0.85; margin-bottom: 8px;">💡 内訳サマリー</div>
+      <div id="summaryText" style="font-size: 13px; line-height: 1.7;"></div>
+    </div>
+  </div>
+
+  <!-- 上級者向け詳細 -->
+  <div class="card advanced-only">
+    <h2>💡 内訳の詳細</h2>
+    <div style="margin-bottom: 20px;">
+      <h3 style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text-sub);">個人事業のみの場合</h3>
+      <table class="breakdown-table">
+        <thead><tr><th>項目</th><th class="right">金額</th></tr></thead>
+        <tbody id="breakdownSolo"></tbody>
+      </table>
+    </div>
+    <div>
+      <h3 style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text-sub);">個人＋マイクロ法人の場合</h3>
+      <table class="breakdown-table">
+        <thead><tr><th>項目</th><th class="right">金額</th></tr></thead>
+        <tbody id="breakdownBoth"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <details>
+    <summary>📖 計算前提と注意事項</summary>
+    <div class="content">
+      <strong>主な前提</strong>
+      <ul>
+        <li>所得税：累進税率（5〜45%）＋復興特別所得税2.1%</li>
+        <li>住民税：一律10%</li>
+        <li>事業税：5%（事業主控除290万円後）</li>
+        <li>国民健康保険：所得割10%＋均等割5万円/人で簡略化（自治体差あり）</li>
+        <li>国民年金：年20.4万円/人</li>
+        <li>協会けんぽ：健康保険10%＋厚生年金18.3%（労使折半合計）</li>
+        <li>法人税実効税率：約25%（800万円以下軽減税率15%考慮）</li>
+        <li>給与所得控除：通常計算</li>
+      </ul>
+      <strong>マイクロ法人のメリット（反映済）</strong>
+      <ul>
+        <li>役員報酬による給与所得控除の活用</li>
+        <li>所得分散による累進税率の緩和</li>
+        <li>協会けんぽ加入で扶養家族の保険料が増えない</li>
+        <li>配偶者が第3号被保険者になれる（年金免除）</li>
+        <li>配当金の益金不算入（投資型）</li>
+      </ul>
+      <strong>士業料金の参考ソース</strong>
+      <ul>
+        <li>マネーフォワードクラウド：公式サイト料金ページ（2026年4月時点）</li>
+        <li>税理士顧問料：freee・各税理士事務所相場記事</li>
+        <li>社労士顧問料：社労士業界相場記事（2025-2026）</li>
+        <li>合同会社設立費用：各社平均値</li>
+        <li>※料金は変動するため公式サイトで再確認推奨</li>
+      </ul>
+      <strong>⚠️ 必ず税理士に相談を</strong>
+      <p>このシミュレーションは概算です。リベ大税理士法人など信頼できる専門家にご相談ください。</p>
+    </div>
+  </details>
+
+  <footer>
+    Made by いのっち for リベ民🦁 | v2 - 業種選択＋経費チェック式
+  </footer>
+</div>
+
+<script>
+// ========================================
+// 業種マスタ
+// ========================================
+const BIZ_TYPES = [
+  {
+    id: 'consulting',
+    icon: '💼',
+    name: 'コンサル',
+    desc: '助言・指導',
+    info: 'スキルや経験を活かしたコンサル業。個人事業の知見をそのまま法人で売る形が多い。',
+    profitRate: 0.85
+  },
+  {
+    id: 'dividend',
+    icon: '📈',
+    name: '投資配当',
+    desc: '配当・運用',
+    info: '法人で株や投信を保有し配当を得る。受取配当の95%が益金不算入で実質非課税。',
+    profitRate: 0.95
+  },
+  {
+    id: 'realestate',
+    icon: '🏘️',
+    name: '不動産投資',
+    desc: '賃貸経営',
+    info: '区分マンションや戸建てを法人所有して賃料収入を得る。減価償却で利益圧縮。',
+    profitRate: 0.40
+  },
+  {
+    id: 'ecommerce',
+    icon: '📦',
+    name: '物販・EC',
+    desc: '転売・小売',
+    info: '個人事業とは別商品・別ブランドで切り分ける必要あり（脱税認定リスク注意）。',
+    profitRate: 0.20
+  },
+  {
+    id: 'web',
+    icon: '🌐',
+    name: 'Web制作',
+    desc: '受託開発',
+    info: 'Web制作・アプリ開発・デザインなど。粗利率高め、外注すれば調整可能。',
+    profitRate: 0.70
+  },
+  {
+    id: 'media',
+    icon: '✍️',
+    name: 'ブログ・YT',
+    desc: '広告・アフィリ',
+    info: 'ブログ・YouTube・SNSで広告/アフィリ収入。粗利率は非常に高い。',
+    profitRate: 0.80
+  },
+  {
+    id: 'lecture',
+    icon: '🎓',
+    name: '講座・教材',
+    desc: 'スクール運営',
+    info: 'オンラインスクール・教材販売・コミュニティ運営など。',
+    profitRate: 0.65
+  },
+  {
+    id: 'agent',
+    icon: '🤝',
+    name: '代理店・紹介',
+    desc: '紹介手数料',
+    info: '保険代理・人材紹介・アフィリ広告代理など。営業重視のビジネス。',
+    profitRate: 0.50
+  },
+  {
+    id: 'rental',
+    icon: '🏠',
+    name: '貸付・レンタル',
+    desc: '物品貸出',
+    info: '駐車場・トランクルーム・カメラ機材レンタルなど資産貸付業。',
+    profitRate: 0.55
+  },
+  {
+    id: 'other',
+    icon: '⚙️',
+    name: 'その他',
+    desc: '自由入力',
+    info: '上記以外の業種。売上・経費を自分で入力してください。',
+    profitRate: 0.50
+  }
+];
+
+// ========================================
+// 経費マスタ（士業・ツール・運営費）
+// ========================================
+const EXPENSE_CATEGORIES = [
+  {
+    name: '税理士・経理',
+    items: [
+      { id: 'libe_tax_kojin', name: 'リベ大税理士法人（個人事業主のみ）', desc: '顧問33,000円/月＋申告66,000円', defaultPrice: 462000, editable: false, hint: '公式サイト料金（税込）' },
+      { id: 'libe_tax_both', name: 'リベ大税理士法人（個人＋マイクロ法人）', desc: '顧問33,000円/月＋申告198,000円', defaultPrice: 594000, editable: false, hint: '公式サイト料金（税込）' },
+      { id: 'libe_tax_houjin', name: 'リベ大税理士法人（法人のみ）', desc: '顧問44,000円/月＋申告132,000円', defaultPrice: 660000, editable: false, hint: '公式サイト料金（税込）' },
+      { id: 'general_tax', name: '一般税理士（顧問契約）', desc: '月3万円×12ヶ月', defaultPrice: 360000, editable: true },
+      { id: 'spot_tax', name: '決算申告のみスポット依頼', desc: '相場15〜25万円', defaultPrice: 180000, editable: true },
+      { id: 'self_filing', name: '自分で確定申告（税理士なし）', desc: '0円・要時間と知識', defaultPrice: 0, editable: false },
+      { id: 'libe_keiri', name: 'リベ大経理代行', desc: '記帳代行サービス', defaultPrice: 180000, editable: true, hint: '要見積もり、参考価格' },
+    ]
+  },
+  {
+    name: '社労士',
+    items: [
+      { id: 'sharoshi_komon', name: '社労士顧問契約', desc: '月15,000円×12（マイクロ法人想定）', defaultPrice: 180000, editable: true },
+      { id: 'sharoshi_spot', name: '社労士スポット（社保新規適用）', desc: '1回限り4万円程度', defaultPrice: 40000, editable: true },
+    ]
+  },
+  {
+    name: '行政書士・司法書士',
+    items: [
+      { id: 'gyosei_setup', name: '行政書士に法人設立を依頼', desc: '初年度のみ・5〜10万円', defaultPrice: 70000, editable: true, oneTime: true },
+      { id: 'shihoshoshi_touki', name: '司法書士に登記依頼', desc: '5〜10万円', defaultPrice: 80000, editable: true, oneTime: true },
+    ]
+  },
+  {
+    name: '会計ソフト',
+    items: [
+      { id: 'mfc_hitori', name: 'マネフォクラウド ひとり法人プラン', desc: '年払い 2,480円/月', defaultPrice: 29760, editable: false },
+      { id: 'mfc_small', name: 'マネフォクラウド スモールビジネス', desc: '年払い 4,480円/月', defaultPrice: 53760, editable: false },
+      { id: 'freee', name: 'freee会計（ミニマム）', desc: '月額 1,980円〜', defaultPrice: 23760, editable: true },
+      { id: 'yayoi', name: '弥生会計オンライン', desc: '年27,800円程度', defaultPrice: 27800, editable: true },
+    ]
+  },
+  {
+    name: 'バーチャルオフィス・住所',
+    items: [
+      { id: 'virtual_office', name: 'バーチャルオフィス', desc: '月1,000〜2,000円程度', defaultPrice: 18000, editable: true, hint: 'GMOおふぃす・レゾナンス等' },
+      { id: 'phone_proxy', name: '電話代行サービス', desc: '月3,000〜10,000円程度', defaultPrice: 60000, editable: true },
+      { id: 'rental_office', name: 'レンタルオフィス', desc: '月20,000〜50,000円', defaultPrice: 360000, editable: true },
+    ]
+  },
+  {
+    name: 'その他ランニングコスト',
+    items: [
+      { id: 'corp_resident_tax', name: '法人住民税 均等割（赤字でも必須）', desc: '最低7万円/年', defaultPrice: 70000, editable: false, autoCheck: true, locked: true },
+      { id: 'bank_fee', name: '法人銀行口座 維持費', desc: 'ネット銀行なら無料、メガバン月1,000〜', defaultPrice: 0, editable: true },
+      { id: 'corp_card', name: '法人クレカ年会費', desc: '0〜30,000円', defaultPrice: 0, editable: true },
+      { id: 'invoice_fee', name: 'インボイス・電帳法対応ツール', desc: '会計ソフトに含まれる場合多い', defaultPrice: 0, editable: true },
+    ]
+  }
+];
+
+// 初期費用マスタ
+const SETUP_COSTS = [
+  { name: '合同会社 登記費用（電子定款）', price: 60000, note: '登録免許税6万円 + 印鑑等' },
+  { name: '株式会社の場合', price: 220000, note: '定款認証5万円＋登録免許税15万円' },
+  { name: '法人実印作成', price: 5000, note: '5,000〜30,000円' },
+  { name: '行政書士・司法書士に丸投げ', price: 70000, note: '5〜10万円（自分でやれば0円）' },
+];
+
+// デフォルトでチェック入れる項目
+const DEFAULT_CHECKED = ['libe_tax_both', 'mfc_hitori', 'corp_resident_tax'];
+
+// ========================================
+// 業種カードと経費リストを生成
+// ========================================
+function renderBizCards() {
+  const grid = document.getElementById('bizGrid');
+  grid.innerHTML = BIZ_TYPES.map(b => `
+    <div class="biz-card ${b.id === 'consulting' ? 'active' : ''}" data-bizid="${b.id}">
+      <div class="icon">${b.icon}</div>
+      <div class="name">${b.name}</div>
+      <div class="desc">${b.desc}</div>
+    </div>
+  `).join('');
+  grid.querySelectorAll('.biz-card').forEach(card => {
+    card.addEventListener('click', () => {
+      grid.querySelectorAll('.biz-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      const id = card.dataset.bizid;
+      document.getElementById('bizType').value = id;
+      const biz = BIZ_TYPES.find(b => b.id === id);
+      document.getElementById('bizInfo').textContent = '💡 ' + biz.info;
+      // 売上ラベルを業種に合わせて
+      const labelMap = {
+        consulting: 'コンサル年間売上',
+        dividend: '年間配当収入',
+        realestate: '年間家賃収入',
+        ecommerce: '物販年間売上',
+        web: 'Web受託年間売上',
+        media: '広告・アフィリ年間売上',
+        lecture: '講座・教材年間売上',
+        agent: '代理店年間売上',
+        rental: 'レンタル年間売上',
+        other: '法人の年間売上'
+      };
+      document.getElementById('corpRevenueLabel').textContent = labelMap[id] || '法人の年間売上';
+      recalculate();
+    });
+  });
+  document.getElementById('bizInfo').textContent = '💡 ' + BIZ_TYPES[0].info;
+}
+
+function renderExpenseList() {
+  const list = document.getElementById('expenseList');
+  list.innerHTML = EXPENSE_CATEGORIES.map(cat => `
+    <div class="expense-category">
+      <div class="expense-category-header">${cat.name}</div>
+      ${cat.items.filter(it => !it.oneTime).map(it => {
+        const checked = DEFAULT_CHECKED.includes(it.id) ? 'checked' : '';
+        const disabled = it.locked ? 'disabled' : '';
+        return `
+        <div class="expense-item">
+          <label class="cb">
+            <input type="checkbox" data-expid="${it.id}" ${checked} ${disabled}>
+            <div style="flex:1;">
+              <div class="name">${it.name}</div>
+              <div class="desc">${it.desc}${it.hint ? ' / ' + it.hint : ''}</div>
+            </div>
+          </label>
+          <input type="number" class="price-input" data-priceid="${it.id}" value="${it.defaultPrice}" ${it.editable ? '' : 'disabled'}>
+          <span style="font-size:11px;color:var(--text-sub);">円/年</span>
+        </div>`;
+      }).join('')}
+    </div>
+  `).join('');
+  list.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.addEventListener('change', recalculate));
+  list.querySelectorAll('.price-input').forEach(inp => inp.addEventListener('input', recalculate));
+
+  // 初期費用リスト
+  const setupList = document.getElementById('setupCostList');
+  setupList.innerHTML = SETUP_COSTS.map(s => `
+    <li style="padding:6px 0;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;">
+      <span>${s.name}<br><span style="font-size:10px;color:var(--text-sub);">${s.note}</span></span>
+      <span style="font-family:'Outfit',sans-serif;font-weight:600;color:var(--accent);">${s.price.toLocaleString()}円</span>
+    </li>`).join('');
+}
+
+function getRunningCost() {
+  let total = 0;
+  document.querySelectorAll('#expenseList input[type="checkbox"]').forEach(cb => {
+    if (cb.checked) {
+      const id = cb.dataset.expid;
+      const priceInput = document.querySelector(`.price-input[data-priceid="${id}"]`);
+      total += +priceInput.value || 0;
+    }
+  });
+  return total;
+}
+
+// 個人事業側（個人事業のみシナリオ）にかかる税理士費用
+// 個人事業に関連するもののみ抽出
+function getSoloTaxCost() {
+  const SOLO_RELATED_IDS = ['libe_tax_kojin', 'libe_tax_both', 'general_tax', 'spot_tax', 'libe_keiri'];
+  let total = 0;
+  document.querySelectorAll('#expenseList input[type="checkbox"]').forEach(cb => {
+    if (cb.checked && SOLO_RELATED_IDS.includes(cb.dataset.expid)) {
+      const priceInput = document.querySelector(`.price-input[data-priceid="${cb.dataset.expid}"]`);
+      total += +priceInput.value || 0;
+    }
+  });
+  return total;
+}
+
+// 個人＋マイクロ法人シナリオにおける、個人事業側の税理士費用
+// libe_tax_bothはセット価格なのでマイクロ法人側に計上、個人事業側は0扱い
+function getSoloTaxCostForBoth() {
+  const SOLO_ONLY_IDS = ['libe_tax_kojin', 'general_tax', 'spot_tax', 'libe_keiri'];
+  let total = 0;
+  document.querySelectorAll('#expenseList input[type="checkbox"]').forEach(cb => {
+    if (cb.checked && SOLO_ONLY_IDS.includes(cb.dataset.expid)) {
+      const priceInput = document.querySelector(`.price-input[data-priceid="${cb.dataset.expid}"]`);
+      total += +priceInput.value || 0;
+    }
+  });
+  return total;
+}
+
+// ========================================
+// 税制計算
+// ========================================
+function incomeTax(t) {
+  if (t <= 0) return 0;
+  let tax = 0;
+  if (t <= 1950000) tax = t * 0.05;
+  else if (t <= 3300000) tax = t * 0.10 - 97500;
+  else if (t <= 6950000) tax = t * 0.20 - 427500;
+  else if (t <= 9000000) tax = t * 0.23 - 636000;
+  else if (t <= 18000000) tax = t * 0.33 - 1536000;
+  else if (t <= 40000000) tax = t * 0.40 - 2796000;
+  else tax = t * 0.45 - 4796000;
+  return tax * 1.021;
+}
+function residentTax(t) {
+  if (t <= 0) return 0;
+  return t * 0.10 + 5000;
+}
+function businessTax(income) {
+  return Math.max(0, income - 2900000) * 0.05;
+}
+function salaryDeduction(s) {
+  if (s <= 0) return 0;
+  if (s <= 1625000) return 550000;
+  if (s <= 1800000) return s * 0.4 - 100000;
+  if (s <= 3600000) return s * 0.3 + 80000;
+  if (s <= 6600000) return s * 0.2 + 440000;
+  if (s <= 8500000) return s * 0.1 + 1100000;
+  return 1950000;
+}
+function nationalHealthInsurance(income, householdSize) {
+  if (income <= 0) return Math.max(0, householdSize) * 50000;
+  const taxable = Math.max(0, income - 430000);
+  const fee = taxable * 0.10 + householdSize * 50000 + 30000;
+  return Math.min(fee, 900000);
+}
+function nationalPension(num) { return num * 204000; }
+function spouseDeduction(spouseIncome) {
+  if (spouseIncome <= 150) return 380000;
+  if (spouseIncome <= 155) return 360000;
+  if (spouseIncome <= 160) return 310000;
+  if (spouseIncome <= 167) return 260000;
+  if (spouseIncome <= 175) return 210000;
+  if (spouseIncome <= 183) return 160000;
+  if (spouseIncome <= 190) return 110000;
+  if (spouseIncome <= 197) return 60000;
+  if (spouseIncome <= 201) return 30000;
+  return 0;
+}
+function shakaiHoken(monthlySalary) {
+  if (monthlySalary <= 0) return { total: 0, employee: 0, employer: 0 };
+  let stdSalary = monthlySalary;
+  if (monthlySalary < 63000) stdSalary = 58000;
+  else if (monthlySalary < 73000) stdSalary = 68000;
+  else if (monthlySalary < 83000) stdSalary = 78000;
+  else if (monthlySalary < 93000) stdSalary = 88000;
+  else if (monthlySalary < 101000) stdSalary = 98000;
+  const health = stdSalary * 0.10 * 12;
+  const pensionBase = Math.max(88000, Math.min(650000, stdSalary));
+  const pension = pensionBase * 0.183 * 12;
+  const total = health + pension;
+  return { total, employee: total / 2, employer: total / 2 };
+}
+function corporateTax(profit) {
+  if (profit <= 0) return 0; // 均等割は別計上
+  if (profit <= 8000000) return profit * 0.25;
+  return 8000000 * 0.25 + (profit - 8000000) * 0.34;
+}
+
+// ========================================
+// シナリオ
+// ========================================
+function getInputs() {
+  return {
+    age: +document.getElementById('age').value || 35,
+    spouse: +document.getElementById('spouse').value || 0,
+    spouseIncome: +document.getElementById('spouseIncome').value || 0,
+    children: +document.getElementById('children').value || 0,
+    revenue: (+document.getElementById('revenue').value || 0) * 10000,
+    expenses: (+document.getElementById('expenses').value || 0) * 10000,
+    vatRefund: (+document.getElementById('vatRefund').value || 0) * 10000,
+    blueDeduction: +document.getElementById('blueDeduction').value * 10000,
+    bizType: document.getElementById('bizType').value,
+    corpRevenue: (+document.getElementById('corpRevenue').value || 0) * 10000,
+    corpExpenses: (+document.getElementById('corpExpenses').value || 0) * 10000,
+    fixedSalary: (+document.getElementById('fixedSalary').value || 0) * 10000,
+    runningCost: getRunningCost(),
+    soloTaxCost: getSoloTaxCost(),       // 個人事業のみシナリオで使う
+    soloTaxCostForBoth: getSoloTaxCostForBoth() // 個人＋マイクロ法人シナリオで使う
+  };
+}
+
+function calcSolo(inp) {
+  const grossProfit = inp.revenue - inp.expenses - inp.soloTaxCost; // 税理士費用を経費計上
+  const businessIncome = Math.max(0, grossProfit - inp.blueDeduction);
+  const householdSize = 1 + inp.spouse + inp.children;
+  const pensionMembers = 1 + inp.spouse;
+  const nhi = nationalHealthInsurance(businessIncome, householdSize);
+  const np = nationalPension(pensionMembers);
+  const socialIns = nhi + np;
+  const basicDed = 480000;
+  const spouseDed = inp.spouse ? spouseDeduction(inp.spouseIncome) : 0;
+  const totalDed = basicDed + spouseDed + socialIns;
+  const taxable = Math.max(0, businessIncome - totalDed);
+  const it = incomeTax(taxable);
+  const rt = residentTax(taxable);
+  const bt = businessTax(grossProfit);
+  const totalTax = it + rt + bt;
+  const handed = grossProfit + inp.vatRefund - totalTax - socialIns;
+  return {
+    handed, grossProfit, vatRefund: inp.vatRefund,
+    incomeT: it, residentT: rt, bizT: bt,
+    nhi, np, totalTax,
+    breakdown: [
+      { label: '事業売上', value: inp.revenue },
+      { label: '事業経費', value: -inp.expenses },
+      { label: '税理士費用（個人事業側）', value: -inp.soloTaxCost },
+      { label: '消費税還付', value: inp.vatRefund },
+      { label: '所得税', value: -it },
+      { label: '住民税', value: -rt },
+      { label: '事業税', value: -bt },
+      { label: '国民健康保険', value: -nhi },
+      { label: '国民年金', value: -np }
+    ]
+  };
+}
+
+function calcBoth(inp, monthlySalary) {
+  const annualSalary = monthlySalary * 12;
+  const biz = BIZ_TYPES.find(b => b.id === inp.bizType);
+
+  // === 法人側 ===
+  let corpRevTaxable, corpRevActual;
+  if (inp.bizType === 'dividend') {
+    corpRevTaxable = inp.corpRevenue * 0.05; // 5%のみ課税
+    corpRevActual = inp.corpRevenue;
+  } else {
+    corpRevTaxable = inp.corpRevenue;
+    corpRevActual = inp.corpRevenue;
+  }
+  const sh = shakaiHoken(monthlySalary);
+  const corpProfit = corpRevTaxable - inp.corpExpenses - annualSalary - sh.employer - inp.runningCost;
+  const corpTax = corporateTax(corpProfit);
+  // 配当の場合、95%の益金不算入分も法人内に残る
+  const corpRetained = corpRevActual - inp.corpExpenses - annualSalary - sh.employer - inp.runningCost - corpTax;
+
+  // === 個人側 ===
+  const grossProfit = inp.revenue - inp.expenses - inp.soloTaxCostForBoth;
+  const businessIncome = Math.max(0, grossProfit - inp.blueDeduction);
+  const salaryDed = salaryDeduction(annualSalary);
+  const salaryIncome = Math.max(0, annualSalary - salaryDed);
+  const socialInsPersonal = sh.employee;
+  const basicDed = 480000;
+  const spouseDed = inp.spouse ? spouseDeduction(inp.spouseIncome) : 0;
+  const totalDed = basicDed + spouseDed + socialInsPersonal;
+  const totalIncome = businessIncome + salaryIncome;
+  const taxable = Math.max(0, totalIncome - totalDed);
+  const it = incomeTax(taxable);
+  const rt = residentTax(taxable);
+  const bt = businessTax(grossProfit);
+  const personalHanded = grossProfit + inp.vatRefund + annualSalary - it - rt - bt - socialInsPersonal;
+  const totalHanded = personalHanded + corpRetained;
+
+  return {
+    handed: totalHanded, personalHanded, corpRetained,
+    monthlySalary, annualSalary, corpRev: corpRevActual,
+    corpExpenses: inp.corpExpenses, corpProfit, corpTax,
+    runningCost: inp.runningCost,
+    sh,
+    breakdown: [
+      { label: '事業売上（個人）', value: inp.revenue },
+      { label: '事業経費（個人）', value: -inp.expenses },
+      { label: '税理士費用（個人事業側）', value: -inp.soloTaxCostForBoth },
+      { label: '消費税還付', value: inp.vatRefund },
+      { label: '役員報酬（給与）', value: annualSalary },
+      { label: '法人売上', value: corpRevActual },
+      { label: '法人事業経費', value: -inp.corpExpenses },
+      { label: '法人運営費（士業・ツール）', value: -inp.runningCost },
+      { label: '社会保険（会社負担）', value: -sh.employer },
+      { label: '社会保険（本人負担）', value: -sh.employee },
+      { label: '所得税', value: -it },
+      { label: '住民税', value: -rt },
+      { label: '事業税', value: -bt },
+      { label: '法人税等', value: -corpTax }
+    ]
+  };
+}
+
+function optimizeSalary(inp) {
+  if (inp.fixedSalary > 0) {
+    return { monthlySalary: inp.fixedSalary, result: calcBoth(inp, inp.fixedSalary) };
+  }
+  let best = null;
+  for (let m = 0; m <= 200000; m += 5000) {
+    const r = calcBoth(inp, m);
+    if (!best || r.handed > best.result.handed) {
+      best = { monthlySalary: m, result: r };
+    }
+  }
+  return best;
+}
+
+// ========================================
+// レンダリング
+// ========================================
+function fmt(yen) {
+  return Math.round(yen / 10000) + '万円';
+}
+function fmtSigned(yen) {
+  const m = Math.round(yen / 10000);
+  return (m >= 0 ? '+' : '') + m + '万円';
+}
+
+function renderBreakdown(tbody, items) {
+  tbody.innerHTML = '';
+  let total = 0;
+  items.forEach(it => {
+    total += it.value;
+    const tr = document.createElement('tr');
+    const color = it.value >= 0 ? 'var(--positive)' : 'var(--negative)';
+    tr.innerHTML = `<td>${it.label}</td><td class="right" style="color:${color}">${it.value >= 0 ? '+' : ''}${fmt(it.value)}</td>`;
+    tbody.appendChild(tr);
+  });
+  const tr = document.createElement('tr');
+  tr.className = 'total';
+  tr.innerHTML = `<td>世帯手取り合計</td><td class="right">${fmt(total)}</td>`;
+  tbody.appendChild(tr);
+}
+
+function recalculate() {
+  const inp = getInputs();
+  // 法人運営費合計を表示
+  document.getElementById('totalRunningCost').textContent = fmt(inp.runningCost);
+
+  const solo = calcSolo(inp);
+  const opt = optimizeSalary(inp);
+  const both = opt.result;
+  const diff = both.handed - solo.handed;
+
+  const diffEl = document.getElementById('diffAmount');
+  diffEl.innerHTML = fmtSigned(diff) + '<span class="unit">/年</span>';
+  diffEl.className = 'result-amount ' + (diff >= 0 ? 'positive' : 'negative');
+
+  document.getElementById('diffMeta').textContent = diff >= 0
+    ? `マイクロ法人スキームで年間 約${Math.round(diff/10000)}万円の節税効果`
+    : `この設定では個人事業のみの方が ${Math.abs(Math.round(diff/10000))}万円 お得`;
+
+  document.getElementById('optimalBadge').textContent =
+    `最適役員報酬：月 ${(opt.monthlySalary/10000).toFixed(1)} 万円`;
+
+  document.getElementById('soloHand').textContent = fmt(solo.handed);
+  document.getElementById('bothHand').textContent = fmt(both.handed);
+
+  // サマリー
+  const biz = BIZ_TYPES.find(b => b.id === inp.bizType);
+  document.getElementById('summaryText').innerHTML = `
+    ・選択業種：${biz.icon} ${biz.name}<br>
+    ・法人運営費：${fmt(inp.runningCost)}/年<br>
+    ・法人内に残る金額：${fmt(both.corpRetained)}/年<br>
+    ・個人手取り：${fmt(both.personalHanded)}/年
+  `;
+
+  renderBreakdown(document.getElementById('breakdownSolo'), solo.breakdown);
+  renderBreakdown(document.getElementById('breakdownBoth'), both.breakdown);
+}
+
+// ========================================
+// イベント
+// ========================================
+document.querySelectorAll('.mode-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.body.classList.toggle('advanced', btn.dataset.mode === 'advanced');
+  });
+});
+
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.target;
+    if (!target) return;
+    btn.parentElement.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(target).value = btn.dataset.value;
+    recalculate();
+  });
+});
+
+document.querySelectorAll('input, select').forEach(el => {
+  el.addEventListener('input', recalculate);
+  el.addEventListener('change', recalculate);
+});
+
+// 初期化
+renderBizCards();
+renderExpenseList();
+recalculate();
+</script>
+</body>
+</html>

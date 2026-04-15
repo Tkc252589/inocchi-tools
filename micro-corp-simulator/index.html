@@ -422,6 +422,95 @@
     color: var(--accent-dark);
     margin-top: 10px;
   }
+
+  /* AIアドバイザー */
+  .advisor-card {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: none;
+  }
+  .advisor-card h2 { color: #78350f; }
+  .advisor-intro {
+    font-size: 13px;
+    color: #78350f;
+    margin-bottom: 14px;
+    line-height: 1.6;
+  }
+  .verdict-box {
+    background: white;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 14px;
+    border-left: 4px solid var(--accent);
+  }
+  .verdict-box.warning { border-left-color: var(--warning); }
+  .verdict-box.negative { border-left-color: var(--negative); }
+  .verdict-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .verdict-text {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .verdict-text strong {
+    color: var(--accent-dark);
+    font-weight: 700;
+  }
+
+  .whatif-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .whatif-item {
+    background: white;
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .whatif-item .label {
+    font-size: 13px;
+    flex: 1;
+  }
+  .whatif-item .label .small {
+    font-size: 11px;
+    color: var(--text-sub);
+    margin-top: 2px;
+    display: block;
+  }
+  .whatif-item .delta {
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .whatif-item .delta.positive { color: var(--positive); }
+  .whatif-item .delta.negative { color: var(--negative); }
+  .whatif-item .delta.neutral { color: var(--text-sub); }
+
+  .tips-list {
+    background: white;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .tips-list ul {
+    padding-left: 18px;
+    margin: 0;
+  }
+  .tips-list li {
+    margin-bottom: 8px;
+  }
+  .tips-list li:last-child { margin-bottom: 0; }
 </style>
 </head>
 <body>
@@ -520,6 +609,19 @@
   <!-- 3. 法人の業種 -->
   <div class="card">
     <h2><span class="num">3</span>マイクロ法人の業種</h2>
+
+    <div class="field">
+      <label>📐 比較モード（重要）</label>
+      <div class="toggle-group">
+        <button type="button" class="toggle-btn active" data-target="compareMode" data-value="split">A案：売上を分割</button>
+        <button type="button" class="toggle-btn" data-target="compareMode" data-value="add">B案：追加で新事業</button>
+      </div>
+      <input type="hidden" id="compareMode" value="split">
+      <div class="hint" id="compareModeHint">
+        <strong>A案（売上分割）</strong>：同じ事業規模で個人事業のみ vs 個人＋マイクロ法人を比較。マイクロ法人の売上を個人事業から切り出すパターン（リベ大スキームの基本）
+      </div>
+    </div>
+
     <div class="biz-grid" id="bizGrid">
       <!-- JSで生成 -->
     </div>
@@ -559,7 +661,10 @@
   <div class="card">
     <h2><span class="num">4</span>法人運営費（チェックして選択）</h2>
     <div style="font-size:12px;color:var(--text-sub);margin-bottom:10px;background:#f9fafb;padding:8px 10px;border-radius:6px;">
-      💡 「リベ大税理士法人（個人事業主のみ）」「一般税理士」などをチェックすると、<strong>個人事業のみシナリオ</strong>にも自動で経費反映されます。「個人＋マイクロ法人」プランは法人セット価格として法人側に計上されます。
+      💡 <strong>料金の自動振り分け：</strong><br>
+      ・「リベ税（個人＋マイクロ法人）」をチェック → マイクロ法人シナリオでは594,000円計上、個人事業のみシナリオでは仮想的に「個人事業のみプラン（462,000円）」を適用<br>
+      ・「一般税理士」「決算スポット」「リベ大経理代行」 → 両シナリオで経費計上<br>
+      ・「リベ税（法人のみ）」 → マイクロ法人シナリオのみ計上
     </div>
 
     <div class="expense-list" id="expenseList">
@@ -605,6 +710,22 @@
       <div style="font-size: 12px; opacity: 0.85; margin-bottom: 8px;">💡 内訳サマリー</div>
       <div id="summaryText" style="font-size: 13px; line-height: 1.7;"></div>
     </div>
+  </div>
+
+  <!-- AIアドバイザー -->
+  <div class="card advisor-card">
+    <h2>🤖 AIアドバイザーからのヒント</h2>
+    <div class="advisor-intro" id="advisorIntro">
+      現在の入力値を元に、こんなパターンも試してみると気づきがあるかも👇
+    </div>
+
+    <div id="verdictArea"></div>
+
+    <h3 style="font-size:12px;font-weight:700;color:#78350f;margin:14px 0 8px;letter-spacing:0.05em;">📊 もしも、こうなったら？</h3>
+    <div class="whatif-grid" id="whatifGrid"></div>
+
+    <h3 style="font-size:12px;font-weight:700;color:#78350f;margin:14px 0 8px;letter-spacing:0.05em;">💡 知っておきたいヒント</h3>
+    <div class="tips-list" id="tipsList"></div>
   </div>
 
   <!-- 上級者向け詳細 -->
@@ -910,16 +1031,30 @@ function getRunningCost() {
 }
 
 // 個人事業側（個人事業のみシナリオ）にかかる税理士費用
-// 個人事業に関連するもののみ抽出
+// リベ税の「個人＋マイクロ法人」プラン(594,000円)をチェックしている場合、
+// 個人事業のみシナリオではマイクロ法人がないため
+// 「個人事業のみプラン」(462,000円)が適用される想定で置換
 function getSoloTaxCost() {
-  const SOLO_RELATED_IDS = ['libe_tax_kojin', 'libe_tax_both', 'general_tax', 'spot_tax', 'libe_keiri'];
+  const SOLO_RELATED_IDS = ['libe_tax_kojin', 'general_tax', 'spot_tax', 'libe_keiri'];
   let total = 0;
+  let hasBothPlan = false;
+  let hasKojinPlan = false;
   document.querySelectorAll('#expenseList input[type="checkbox"]').forEach(cb => {
-    if (cb.checked && SOLO_RELATED_IDS.includes(cb.dataset.expid)) {
-      const priceInput = document.querySelector(`.price-input[data-priceid="${cb.dataset.expid}"]`);
-      total += +priceInput.value || 0;
+    if (cb.checked) {
+      const id = cb.dataset.expid;
+      if (id === 'libe_tax_both') hasBothPlan = true;
+      if (id === 'libe_tax_kojin') hasKojinPlan = true;
+      if (SOLO_RELATED_IDS.includes(id)) {
+        const priceInput = document.querySelector(`.price-input[data-priceid="${id}"]`);
+        total += +priceInput.value || 0;
+      }
     }
   });
+  // セット契約をチェックしているが個人事業プランは未チェックの場合、
+  // 個人事業のみシナリオでは個人事業プラン(462,000円)を仮想適用
+  if (hasBothPlan && !hasKojinPlan) {
+    total += 462000;
+  }
   return total;
 }
 
@@ -1025,13 +1160,33 @@ function getInputs() {
     corpExpenses: (+document.getElementById('corpExpenses').value || 0) * 10000,
     fixedSalary: (+document.getElementById('fixedSalary').value || 0) * 10000,
     runningCost: getRunningCost(),
-    soloTaxCost: getSoloTaxCost(),       // 個人事業のみシナリオで使う
-    soloTaxCostForBoth: getSoloTaxCostForBoth() // 個人＋マイクロ法人シナリオで使う
+    soloTaxCost: getSoloTaxCost(),
+    soloTaxCostForBoth: getSoloTaxCostForBoth(),
+    compareMode: document.getElementById('compareMode').value
   };
 }
 
 function calcSolo(inp) {
-  const grossProfit = inp.revenue - inp.expenses - inp.soloTaxCost; // 税理士費用を経費計上
+  // 比較モード: A案（売上分割）の場合は法人売上も個人事業に乗せる
+  // 投資配当型は個人で配当もらうと税率20%固定なので別計算
+  let extraRevenue = 0;
+  let extraExpenses = 0;
+  let dividendIncomeForSolo = 0;
+
+  if (inp.compareMode === 'split') {
+    if (inp.bizType === 'dividend') {
+      // 配当の場合：個人で受け取ると申告分離課税20.315%
+      dividendIncomeForSolo = inp.corpRevenue;
+    } else {
+      // 通常事業の場合：個人事業として丸ごと受ける
+      extraRevenue = inp.corpRevenue;
+      extraExpenses = inp.corpExpenses;
+    }
+  }
+
+  const totalRevenue = inp.revenue + extraRevenue;
+  const totalExpenses = inp.expenses + extraExpenses;
+  const grossProfit = totalRevenue - totalExpenses - inp.soloTaxCost;
   const businessIncome = Math.max(0, grossProfit - inp.blueDeduction);
   const householdSize = 1 + inp.spouse + inp.children;
   const pensionMembers = 1 + inp.spouse;
@@ -1045,23 +1200,40 @@ function calcSolo(inp) {
   const it = incomeTax(taxable);
   const rt = residentTax(taxable);
   const bt = businessTax(grossProfit);
-  const totalTax = it + rt + bt;
-  const handed = grossProfit + inp.vatRefund - totalTax - socialIns;
+
+  // 配当の申告分離課税（20.315%）
+  const dividendTax = dividendIncomeForSolo * 0.20315;
+
+  const totalTax = it + rt + bt + dividendTax;
+  const handed = grossProfit + inp.vatRefund + dividendIncomeForSolo - totalTax - socialIns;
+
+  const breakdown = [
+    { label: '事業売上', value: inp.revenue }
+  ];
+  if (extraRevenue > 0) {
+    breakdown.push({ label: `(法人事業も個人で受ける場合の追加売上)`, value: extraRevenue });
+  }
+  breakdown.push({ label: '事業経費', value: -inp.expenses });
+  if (extraExpenses > 0) {
+    breakdown.push({ label: '(法人事業の経費追加)', value: -extraExpenses });
+  }
+  breakdown.push({ label: '税理士費用（個人事業側）', value: -inp.soloTaxCost });
+  if (dividendIncomeForSolo > 0) {
+    breakdown.push({ label: '配当収入（個人で受取）', value: dividendIncomeForSolo });
+    breakdown.push({ label: '配当税（申告分離20.315%）', value: -dividendTax });
+  }
+  breakdown.push({ label: '消費税還付', value: inp.vatRefund });
+  breakdown.push({ label: '所得税', value: -it });
+  breakdown.push({ label: '住民税', value: -rt });
+  breakdown.push({ label: '事業税', value: -bt });
+  breakdown.push({ label: '国民健康保険', value: -nhi });
+  breakdown.push({ label: '国民年金', value: -np });
+
   return {
     handed, grossProfit, vatRefund: inp.vatRefund,
     incomeT: it, residentT: rt, bizT: bt,
     nhi, np, totalTax,
-    breakdown: [
-      { label: '事業売上', value: inp.revenue },
-      { label: '事業経費', value: -inp.expenses },
-      { label: '税理士費用（個人事業側）', value: -inp.soloTaxCost },
-      { label: '消費税還付', value: inp.vatRefund },
-      { label: '所得税', value: -it },
-      { label: '住民税', value: -rt },
-      { label: '事業税', value: -bt },
-      { label: '国民健康保険', value: -nhi },
-      { label: '国民年金', value: -np }
-    ]
+    breakdown
   };
 }
 
@@ -1141,6 +1313,214 @@ function optimizeSalary(inp) {
 }
 
 // ========================================
+// AIアドバイザー
+// ========================================
+
+// 入力値を一部書き換えて再計算するヘルパー
+function calcWithOverride(baseInp, overrides) {
+  const inp = { ...baseInp, ...overrides };
+  const solo = calcSolo(inp);
+  const opt = optimizeSalary(inp);
+  return { solo, both: opt.result, salary: opt.monthlySalary, diff: opt.result.handed - solo.handed };
+}
+
+function renderAdvisor(inp, solo, both, optMonthlySalary) {
+  const diff = both.handed - solo.handed;
+  const baseDiff = diff;
+
+  // === 総合判定 ===
+  const verdictArea = document.getElementById('verdictArea');
+  let verdicts = [];
+
+  if (diff > 500000) {
+    verdicts.push({
+      type: 'good',
+      icon: '✅',
+      title: 'マイクロ法人を検討する価値あり',
+      text: `年間 <strong>${fmt(diff)}</strong> の節税効果が見込めます。法人設立費用（合同会社で約10万円）と運営の手間を考えても、十分メリットがあるレベルです。`
+    });
+  } else if (diff > 100000) {
+    verdicts.push({
+      type: 'warning',
+      icon: '🤔',
+      title: '微妙なライン',
+      text: `年間 <strong>${fmt(diff)}</strong> の差額。法人設立・維持の手間を考えると判断が難しいライン。下の「もしも」シミュレーションで他のパターンを試してみてください。`
+    });
+  } else if (diff > -100000) {
+    verdicts.push({
+      type: 'warning',
+      icon: '⚖️',
+      title: 'ほぼ同じ',
+      text: `年間 <strong>${fmt(Math.abs(diff))}</strong> 程度の差。現状ではマイクロ法人化のメリットは小さいです。事業規模が拡大するまで個人事業のままでもOKかも。`
+    });
+  } else {
+    verdicts.push({
+      type: 'negative',
+      icon: '❌',
+      title: '現状では個人事業主のままがお得',
+      text: `マイクロ法人を作ると年間 <strong>${fmt(Math.abs(diff))}</strong> 損する計算。法人運営費が節税効果を上回っています。下の「もしも」で売上を増やした場合も試してみてください。`
+    });
+  }
+
+  // 法人運営費が高すぎる警告
+  if (inp.runningCost > 600000 && diff < 200000) {
+    verdicts.push({
+      type: 'warning',
+      icon: '💸',
+      title: '法人運営費が重い',
+      text: `年間 <strong>${fmt(inp.runningCost)}</strong> の運営費は事業規模に対してやや高めかも。会計ソフトを安いプランにする・税理士をスポット契約にする等で節約余地あり。`
+    });
+  }
+
+  // 売上規模が小さすぎる警告
+  if (inp.revenue < 5000000 && diff < 0) {
+    verdicts.push({
+      type: 'negative',
+      icon: '📉',
+      title: '事業規模がまだ小さい',
+      text: `年商 <strong>${fmt(inp.revenue)}</strong> ではマイクロ法人化のメリットが出にくいです。一般的に <strong>年商700万円</strong> くらいから検討するのが目安と言われます。`
+    });
+  }
+
+  verdictArea.innerHTML = verdicts.map(v => `
+    <div class="verdict-box ${v.type === 'good' ? '' : v.type === 'warning' ? 'warning' : 'negative'}">
+      <div class="verdict-title">${v.icon} ${v.title}</div>
+      <div class="verdict-text">${v.text}</div>
+    </div>
+  `).join('');
+
+  // === もしも、こうなったら？ ===
+  const whatifs = [];
+
+  // 1. 役員報酬を最適値+/-3万円
+  const optMan = optMonthlySalary / 10000;
+  if (inp.fixedSalary === 0) { // 自動最適化中の場合のみ
+    const salaryUp = optMonthlySalary + 30000;
+    const salaryDown = Math.max(0, optMonthlySalary - 30000);
+    if (salaryUp <= 200000) {
+      const r = calcBoth(inp, salaryUp);
+      const d = r.handed - both.handed;
+      whatifs.push({
+        label: `役員報酬を月+3万円（${(salaryUp/10000).toFixed(1)}万円）にしたら`,
+        small: '社会保険料が増える代わりに年金額アップ',
+        delta: d
+      });
+    }
+    if (salaryDown >= 0 && salaryDown !== optMonthlySalary) {
+      const r = calcBoth(inp, salaryDown);
+      const d = r.handed - both.handed;
+      whatifs.push({
+        label: `役員報酬を月-3万円（${(salaryDown/10000).toFixed(1)}万円）にしたら`,
+        small: '社会保険料は減るが将来年金も減る',
+        delta: d
+      });
+    }
+  }
+
+  // 2. 子供が1人増えたら
+  const childUp = calcWithOverride(inp, { children: inp.children + 1 });
+  whatifs.push({
+    label: `子供が1人増えたら（${inp.children + 1}人）`,
+    small: '国保や扶養計算に影響',
+    delta: childUp.diff - baseDiff,
+    note: 'マイクロ法人の節税効果の変化'
+  });
+
+  // 3. 売上が500万円増えたら
+  const revUp = calcWithOverride(inp, { revenue: inp.revenue + 5000000 });
+  whatifs.push({
+    label: `事業売上が+500万円になったら`,
+    small: `年商${fmt(inp.revenue + 5000000)}に成長`,
+    delta: revUp.diff - baseDiff,
+    note: 'マイクロ法人の節税効果の変化'
+  });
+
+  // 4. 配偶者の年収が130万円超えたら（扶養外れる）
+  if (inp.spouse && inp.spouseIncome < 130) {
+    const spouseUp = calcWithOverride(inp, { spouseIncome: 200 });
+    whatifs.push({
+      label: `配偶者がフルタイム復帰（年収200万円）したら`,
+      small: '扶養から外れる影響',
+      delta: spouseUp.diff - baseDiff,
+      note: 'マイクロ法人の節税効果の変化'
+    });
+  }
+
+  // 5. リベ税を使わなかったら（自分で確定申告）
+  const noTaxAccountant = { ...inp, runningCost: Math.max(0, inp.runningCost - 594000), soloTaxCostForBoth: 0, soloTaxCost: 0 };
+  if (inp.runningCost >= 400000) {
+    const noTax = calcWithOverride(noTaxAccountant, {});
+    whatifs.push({
+      label: `税理士なしで全部自分でやったら`,
+      small: '時間と知識は必要',
+      delta: noTax.diff - baseDiff,
+      note: 'マイクロ法人の節税効果の変化'
+    });
+  }
+
+  // 6. 法人売上が倍になったら
+  const corpRevUp = calcWithOverride(inp, { corpRevenue: inp.corpRevenue * 2 });
+  whatifs.push({
+    label: `法人の売上が2倍になったら`,
+    small: `${fmt(inp.corpRevenue)} → ${fmt(inp.corpRevenue * 2)}`,
+    delta: corpRevUp.diff - baseDiff,
+    note: 'マイクロ法人の節税効果の変化'
+  });
+
+  document.getElementById('whatifGrid').innerHTML = whatifs.map(w => {
+    const cls = Math.abs(w.delta) < 30000 ? 'neutral' : (w.delta >= 0 ? 'positive' : 'negative');
+    const sign = w.delta >= 0 ? '+' : '';
+    return `
+      <div class="whatif-item">
+        <div class="label">
+          ${w.label}
+          <span class="small">${w.small}</span>
+        </div>
+        <div class="delta ${cls}">${sign}${fmt(w.delta)}</div>
+      </div>
+    `;
+  }).join('');
+
+  // === ヒント ===
+  const tips = [];
+
+  if (diff > 0 && optMonthlySalary <= 50000) {
+    tips.push('🎯 <strong>最適役員報酬が低い理由</strong>：給与所得控除（最低55万円）の枠を活用しつつ、社会保険料を最小化するため、月4.5万円付近に最適値が来ることが多いです。');
+  }
+
+  if (inp.bizType === 'dividend') {
+    tips.push('📈 <strong>投資配当型のポイント</strong>：受取配当の95%が益金不算入なので、法人内で実質非課税で運用できます。長期投資との相性が抜群。');
+  }
+
+  if (inp.bizType === 'realestate') {
+    tips.push('🏘️ <strong>不動産投資型のポイント</strong>：減価償却で利益を圧縮できるため、表面上の節税効果以上のメリットがあります。');
+  }
+
+  if (inp.spouse && inp.spouseIncome === 0) {
+    tips.push('👨‍👩‍👧 <strong>配偶者を社会保険の扶養に</strong>：マイクロ法人で協会けんぽに加入すると、配偶者は第3号被保険者として年金保険料が免除されます（年20万円相当の節約）。');
+  }
+
+  if (inp.children >= 2) {
+    tips.push(`👶 <strong>お子さん${inp.children}人の場合</strong>：マイクロ法人で協会けんぽに加入すると、扶養家族の保険料は0円。国保だと人数分かかるので、家族が多いほどマイクロ法人のメリット大。`);
+  }
+
+  if (inp.vatRefund > 0) {
+    tips.push('💰 <strong>消費税還付スキーム維持</strong>：マイクロ法人を別事業で立てれば、個人事業の輸出免税還付スキームをそのまま維持できます。これがマイクロ法人化の隠れた大きなメリット。');
+  }
+
+  if (inp.revenue > 10000000) {
+    tips.push('🚀 <strong>事業規模が大きい</strong>：年商1000万円超なので、マイクロ法人化以外にも「法人化」「事業承継」などより踏み込んだ節税策の検討余地あり。リベ税に相談を。');
+  }
+
+  // 2026年の経過措置
+  tips.push('📅 <strong>2026年10月〜の注意</strong>：インボイス制度の経過措置が縮小されます（仕入税額控除50%）。適格請求書発行事業者からの仕入が重要に。');
+
+  tips.push('⚠️ <strong>同業種の二刀流は注意</strong>：個人事業とマイクロ法人で同じ事業をやると、税務署から脱税認定されるリスクあり。明確に事業を分ける必要があります。');
+
+  document.getElementById('tipsList').innerHTML = `<ul>${tips.map(t => `<li>${t}</li>`).join('')}</ul>`;
+}
+
+// ========================================
 // レンダリング
 // ========================================
 function fmt(yen) {
@@ -1193,7 +1573,9 @@ function recalculate() {
 
   // サマリー
   const biz = BIZ_TYPES.find(b => b.id === inp.bizType);
+  const modeLabel = inp.compareMode === 'split' ? 'A案：売上分割' : 'B案：追加事業';
   document.getElementById('summaryText').innerHTML = `
+    ・比較モード：<strong>${modeLabel}</strong><br>
     ・選択業種：${biz.icon} ${biz.name}<br>
     ・法人運営費：${fmt(inp.runningCost)}/年<br>
     ・法人内に残る金額：${fmt(both.corpRetained)}/年<br>
@@ -1202,6 +1584,9 @@ function recalculate() {
 
   renderBreakdown(document.getElementById('breakdownSolo'), solo.breakdown);
   renderBreakdown(document.getElementById('breakdownBoth'), both.breakdown);
+
+  // AIアドバイザー
+  renderAdvisor(inp, solo, both, opt.monthlySalary);
 }
 
 // ========================================
@@ -1222,6 +1607,16 @@ document.querySelectorAll('.toggle-btn').forEach(btn => {
     btn.parentElement.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById(target).value = btn.dataset.value;
+
+    // 比較モード切替時のヒント文更新
+    if (target === 'compareMode') {
+      const hint = document.getElementById('compareModeHint');
+      if (btn.dataset.value === 'split') {
+        hint.innerHTML = '<strong>A案（売上分割）</strong>：同じ事業規模で個人事業のみ vs 個人＋マイクロ法人を比較。マイクロ法人の売上を個人事業から切り出すパターン（リベ大スキームの基本）';
+      } else {
+        hint.innerHTML = '<strong>B案（追加事業）</strong>：個人事業はそのまま、マイクロ法人で<u>新規事業を追加</u>するパターン。コンサル副業など、個人事業とは別の収入源を法人で持つ場合に選択';
+      }
+    }
     recalculate();
   });
 });
@@ -1236,22 +1631,5 @@ renderBizCards();
 renderExpenseList();
 recalculate();
 </script>
-
-<footer style="max-width:800px; margin:32px auto 16px; padding:20px 24px; background:#fff; border:1px solid var(--border); border-radius:12px; text-align:center; font-size:14px; color:var(--text-sub);">
-  <p style="margin-bottom:8px;">
-    <span style="font-size:16px; font-weight:600; color:var(--text);">🛠 作成：いのっち</span>
-  </p>
-  <p style="margin-bottom:12px; font-size:13px;">eBayせどりフルタイム挑戦中 ｜ Claude Code で構築</p>
-  <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
-    <a href="https://libecity.com/user_profile/996673482" target="_blank"
-       style="display:inline-flex; align-items:center; gap:6px; padding:8px 16px; background:var(--accent-light); color:var(--accent-dark); border-radius:8px; text-decoration:none; font-weight:600; font-size:13px;">
-      🏠 リベシティ プロフィール
-    </a>
-    <a href="https://tkc252589.github.io/inocchi-tools/efficiency_tools.html" target="_blank"
-       style="display:inline-flex; align-items:center; gap:6px; padding:8px 16px; background:#f0f9ff; color:#1e40af; border-radius:8px; text-decoration:none; font-weight:600; font-size:13px;">
-      📋 いのっちの活用事例一覧
-    </a>
-  </div>
-</footer>
 </body>
 </html>

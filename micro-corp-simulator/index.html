@@ -1280,20 +1280,20 @@ function calcBoth(inp, monthlySalary) {
     runningCost: inp.runningCost,
     sh,
     breakdown: [
+      // 個人事業の収支
       { label: '事業売上（個人）', value: inp.revenue },
       { label: '事業経費（個人）', value: -inp.expenses },
       { label: '税理士費用（個人事業側）', value: -inp.soloTaxCostForBoth },
       { label: '消費税還付', value: inp.vatRefund },
+      // 法人から受け取る給与（個人の収入）
       { label: '役員報酬（給与）', value: annualSalary },
-      { label: '法人売上', value: corpRevActual },
-      { label: '法人事業経費', value: -inp.corpExpenses },
-      { label: '法人運営費（士業・ツール）', value: -inp.runningCost },
-      { label: '社会保険（会社負担）', value: -sh.employer },
+      // 個人にかかる税金・社会保険
       { label: '社会保険（本人負担）', value: -sh.employee },
       { label: '所得税', value: -it },
       { label: '住民税', value: -rt },
       { label: '事業税', value: -bt },
-      { label: '法人税等', value: -corpTax }
+      // 法人に残る利益（法人売上から経費・給与・税を引いた残り）
+      { label: '法人内部留保', value: corpRetained }
     ]
   };
 }

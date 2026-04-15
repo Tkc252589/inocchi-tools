@@ -747,38 +747,64 @@
     </div>
   </div>
 
-  <details>
-    <summary>📖 計算前提と注意事項</summary>
-    <div class="content">
-      <strong>主な前提</strong>
-      <ul>
-        <li>所得税：累進税率（5〜45%）＋復興特別所得税2.1%</li>
-        <li>住民税：一律10%</li>
-        <li>事業税：5%（事業主控除290万円後）</li>
-        <li>国民健康保険：所得割10%＋均等割5万円/人で簡略化（自治体差あり）</li>
-        <li>国民年金：年20.4万円/人</li>
-        <li>協会けんぽ：健康保険10%＋厚生年金18.3%（労使折半合計）</li>
-        <li>法人税実効税率：約25%（800万円以下軽減税率15%考慮）</li>
-        <li>給与所得控除：通常計算</li>
+  <details style="margin-top:16px; border:1px solid var(--border); border-radius:12px; background:#fff;">
+    <summary style="padding:14px 20px; cursor:pointer; font-size:15px; font-weight:600; color:var(--text);">📖 計算前提と注意事項</summary>
+    <div style="padding:0 20px 20px; line-height:1.8; font-size:13px;">
+      <div style="background:#fffbeb; border:1px solid #fbbf24; border-radius:8px; padding:12px 16px; margin-bottom:16px;">
+        <strong>⚠️ 免責事項</strong><br>
+        本シミュレーターは概算による参考値です。実際の税額は個人の状況により異なります。<br>
+        正確な税額については税理士にご相談ください。
+      </div>
+
+      <h4 style="font-size:14px; font-weight:600; color:var(--text); margin-bottom:8px;">📅 適用税制：2025年（令和7年）改正対応</h4>
+
+      <strong>所得税率（国税庁 速算表準拠）</strong>
+      <ul style="padding-left:20px; margin-bottom:8px;">
+        <li>195万円以下：5%</li>
+        <li>195万超〜330万円：10%（控除額 97,500円）</li>
+        <li>330万超〜695万円：20%（控除額 427,500円）</li>
+        <li>695万超〜900万円：23%（控除額 636,000円）</li>
+        <li>900万超〜1,800万円：33%（控除額 1,536,000円）</li>
+        <li>1,800万超〜4,000万円：40%（控除額 2,796,000円）</li>
+        <li>4,000万円超：45%（控除額 4,796,000円）</li>
       </ul>
-      <strong>マイクロ法人のメリット（反映済）</strong>
-      <ul>
-        <li>役員報酬による給与所得控除の活用</li>
-        <li>所得分散による累進税率の緩和</li>
-        <li>協会けんぽ加入で扶養家族の保険料が増えない</li>
-        <li>配偶者が第3号被保険者になれる（年金免除）</li>
-        <li>配当金の益金不算入（投資型）</li>
+      <p style="font-size:12px; color:var(--text-sub); margin-bottom:12px;">※復興特別所得税（2.1%）を加算</p>
+
+      <strong>住民税・事業税</strong>
+      <ul style="padding-left:20px; margin-bottom:12px;">
+        <li>住民税：一律10%＋均等割5,000円</li>
+        <li>事業税：(事業所得−290万円)×5%</li>
       </ul>
-      <strong>士業料金の参考ソース</strong>
-      <ul>
-        <li>マネーフォワードクラウド：公式サイト料金ページ（2026年4月時点）</li>
-        <li>税理士顧問料：freee・各税理士事務所相場記事</li>
-        <li>社労士顧問料：社労士業界相場記事（2025-2026）</li>
-        <li>合同会社設立費用：各社平均値</li>
-        <li>※料金は変動するため公式サイトで再確認推奨</li>
+
+      <strong>所得控除</strong>
+      <ul style="padding-left:20px; margin-bottom:12px;">
+        <li>基礎控除：58万円（2025年改正）</li>
+        <li>給与所得控除：最低65万円（2025年改正）</li>
       </ul>
-      <strong>⚠️ 必ず税理士に相談を</strong>
-      <p>このシミュレーションは概算です。リベ大税理士法人など信頼できる専門家にご相談ください。</p>
+
+      <strong>社会保険料（協会けんぽ 2026年度）</strong>
+      <ul style="padding-left:20px; margin-bottom:12px;">
+        <li>健康保険料率：9.9%（全国平均・労使折半）</li>
+        <li>厚生年金保険料率：18.3%（労使折半）</li>
+      </ul>
+
+      <strong>国民健康保険・国民年金</strong>
+      <ul style="padding-left:20px; margin-bottom:12px;">
+        <li>国民健康保険：所得×10%＋均等割（簡易計算・上限90万円）</li>
+        <li>国民年金：年額約20.4万円/人</li>
+      </ul>
+
+      <strong>法人税等（実効税率の簡易計算）</strong>
+      <ul style="padding-left:20px; margin-bottom:12px;">
+        <li>所得800万円以下：約25%</li>
+        <li>所得800万円超：約34%</li>
+      </ul>
+
+      <strong>参考リンク</strong>
+      <ul style="padding-left:20px; margin-bottom:4px;">
+        <li><a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm" target="_blank" style="color:var(--accent);">国税庁 所得税の税率</a></li>
+        <li><a href="https://www.kyoukaikenpo.or.jp/" target="_blank" style="color:var(--accent);">協会けんぽ 保険料率</a></li>
+      </ul>
     </div>
   </details>
 
@@ -1096,8 +1122,7 @@ function businessTax(income) {
 }
 function salaryDeduction(s) {
   if (s <= 0) return 0;
-  if (s <= 1625000) return 550000;
-  if (s <= 1800000) return s * 0.4 - 100000;
+  if (s <= 1900000) return 650000;
   if (s <= 3600000) return s * 0.3 + 80000;
   if (s <= 6600000) return s * 0.2 + 440000;
   if (s <= 8500000) return s * 0.1 + 1100000;
@@ -1130,7 +1155,7 @@ function shakaiHoken(monthlySalary) {
   else if (monthlySalary < 83000) stdSalary = 78000;
   else if (monthlySalary < 93000) stdSalary = 88000;
   else if (monthlySalary < 101000) stdSalary = 98000;
-  const health = stdSalary * 0.10 * 12;
+  const health = stdSalary * 0.099 * 12;
   const pensionBase = Math.max(88000, Math.min(650000, stdSalary));
   const pension = pensionBase * 0.183 * 12;
   const total = health + pension;
@@ -1193,7 +1218,7 @@ function calcSolo(inp) {
   const nhi = nationalHealthInsurance(businessIncome, householdSize);
   const np = nationalPension(pensionMembers);
   const socialIns = nhi + np;
-  const basicDed = 480000;
+  const basicDed = 580000;
   const spouseDed = inp.spouse ? spouseDeduction(inp.spouseIncome) : 0;
   const totalDed = basicDed + spouseDed + socialIns;
   const taxable = Math.max(0, businessIncome - totalDed);
@@ -1262,7 +1287,7 @@ function calcBoth(inp, monthlySalary) {
   const salaryDed = salaryDeduction(annualSalary);
   const salaryIncome = Math.max(0, annualSalary - salaryDed);
   const socialInsPersonal = sh.employee;
-  const basicDed = 480000;
+  const basicDed = 580000;
   const spouseDed = inp.spouse ? spouseDeduction(inp.spouseIncome) : 0;
   const totalDed = basicDed + spouseDed + socialInsPersonal;
   const totalIncome = businessIncome + salaryIncome;

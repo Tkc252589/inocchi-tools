@@ -609,19 +609,6 @@
   <!-- 3. 法人の業種 -->
   <div class="card">
     <h2><span class="num">3</span>マイクロ法人の業種</h2>
-
-    <div class="field">
-      <label>📐 比較モード（重要）</label>
-      <div class="toggle-group">
-        <button type="button" class="toggle-btn active" data-target="compareMode" data-value="split">A案：売上を分割</button>
-        <button type="button" class="toggle-btn" data-target="compareMode" data-value="add">B案：追加で新事業</button>
-      </div>
-      <input type="hidden" id="compareMode" value="split">
-      <div class="hint" id="compareModeHint">
-        <strong>A案（売上分割）</strong>：同じ事業規模で個人事業のみ vs 個人＋マイクロ法人を比較。マイクロ法人の売上を個人事業から切り出すパターン（リベ大スキームの基本）
-      </div>
-    </div>
-
     <div class="biz-grid" id="bizGrid">
       <!-- JSで生成 -->
     </div>
@@ -747,64 +734,38 @@
     </div>
   </div>
 
-  <details style="margin-top:16px; border:1px solid var(--border); border-radius:12px; background:#fff;">
-    <summary style="padding:14px 20px; cursor:pointer; font-size:15px; font-weight:600; color:var(--text);">📖 計算前提と注意事項</summary>
-    <div style="padding:0 20px 20px; line-height:1.8; font-size:13px;">
-      <div style="background:#fffbeb; border:1px solid #fbbf24; border-radius:8px; padding:12px 16px; margin-bottom:16px;">
-        <strong>⚠️ 免責事項</strong><br>
-        本シミュレーターは概算による参考値です。実際の税額は個人の状況により異なります。<br>
-        正確な税額については税理士にご相談ください。
-      </div>
-
-      <h4 style="font-size:14px; font-weight:600; color:var(--text); margin-bottom:8px;">📅 適用税制：2025年（令和7年）改正対応</h4>
-
-      <strong>所得税率（国税庁 速算表準拠）</strong>
-      <ul style="padding-left:20px; margin-bottom:8px;">
-        <li>195万円以下：5%</li>
-        <li>195万超〜330万円：10%（控除額 97,500円）</li>
-        <li>330万超〜695万円：20%（控除額 427,500円）</li>
-        <li>695万超〜900万円：23%（控除額 636,000円）</li>
-        <li>900万超〜1,800万円：33%（控除額 1,536,000円）</li>
-        <li>1,800万超〜4,000万円：40%（控除額 2,796,000円）</li>
-        <li>4,000万円超：45%（控除額 4,796,000円）</li>
+  <details>
+    <summary>📖 計算前提と注意事項</summary>
+    <div class="content">
+      <strong>主な前提</strong>
+      <ul>
+        <li>所得税：累進税率（5〜45%）＋復興特別所得税2.1%</li>
+        <li>住民税：一律10%</li>
+        <li>事業税：5%（事業主控除290万円後）</li>
+        <li>国民健康保険：所得割10%＋均等割5万円/人で簡略化（自治体差あり）</li>
+        <li>国民年金：年20.4万円/人</li>
+        <li>協会けんぽ：健康保険10%＋厚生年金18.3%（労使折半合計）</li>
+        <li>法人税実効税率：約25%（800万円以下軽減税率15%考慮）</li>
+        <li>給与所得控除：通常計算</li>
       </ul>
-      <p style="font-size:12px; color:var(--text-sub); margin-bottom:12px;">※復興特別所得税（2.1%）を加算</p>
-
-      <strong>住民税・事業税</strong>
-      <ul style="padding-left:20px; margin-bottom:12px;">
-        <li>住民税：一律10%＋均等割5,000円</li>
-        <li>事業税：(事業所得−290万円)×5%</li>
+      <strong>マイクロ法人のメリット（反映済）</strong>
+      <ul>
+        <li>役員報酬による給与所得控除の活用</li>
+        <li>所得分散による累進税率の緩和</li>
+        <li>協会けんぽ加入で扶養家族の保険料が増えない</li>
+        <li>配偶者が第3号被保険者になれる（年金免除）</li>
+        <li>配当金の益金不算入（投資型）</li>
       </ul>
-
-      <strong>所得控除</strong>
-      <ul style="padding-left:20px; margin-bottom:12px;">
-        <li>基礎控除：58万円（2025年改正）</li>
-        <li>給与所得控除：最低65万円（2025年改正）</li>
+      <strong>士業料金の参考ソース</strong>
+      <ul>
+        <li>マネーフォワードクラウド：公式サイト料金ページ（2026年4月時点）</li>
+        <li>税理士顧問料：freee・各税理士事務所相場記事</li>
+        <li>社労士顧問料：社労士業界相場記事（2025-2026）</li>
+        <li>合同会社設立費用：各社平均値</li>
+        <li>※料金は変動するため公式サイトで再確認推奨</li>
       </ul>
-
-      <strong>社会保険料（協会けんぽ 2026年度）</strong>
-      <ul style="padding-left:20px; margin-bottom:12px;">
-        <li>健康保険料率：9.9%（全国平均・労使折半）</li>
-        <li>厚生年金保険料率：18.3%（労使折半）</li>
-      </ul>
-
-      <strong>国民健康保険・国民年金</strong>
-      <ul style="padding-left:20px; margin-bottom:12px;">
-        <li>国民健康保険：所得×10%＋均等割（簡易計算・上限90万円）</li>
-        <li>国民年金：年額約20.4万円/人</li>
-      </ul>
-
-      <strong>法人税等（実効税率の簡易計算）</strong>
-      <ul style="padding-left:20px; margin-bottom:12px;">
-        <li>所得800万円以下：約25%</li>
-        <li>所得800万円超：約34%</li>
-      </ul>
-
-      <strong>参考リンク</strong>
-      <ul style="padding-left:20px; margin-bottom:4px;">
-        <li><a href="https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm" target="_blank" style="color:var(--accent);">国税庁 所得税の税率</a></li>
-        <li><a href="https://www.kyoukaikenpo.or.jp/" target="_blank" style="color:var(--accent);">協会けんぽ 保険料率</a></li>
-      </ul>
+      <strong>⚠️ 必ず税理士に相談を</strong>
+      <p>このシミュレーションは概算です。リベ大税理士法人など信頼できる専門家にご相談ください。</p>
     </div>
   </details>
 
@@ -1122,7 +1083,8 @@ function businessTax(income) {
 }
 function salaryDeduction(s) {
   if (s <= 0) return 0;
-  if (s <= 1900000) return 650000;
+  if (s <= 1625000) return 550000;
+  if (s <= 1800000) return s * 0.4 - 100000;
   if (s <= 3600000) return s * 0.3 + 80000;
   if (s <= 6600000) return s * 0.2 + 440000;
   if (s <= 8500000) return s * 0.1 + 1100000;
@@ -1155,7 +1117,7 @@ function shakaiHoken(monthlySalary) {
   else if (monthlySalary < 83000) stdSalary = 78000;
   else if (monthlySalary < 93000) stdSalary = 88000;
   else if (monthlySalary < 101000) stdSalary = 98000;
-  const health = stdSalary * 0.099 * 12;
+  const health = stdSalary * 0.10 * 12;
   const pensionBase = Math.max(88000, Math.min(650000, stdSalary));
   const pension = pensionBase * 0.183 * 12;
   const total = health + pension;
@@ -1185,32 +1147,15 @@ function getInputs() {
     corpExpenses: (+document.getElementById('corpExpenses').value || 0) * 10000,
     fixedSalary: (+document.getElementById('fixedSalary').value || 0) * 10000,
     runningCost: getRunningCost(),
-    soloTaxCost: getSoloTaxCost(),
-    soloTaxCostForBoth: getSoloTaxCostForBoth(),
-    compareMode: document.getElementById('compareMode').value
+    soloTaxCost: getSoloTaxCost(),       // 個人事業のみシナリオで使う
+    soloTaxCostForBoth: getSoloTaxCostForBoth() // 個人＋マイクロ法人シナリオで使う
   };
 }
 
 function calcSolo(inp) {
-  // 比較モード: A案（売上分割）の場合は法人売上も個人事業に乗せる
-  // 投資配当型は個人で配当もらうと税率20%固定なので別計算
-  let extraRevenue = 0;
-  let extraExpenses = 0;
-  let dividendIncomeForSolo = 0;
-
-  if (inp.compareMode === 'split') {
-    if (inp.bizType === 'dividend') {
-      // 配当の場合：個人で受け取ると申告分離課税20.315%
-      dividendIncomeForSolo = inp.corpRevenue;
-    } else {
-      // 通常事業の場合：個人事業として丸ごと受ける
-      extraRevenue = inp.corpRevenue;
-      extraExpenses = inp.corpExpenses;
-    }
-  }
-
-  const totalRevenue = inp.revenue + extraRevenue;
-  const totalExpenses = inp.expenses + extraExpenses;
+  // 個人事業のみの場合、法人分の売上・経費も個人事業として受ける前提で比較（A案：売上分割）
+  const totalRevenue = inp.revenue + inp.corpRevenue;
+  const totalExpenses = inp.expenses + inp.corpExpenses;
   const grossProfit = totalRevenue - totalExpenses - inp.soloTaxCost;
   const businessIncome = Math.max(0, grossProfit - inp.blueDeduction);
   const householdSize = 1 + inp.spouse + inp.children;
@@ -1218,47 +1163,32 @@ function calcSolo(inp) {
   const nhi = nationalHealthInsurance(businessIncome, householdSize);
   const np = nationalPension(pensionMembers);
   const socialIns = nhi + np;
-  const basicDed = 580000;
+  const basicDed = 480000;
   const spouseDed = inp.spouse ? spouseDeduction(inp.spouseIncome) : 0;
   const totalDed = basicDed + spouseDed + socialIns;
   const taxable = Math.max(0, businessIncome - totalDed);
   const it = incomeTax(taxable);
   const rt = residentTax(taxable);
   const bt = businessTax(grossProfit);
-
-  // 配当の申告分離課税（20.315%）
-  const dividendTax = dividendIncomeForSolo * 0.20315;
-
-  const totalTax = it + rt + bt + dividendTax;
-  const handed = grossProfit + inp.vatRefund + dividendIncomeForSolo - totalTax - socialIns;
+  const totalTax = it + rt + bt;
+  const handed = grossProfit + inp.vatRefund - totalTax - socialIns;
 
   const breakdown = [
-    { label: '事業売上', value: inp.revenue }
+    { label: '事業売上', value: totalRevenue },
+    { label: '事業経費', value: -totalExpenses },
+    { label: '税理士費用（個人事業側）', value: -inp.soloTaxCost },
+    { label: '消費税還付', value: inp.vatRefund },
+    { label: '所得税', value: -it },
+    { label: '住民税', value: -rt },
+    { label: '事業税', value: -bt },
+    { label: '国民健康保険', value: -nhi },
+    { label: '国民年金', value: -np }
   ];
-  if (extraRevenue > 0) {
-    breakdown.push({ label: `(法人事業も個人で受ける場合の追加売上)`, value: extraRevenue });
-  }
-  breakdown.push({ label: '事業経費', value: -inp.expenses });
-  if (extraExpenses > 0) {
-    breakdown.push({ label: '(法人事業の経費追加)', value: -extraExpenses });
-  }
-  breakdown.push({ label: '税理士費用（個人事業側）', value: -inp.soloTaxCost });
-  if (dividendIncomeForSolo > 0) {
-    breakdown.push({ label: '配当収入（個人で受取）', value: dividendIncomeForSolo });
-    breakdown.push({ label: '配当税（申告分離20.315%）', value: -dividendTax });
-  }
-  breakdown.push({ label: '消費税還付', value: inp.vatRefund });
-  breakdown.push({ label: '所得税', value: -it });
-  breakdown.push({ label: '住民税', value: -rt });
-  breakdown.push({ label: '事業税', value: -bt });
-  breakdown.push({ label: '国民健康保険', value: -nhi });
-  breakdown.push({ label: '国民年金', value: -np });
 
   return {
     handed, grossProfit, vatRefund: inp.vatRefund,
     incomeT: it, residentT: rt, bizT: bt,
-    nhi, np, totalTax,
-    breakdown
+    nhi, np, totalTax, breakdown
   };
 }
 
@@ -1286,8 +1216,24 @@ function calcBoth(inp, monthlySalary) {
   const businessIncome = Math.max(0, grossProfit - inp.blueDeduction);
   const salaryDed = salaryDeduction(annualSalary);
   const salaryIncome = Math.max(0, annualSalary - salaryDed);
-  const socialInsPersonal = sh.employee;
-  const basicDed = 580000;
+
+  // 役員報酬が0の場合は協会けんぽに加入できないため、国保＋国民年金を適用
+  const householdSize = 1 + inp.spouse + inp.children;
+  const pensionMembers = 1 + inp.spouse;
+  let socialInsPersonal, nhi_both, np_both;
+  if (monthlySalary > 0) {
+    // 協会けんぽ加入：本人負担分のみ、扶養家族は追加費用なし
+    socialInsPersonal = sh.employee;
+    nhi_both = 0;
+    np_both = 0;
+  } else {
+    // 報酬0円→協会けんぽ非加入：個人事業と同じく国保＋国民年金
+    nhi_both = nationalHealthInsurance(businessIncome, householdSize);
+    np_both = nationalPension(pensionMembers);
+    socialInsPersonal = nhi_both + np_both;
+  }
+
+  const basicDed = 480000;
   const spouseDed = inp.spouse ? spouseDeduction(inp.spouseIncome) : 0;
   const totalDed = basicDed + spouseDed + socialInsPersonal;
   const totalIncome = businessIncome + salaryIncome;
@@ -1304,21 +1250,28 @@ function calcBoth(inp, monthlySalary) {
     corpExpenses: inp.corpExpenses, corpProfit, corpTax,
     runningCost: inp.runningCost,
     sh,
-    breakdown: [
-      // 個人事業の収支
+    breakdown: monthlySalary > 0 ? [
       { label: '事業売上（個人）', value: inp.revenue },
       { label: '事業経費（個人）', value: -inp.expenses },
       { label: '税理士費用（個人事業側）', value: -inp.soloTaxCostForBoth },
       { label: '消費税還付', value: inp.vatRefund },
-      // 法人から受け取る給与（個人の収入）
       { label: '役員報酬（給与）', value: annualSalary },
-      // 個人にかかる税金・社会保険
       { label: '社会保険（本人負担）', value: -sh.employee },
       { label: '所得税', value: -it },
       { label: '住民税', value: -rt },
       { label: '事業税', value: -bt },
-      // 法人に残る利益（法人売上から経費・給与・税を引いた残り）
-      { label: '法人内部留保', value: corpRetained }
+      { label: '法人内部留保（売上' + fmt(corpRevActual) + '−経費−報酬−社保−運営費−法人税）', value: corpRetained }
+    ] : [
+      { label: '事業売上（個人）', value: inp.revenue },
+      { label: '事業経費（個人）', value: -inp.expenses },
+      { label: '税理士費用（個人事業側）', value: -inp.soloTaxCostForBoth },
+      { label: '消費税還付', value: inp.vatRefund },
+      { label: '国民健康保険', value: -nhi_both },
+      { label: '国民年金', value: -np_both },
+      { label: '所得税', value: -it },
+      { label: '住民税', value: -rt },
+      { label: '事業税', value: -bt },
+      { label: '法人内部留保（売上' + fmt(corpRevActual) + '−経費−運営費−法人税）', value: corpRetained }
     ]
   };
 }
@@ -1327,8 +1280,18 @@ function optimizeSalary(inp) {
   if (inp.fixedSalary > 0) {
     return { monthlySalary: inp.fixedSalary, result: calcBoth(inp, inp.fixedSalary) };
   }
+
+  // 法人売上がない場合は報酬を払う原資がないため salary=0
+  if (inp.corpRevenue <= 0) {
+    return { monthlySalary: 0, result: calcBoth(inp, 0) };
+  }
+
+  // 報酬の上限：法人売上の月額を超えない（現実的な制約）
+  const maxMonthly = Math.min(200000, Math.floor(inp.corpRevenue / 12 / 5000) * 5000);
+
   let best = null;
-  for (let m = 0; m <= 200000; m += 5000) {
+  // salary=0（国保＋国民年金のまま）も含めて全探索
+  for (let m = 0; m <= maxMonthly; m += 5000) {
     const r = calcBoth(inp, m);
     if (!best || r.handed > best.result.handed) {
       best = { monthlySalary: m, result: r };
@@ -1598,9 +1561,7 @@ function recalculate() {
 
   // サマリー
   const biz = BIZ_TYPES.find(b => b.id === inp.bizType);
-  const modeLabel = inp.compareMode === 'split' ? 'A案：売上分割' : 'B案：追加事業';
   document.getElementById('summaryText').innerHTML = `
-    ・比較モード：<strong>${modeLabel}</strong><br>
     ・選択業種：${biz.icon} ${biz.name}<br>
     ・法人運営費：${fmt(inp.runningCost)}/年<br>
     ・法人内に残る金額：${fmt(both.corpRetained)}/年<br>
@@ -1632,16 +1593,6 @@ document.querySelectorAll('.toggle-btn').forEach(btn => {
     btn.parentElement.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById(target).value = btn.dataset.value;
-
-    // 比較モード切替時のヒント文更新
-    if (target === 'compareMode') {
-      const hint = document.getElementById('compareModeHint');
-      if (btn.dataset.value === 'split') {
-        hint.innerHTML = '<strong>A案（売上分割）</strong>：同じ事業規模で個人事業のみ vs 個人＋マイクロ法人を比較。マイクロ法人の売上を個人事業から切り出すパターン（リベ大スキームの基本）';
-      } else {
-        hint.innerHTML = '<strong>B案（追加事業）</strong>：個人事業はそのまま、マイクロ法人で<u>新規事業を追加</u>するパターン。コンサル副業など、個人事業とは別の収入源を法人で持つ場合に選択';
-      }
-    }
     recalculate();
   });
 });
@@ -1656,22 +1607,5 @@ renderBizCards();
 renderExpenseList();
 recalculate();
 </script>
-
-<footer style="max-width:800px; margin:32px auto 16px; padding:20px 24px; background:#fff; border:1px solid var(--border); border-radius:12px; text-align:center; font-size:14px; color:var(--text-sub);">
-  <p style="margin-bottom:8px;">
-    <span style="font-size:16px; font-weight:600; color:var(--text);">🛠 作成：いのっち</span>
-  </p>
-  <p style="margin-bottom:12px; font-size:13px;">eBayせどりフルタイム挑戦中 ｜ Claude Code で構築</p>
-  <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
-    <a href="https://libecity.com/user_profile/996673482" target="_blank"
-       style="display:inline-flex; align-items:center; gap:6px; padding:8px 16px; background:var(--accent-light); color:var(--accent-dark); border-radius:8px; text-decoration:none; font-weight:600; font-size:13px;">
-      🏠 リベシティ プロフィール
-    </a>
-    <a href="https://tkc252589.github.io/inocchi-tools/efficiency_tools.html" target="_blank"
-       style="display:inline-flex; align-items:center; gap:6px; padding:8px 16px; background:#f0f9ff; color:#1e40af; border-radius:8px; text-decoration:none; font-weight:600; font-size:13px;">
-      📋 いのっちの活用事例一覧
-    </a>
-  </div>
-</footer>
 </body>
 </html>

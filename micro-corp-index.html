@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>マイクロ法人 まとめページ</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans JP',sans-serif;background:#fafafa;color:#111827;line-height:1.7;padding:24px}
+  .container{max-width:640px;margin:0 auto}
+  h1{font-size:24px;font-weight:700;text-align:center;margin-bottom:6px}
+  .sub{text-align:center;color:#6b7280;font-size:13px;margin-bottom:32px}
+  .section-label{font-size:11px;font-weight:700;color:#6b7280;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;padding-left:4px}
+  a.card{display:block;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;margin-bottom:10px;text-decoration:none;color:#111827;transition:all .15s}
+  a.card:hover{border-color:#0f766e;background:#f0fdfa;transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .card .num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#0f766e;color:#fff;font-size:11px;font-weight:700;font-family:'Outfit',sans-serif;margin-right:8px;flex-shrink:0}
+  .card .title{font-size:14px;font-weight:600}
+  .card .desc{font-size:12px;color:#6b7280;margin-top:3px}
+  .card .tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;margin-top:6px}
+  .tag-family{background:#d1fae5;color:#047857}
+  .tag-single{background:#dbeafe;color:#1d4ed8}
+  .tag-both{background:#ede9fe;color:#6d28d9}
+  .divider{height:1px;background:linear-gradient(90deg,transparent,#e5e7eb,transparent);margin:24px 0}
+  .sim{border:2px solid #0f766e;border-radius:12px;overflow:hidden;margin-bottom:10px}
+  .sim a{display:block;padding:18px;text-decoration:none;color:#fff;background:linear-gradient(135deg,#134e4a,#0f766e);text-align:center;transition:opacity .15s}
+  .sim a:hover{opacity:.9}
+  .sim .title{font-size:16px;font-weight:700}
+  .sim .desc{font-size:12px;opacity:.85;margin-top:4px}
+  .footer{text-align:center;color:#9ca3af;font-size:11px;margin-top:32px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>マイクロ法人 資料まとめ</h1>
+  <p class="sub">個人事業主 × マイクロ法人の節税シミュレーション・分析資料</p>
+
+  <!-- シミュレーター -->
+  <div class="sim">
+    <a href="micro-corp-simulator/">
+      <div class="title">節税シミュレーター（計算ツール）</div>
+      <div class="desc">自分の数字を入れて個人のみ vs マイクロ法人の手取りを比較</div>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 5人世帯向け -->
+  <div class="section-label">家族あり向け</div>
+
+  <a class="card" href="micro-corp-analysis.html">
+    <div class="title"><span class="num">1</span>節税シミュレーション結果</div>
+    <div class="desc">5人世帯・利益600万・還付120万の場合。報酬0円 vs 月4.5万で年47万円の差</div>
+    <span class="tag tag-family">5人世帯</span>
+  </a>
+
+  <a class="card" href="micro-corp-consulting-vs-dividend.html">
+    <div class="title"><span class="num">2</span>コンサル型 vs 配当型 比較</div>
+    <div class="desc">法人の事業をコンサルにするか投資配当にするか。手間・リスク・税制の違い</div>
+    <span class="tag tag-family">5人世帯</span>
+  </a>
+
+  <a class="card" href="micro-corp-dividend-demerits.html">
+    <div class="title"><span class="num">3</span>配当型デメリット 全13項目</div>
+    <div class="desc">益金不算入は95%ではなく20%？NISA問題・二重課税・移管コスト等</div>
+    <span class="tag tag-both">共通</span>
+  </a>
+
+  <a class="card" href="micro-corp-breakeven.html">
+    <div class="title"><span class="num">4</span>損益分岐点（家族構成別）</div>
+    <div class="desc">1人〜5人世帯で事業所得がいくらあればマイクロ法人が得か。グラフ付き</div>
+    <span class="tag tag-both">共通</span>
+  </a>
+
+  <a class="card" href="micro-corp-scaling-guide.html">
+    <div class="title"><span class="num">5</span>事業拡大ガイド</div>
+    <div class="desc">従業員を雇う方法・個人事業 vs 法人化・2法人体制・外注活用</div>
+    <span class="tag tag-family">5人世帯</span>
+  </a>
+
+  <div class="divider"></div>
+
+  <!-- 独身向け -->
+  <div class="section-label">独身向け</div>
+
+  <a class="card" href="micro-corp-single-breakeven.html">
+    <div class="title"><span class="num">6</span>独身・法人売上0・貸付運営の損益分岐点</div>
+    <div class="desc">法人に事業なし・個人から貸付で運営する場合。分岐点は事業所得500〜600万</div>
+    <span class="tag tag-single">独身</span>
+  </a>
+
+  <div class="footer">
+    作成日: 2026-04-17 | ⚠️ 概算ツール・正式判断は税理士にご相談を
+  </div>
+</div>
+</body>
+</html>

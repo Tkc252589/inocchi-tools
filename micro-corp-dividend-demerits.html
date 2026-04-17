@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>配当型マイクロ法人のデメリット — 全リスク一覧</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#fafafa;--card:#fff;--border:#e5e7eb;--text:#111827;--sub:#6b7280;--pos:#059669;--neg:#dc2626;--warn:#d97706;--accent:#0f766e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:20px}
+  .container{max-width:860px;margin:0 auto}
+  h1{font-size:22px;font-weight:700;text-align:center;margin-bottom:4px}
+  .subtitle{text-align:center;color:var(--sub);font-size:13px;margin-bottom:24px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px}
+  .card h2{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+  .alert{border:2px solid var(--neg);background:#fef2f2;border-radius:14px;padding:20px;margin-bottom:16px}
+  .alert h2{color:var(--neg);font-size:16px;font-weight:700;margin-bottom:8px}
+  .alert p{font-size:13px}
+
+  .warn-box{border:2px solid var(--warn);background:#fffbeb;border-radius:14px;padding:20px;margin-bottom:16px}
+  .warn-box h2{color:#92400e;font-size:15px;font-weight:700;margin-bottom:8px}
+
+  .demerit-list{counter-reset:demerit}
+  .demerit-item{border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;position:relative;padding-left:52px}
+  .demerit-item::before{counter-increment:demerit;content:counter(demerit);position:absolute;left:16px;top:16px;width:24px;height:24px;background:var(--neg);color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif}
+  .demerit-item.critical{border-color:var(--neg);background:#fef2f2}
+  .demerit-item.critical::before{background:#991b1b}
+  .demerit-item.warning{border-color:var(--warn);background:#fffbeb}
+  .demerit-item.warning::before{background:var(--warn)}
+  .demerit-item.minor{border-color:#94a3b8;background:#f8fafc}
+  .demerit-item.minor::before{background:#64748b}
+  .demerit-item h3{font-size:14px;font-weight:700;margin-bottom:4px}
+  .demerit-item p{font-size:12px;color:var(--sub);line-height:1.6}
+  .demerit-item .impact{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:6px}
+  .impact-high{background:#fee2e2;color:#991b1b}
+  .impact-mid{background:#fef3c7;color:#92400e}
+  .impact-low{background:#f1f5f9;color:#475569}
+
+  .tax-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+  .tax-box{padding:14px;border-radius:10px;border:1.5px solid;font-size:12px}
+  .tax-box h4{font-size:12px;font-weight:700;margin-bottom:6px}
+  .tax-box .row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+  .tax-box .row:last-child{border:none}
+  .tax-box .row span:last-child{font-family:'Outfit',sans-serif;font-weight:600}
+  .box-wrong{border-color:#f87171;background:#fef2f2}
+  .box-right{border-color:#fbbf24;background:#fffbeb}
+  .box-good{border-color:#34d399;background:#ecfdf5}
+  .pos{color:var(--pos)}.neg{color:var(--neg)}.warn{color:var(--warn)}
+
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{padding:8px 10px;text-align:left;border-bottom:1px solid #f3f4f6}
+  th{background:#f8fafc;font-weight:600;color:var(--sub);font-size:11px}
+
+  .flow-row{display:flex;align-items:center;gap:0;flex-wrap:wrap;justify-content:center;margin:10px 0}
+  .fbox{padding:10px 12px;border-radius:10px;text-align:center;font-size:11px;font-weight:600;border:1.5px solid;min-width:80px;line-height:1.4}
+  .fbox small{display:block;font-weight:400;font-size:10px;opacity:.7;margin-top:2px}
+  .fb-r{background:rgba(239,68,68,.08);border-color:#ef4444;color:#b91c1c}
+  .fb-o{background:rgba(249,115,22,.08);border-color:#f97316;color:#c2410c}
+  .fb-g{background:rgba(5,150,105,.08);border-color:#059669;color:#047857}
+  .fb-b{background:rgba(59,130,246,.08);border-color:#3b82f6;color:#1d4ed8}
+  .fb-p{background:rgba(139,92,246,.08);border-color:#8b5cf6;color:#6d28d9}
+  .arr{color:#94a3b8;padding:0 6px;font-size:14px}
+
+  .conclusion{background:linear-gradient(135deg,#134e4a,#0f766e);color:#fff;border:none;border-radius:14px;padding:24px;margin-bottom:16px}
+  .conclusion h2{color:#fff;margin-bottom:12px}
+  .conclusion ul{padding-left:18px;font-size:13px}
+  .conclusion li{margin-bottom:6px}
+  .conclusion li strong{color:#6ee7b7}
+
+  .legend{display:flex;gap:16px;margin-bottom:16px;font-size:11px;color:var(--sub);flex-wrap:wrap}
+  .legend span{display:flex;align-items:center;gap:4px}
+  .legend .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+  @media(max-width:700px){
+    .tax-compare{grid-template-columns:1fr}
+    .flow-row{flex-direction:column}
+    .arr{transform:rotate(90deg);padding:4px 0}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>配当型マイクロ法人のデメリット</h1>
+<p class="subtitle">メリットだけ見て判断しないための全リスク一覧</p>
+
+<!-- 最重要アラート -->
+<div class="alert">
+  <h2>最重要：「95%益金不算入」は上場株には適用されない可能性が高い</h2>
+  <p>リベ大やYouTubeでよく聞く「配当の95%が非課税」は<strong>完全子法人（100%保有）の配当</strong>の話。<br>
+  VYMや日本の高配当株など<strong>上場株を少量保有する場合は「非支配目的株式等」に該当し、益金不算入は20%のみ</strong>（80%が課税対象）。<br>
+  これはリベ税に必ず確認してください。以下、両パターンで解説します。</p>
+</div>
+
+<!-- 益金不算入の正しい理解 -->
+<div class="card">
+  <h2>益金不算入の割合（株式の保有比率で変わる）</h2>
+  <table>
+    <thead>
+      <tr><th>株式の区分</th><th>保有比率</th><th>益金不算入割合</th><th>該当例</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>完全子法人株式等</td><td>100%</td><td class="pos"><strong>100%</strong></td><td>自分が作った別法人の株</td></tr>
+      <tr><td>関連法人株式等</td><td>1/3超</td><td class="pos"><strong>100%</strong>（負債利子控除後）</td><td>関連会社の株</td></tr>
+      <tr><td>その他の株式等</td><td>5%超〜1/3以下</td><td class="warn"><strong>50%</strong></td><td>中規模投資先</td></tr>
+      <tr style="background:#fef2f2"><td><strong>非支配目的株式等</strong></td><td><strong>5%以下</strong></td><td class="neg"><strong>20%</strong></td><td><strong>VYM・高配当株・ETF<br>← いのっちはここ</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 税金比較 -->
+<div class="card">
+  <h2>配当100万円の税金比較（上場株の場合）</h2>
+  <div class="tax-compare" style="grid-template-columns:1fr 1fr 1fr">
+    <div class="tax-box box-good">
+      <h4>個人で受け取る</h4>
+      <div class="row"><span>配当収入</span><span>100万</span></div>
+      <div class="row"><span>税率</span><span>20.315%</span></div>
+      <div class="row"><span>税金</span><span class="neg">-20.3万</span></div>
+      <div class="row" style="font-weight:700;border-top:2px solid #34d399;padding-top:6px"><span>手元に残る</span><span class="pos">79.7万</span></div>
+    </div>
+    <div class="tax-box box-wrong">
+      <h4>法人で受取（上場株）<br><span style="font-size:10px;color:var(--neg)">益金不算入20%</span></h4>
+      <div class="row"><span>配当収入</span><span>100万</span></div>
+      <div class="row"><span>課税対象（80%）</span><span>80万</span></div>
+      <div class="row"><span>法人税（25%）</span><span class="neg">-20万</span></div>
+      <div class="row" style="font-weight:700;border-top:2px solid #f87171;padding-top:6px"><span>法人に残る</span><span>80万</span></div>
+      <div style="font-size:10px;color:var(--neg);margin-top:4px">※ 個人に出す時さらに課税</div>
+    </div>
+    <div class="tax-box box-right">
+      <h4>法人で受取（子法人）<br><span style="font-size:10px;color:var(--warn)">益金不算入100%</span></h4>
+      <div class="row"><span>配当収入</span><span>100万</span></div>
+      <div class="row"><span>課税対象</span><span>0万</span></div>
+      <div class="row"><span>法人税</span><span class="pos">0万</span></div>
+      <div class="row" style="font-weight:700;border-top:2px solid #fbbf24;padding-top:6px"><span>法人に残る</span><span class="pos">100万</span></div>
+      <div style="font-size:10px;color:var(--sub);margin-top:4px">※ 普通の上場株では無理</div>
+    </div>
+  </div>
+  <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px;font-size:12px;color:#991b1b;margin-top:8px;text-align:center">
+    <strong>上場株の配当は、個人（20.3%）も法人（実質20%）もほぼ同じ税率。法人で持つ税メリットは小さい。</strong>
+  </div>
+</div>
+
+<!-- デメリット全リスト -->
+<div class="card">
+  <h2>デメリット全13項目</h2>
+  <div class="legend">
+    <span><span class="dot" style="background:#991b1b"></span> 致命的</span>
+    <span><span class="dot" style="background:var(--warn)"></span> 要注意</span>
+    <span><span class="dot" style="background:#64748b"></span> 軽微</span>
+  </div>
+
+  <div class="demerit-list">
+
+    <!-- 致命的 -->
+    <div class="demerit-item critical">
+      <h3>益金不算入が95%ではなく20%の可能性 <span class="impact impact-high">致命的</span></h3>
+      <p>上場株（保有5%以下）は非支配目的株式等に該当し、益金不算入は20%のみ。配当の80%に法人税がかかるため、個人で持つのとほぼ同じ税率。「法人で配当を受ければ非課税」は上場株には当てはまらない。</p>
+    </div>
+
+    <div class="demerit-item critical">
+      <h3>個人→法人への株式移管で税金が発生 <span class="impact impact-high">致命的</span></h3>
+      <p>今個人で持っている2,500万の高配当株を法人に移すには「売却→法人で買い直し」が必要。<strong>含み益がある場合、売却時に20.315%が課税される。</strong>例えば含み益500万なら約100万の税金。移管の実費（売買手数料）もかかる。</p>
+    </div>
+
+    <div class="demerit-item critical">
+      <h3>NISAが使えなくなる <span class="impact impact-high">致命的</span></h3>
+      <p>法人にはNISA口座がない。現在NISAで運用している分は法人に移せない（移したら非課税メリット消滅）。新NISA枠1,800万円の非課税メリットを捨てることになる。<strong>NISAで高配当株を持っている場合、法人に移す意味がゼロ。</strong></p>
+    </div>
+
+    <div class="demerit-item critical">
+      <h3>出口で二重課税 <span class="impact impact-high">致命的</span></h3>
+      <p>法人内の株を売却→法人税。その後、利益を個人に出す→所得税（配当課税 or 役員報酬）。最終的に法人を畳む時も残余財産にみなし配当課税。<strong>入口で税金、出口でも税金の二重構造。</strong></p>
+      <div class="flow-row" style="margin-top:8px">
+        <div class="fbox fb-r">株を売却<small>法人税25%</small></div>
+        <span class="arr">→</span>
+        <div class="fbox fb-r">個人に出す<small>配当税20%</small></div>
+        <span class="arr">→</span>
+        <div class="fbox fb-r">実質税率<small>約40%</small></div>
+      </div>
+    </div>
+
+    <!-- 要注意 -->
+    <div class="demerit-item warning">
+      <h3>法人口座の開設が難しい <span class="impact impact-mid">要注意</span></h3>
+      <p>法人の証券口座を開設できる証券会社は限られる（SBI証券・マネックス証券など）。楽天証券は法人口座なし。審査も個人より厳しく、設立直後は断られることもある。</p>
+    </div>
+
+    <div class="demerit-item warning">
+      <h3>投資元本を法人に入れる手続き <span class="impact impact-mid">要注意</span></h3>
+      <p>2,500万を法人に入れるには「資本金」か「役員借入金」で入れる。資本金1,000万超にすると消費税の免税特例が使えなくなる。役員借入金なら問題ないが、返済計画が必要。</p>
+    </div>
+
+    <div class="demerit-item warning">
+      <h3>外国株の配当は外国税額控除が複雑 <span class="impact impact-mid">要注意</span></h3>
+      <p>米国株・ETF（VYMなど）の配当は米国で10%源泉徴収される。個人なら確定申告で外国税額控除が比較的簡単。法人だと控除限度額の計算が複雑で、税理士費用が増える可能性。</p>
+    </div>
+
+    <div class="demerit-item warning">
+      <h3>配当が減ると社保メリットの維持コストが相対的に上がる <span class="impact impact-mid">要注意</span></h3>
+      <p>不景気で配当が減配・無配になっても、法人の運営費（税理士・会計ソフト・法人住民税均等割 年7万〜）は固定で発生し続ける。配当収入が減った年は法人の赤字が拡大する。</p>
+    </div>
+
+    <div class="demerit-item warning">
+      <h3>含み損の扱い <span class="impact impact-mid">要注意</span></h3>
+      <p>個人なら株の売却損は3年間繰越控除できる。法人なら10年間繰越可能（これはメリット）。ただし法人内で含み損を抱えると法人の純資産が減り、融資や信用に影響する可能性。</p>
+    </div>
+
+    <div class="demerit-item warning">
+      <h3>相続が複雑になる <span class="impact impact-mid">要注意</span></h3>
+      <p>個人で持つ上場株は時価で簡単に評価できる。法人の株式は「類似業種比準方式」等で評価が必要で、法人内の資産内容によっては個人保有より高く評価されることも。相続税対策が別途必要。</p>
+    </div>
+
+    <!-- 軽微 -->
+    <div class="demerit-item minor">
+      <h3>個人と法人の投資を分けて管理する手間 <span class="impact impact-low">軽微</span></h3>
+      <p>個人のNISA・特定口座と、法人の証券口座を並行管理。配当の入金先、再投資のタイミングなどを分けて把握する必要がある。</p>
+    </div>
+
+    <div class="demerit-item minor">
+      <h3>法人の決算月に含み益/損を計上するか判断が必要 <span class="impact impact-low">軽微</span></h3>
+      <p>法人保有の有価証券は決算で時価評価（売買目的の場合）。保有目的の分類によっては評価損益が法人税に影響。税理士との相談が必要。</p>
+    </div>
+
+    <div class="demerit-item minor">
+      <h3>法人口座では信用取引・デリバティブが制限される場合がある <span class="impact impact-low">軽微</span></h3>
+      <p>証券会社によっては法人口座で信用取引やオプション取引ができない場合がある。高配当株のバイ&ホールドなら問題ないが、ヘッジや積極運用を考えている場合は制約に。</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- コンサル型との再比較 -->
+<div class="card">
+  <h2>配当型 vs コンサル型 — デメリットを踏まえた再評価</h2>
+  <table>
+    <thead><tr><th>比較項目</th><th>配当型</th><th>コンサル型</th></tr></thead>
+    <tbody>
+      <tr><td>法人での税率</td><td class="neg">実質20%（上場株）<br>個人とほぼ同じ</td><td>利益に25%<br>（赤字なら0%）</td></tr>
+      <tr><td>売上の確実性</td><td class="pos">配当は比較的安定</td><td class="neg">クライアント次第</td></tr>
+      <tr><td>初期コスト</td><td class="neg">株の移管で含み益に課税</td><td class="pos">特になし</td></tr>
+      <tr><td>NISA</td><td class="neg">使えない</td><td>関係なし</td></tr>
+      <tr><td>出口の税金</td><td class="neg">二重課税あり</td><td class="pos">利益留保しなければ軽い</td></tr>
+      <tr><td>手間</td><td class="pos">ほぼゼロ</td><td class="neg">営業・納品が必要</td></tr>
+      <tr><td>同業種リスク</td><td class="pos">eBayと無関係</td><td class="neg">eBay系だとリスクあり</td></tr>
+      <tr><td>社保メリット（年47万）</td><td class="pos">どちらでも同じ</td><td class="pos">どちらでも同じ</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 第3の選択肢 -->
+<div class="warn-box">
+  <h2>第3の選択肢：株は個人のまま、法人は最小限の事業で回す</h2>
+  <p style="font-size:13px;margin-bottom:12px">
+    配当型のデメリットが大きいなら、<strong>株は個人（NISA+特定口座）で持ち続け、法人は別の方法で最小限の売上を立てる</strong>という選択肢もあります。
+  </p>
+  <div class="tax-compare">
+    <div class="tax-box box-good">
+      <h4>個人で株を持つメリット</h4>
+      <div style="font-size:12px">
+        <div style="padding:3px 0">+ NISA枠（1,800万）が使える → 非課税</div>
+        <div style="padding:3px 0">+ 含み益の移管コストなし</div>
+        <div style="padding:3px 0">+ 出口の二重課税なし</div>
+        <div style="padding:3px 0">+ 外国税額控除がシンプル</div>
+        <div style="padding:3px 0">+ 相続も時価評価でシンプル</div>
+      </div>
+    </div>
+    <div class="tax-box" style="border-color:var(--accent);background:#f0fdfa">
+      <h4>法人の売上は別で作る例</h4>
+      <div style="font-size:12px">
+        <div style="padding:3px 0">・eBay以外の分野でコンサル（少額でOK）</div>
+        <div style="padding:3px 0">・せどりノウハウの教材販売</div>
+        <div style="padding:3px 0">・業務効率化ツールの販売</div>
+        <div style="padding:3px 0">・不動産（区分マンション1室など）</div>
+        <div style="padding:3px 0;font-weight:600;color:var(--accent)">→ 年100万程度の売上があれば社保メリットは得られる</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 結論 -->
+<div class="conclusion">
+  <h2>リベ税に必ず確認すべきこと</h2>
+  <ul>
+    <li><strong>上場株の益金不算入率</strong> — 本当に20%なのか、何か方法があるのか</li>
+    <li><strong>NISAで持っている株</strong> — 法人に移す意味があるのか（たぶんない）</li>
+    <li><strong>含み益がいくらあるか</strong> — 移管コストの試算</li>
+    <li><strong>出口戦略</strong> — 将来法人を畳む時の二重課税をどう回避するか</li>
+    <li><strong>「株は個人のまま＋法人は別事業」パターン</strong> — これが最適ではないか</li>
+    <li><strong>コンサル型にする場合</strong> — eBay以外でどんな事業が現実的か</li>
+  </ul>
+</div>
+
+<div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px;font-size:12px;color:var(--sub);margin-bottom:16px">
+  <strong>注意:</strong> この資料は概算・一般論です。特に益金不算入の適用割合は保有形態（直接保有 vs ETF経由）や税制改正で変わる可能性があります。最終判断は必ずリベ大税理士法人に確認してください。
+</div>
+
+<div style="text-align:center;color:var(--sub);font-size:11px;padding:16px 0">
+  作成日: 2026-04-17 | 配当型マイクロ法人 デメリット全リスト
+</div>
+
+</div>
+</body>
+</html>

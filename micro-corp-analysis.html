@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>マイクロ法人 シミュレーション結果</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa; --card: #fff; --border: #e5e7eb; --text: #111827;
+    --sub: #6b7280; --accent: #0f766e; --accent-light: #ccfbf1;
+    --positive: #059669; --negative: #dc2626; --warning: #d97706;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; padding: 20px; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 4px; }
+  .subtitle { text-align: center; color: var(--sub); font-size: 13px; margin-bottom: 24px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+  .card h2 { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .card h2 .badge { font-size: 11px; padding: 2px 10px; border-radius: 99px; font-weight: 600; }
+  .badge-solo { background: #fef3c7; color: #92400e; }
+  .badge-both { background: var(--accent-light); color: var(--accent); }
+  .badge-loss { background: #fee2e2; color: var(--negative); }
+  .badge-gain { background: #d1fae5; color: var(--positive); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #f3f4f6; }
+  th { color: var(--sub); font-weight: 500; font-size: 12px; }
+  td:last-child { text-align: right; font-family: 'Outfit', sans-serif; font-weight: 600; }
+  tr.total { border-top: 2px solid var(--text); font-weight: 700; font-size: 15px; }
+  tr.total td { padding-top: 12px; }
+  .pos { color: var(--positive); }
+  .neg { color: var(--negative); }
+  .muted { color: var(--sub); }
+
+  .result-card { background: linear-gradient(135deg, #134e4a, #0f766e); color: #fff; border: none; text-align: center; }
+  .result-card h2 { color: #fff; justify-content: center; }
+  .result-big { font-family: 'Outfit', sans-serif; font-size: 48px; font-weight: 700; margin: 8px 0; }
+  .result-sub { font-size: 13px; opacity: .85; }
+  .result-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.2); }
+  .result-item .label { font-size: 12px; opacity: .7; }
+  .result-item .value { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 700; }
+
+  .flow-section { background: #f8fafc; border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+  .flow-section h2 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+  .flow-row { display: flex; align-items: center; gap: 0; flex-wrap: wrap; justify-content: center; margin: 12px 0; }
+  .flow-box { padding: 10px 14px; border-radius: 10px; text-align: center; font-size: 12px; font-weight: 600; border: 1.5px solid; min-width: 100px; line-height: 1.4; }
+  .flow-box small { display: block; font-weight: 400; font-size: 10px; opacity: .7; margin-top: 2px; }
+  .fb-orange { background: rgba(249,115,22,.08); border-color: #f97316; color: #c2410c; }
+  .fb-green { background: rgba(5,150,105,.08); border-color: #059669; color: #047857; }
+  .fb-red { background: rgba(220,38,38,.08); border-color: #dc2626; color: #b91c1c; }
+  .fb-blue { background: rgba(59,130,246,.08); border-color: #3b82f6; color: #1d4ed8; }
+  .fb-purple { background: rgba(139,92,246,.08); border-color: #8b5cf6; color: #6d28d9; }
+  .arrow { color: #94a3b8; padding: 0 8px; font-size: 18px; }
+
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+  .compare-box { padding: 14px; border-radius: 10px; border: 1.5px solid; }
+  .compare-box h3 { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+  .compare-box ul { list-style: none; font-size: 12px; }
+  .compare-box li { padding: 3px 0; display: flex; justify-content: space-between; }
+  .compare-box li span:last-child { font-family: 'Outfit', sans-serif; font-weight: 600; }
+  .box-solo { border-color: #fbbf24; background: #fffbeb; }
+  .box-both { border-color: #34d399; background: #ecfdf5; }
+
+  .note { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 14px 16px; font-size: 12px; color: #92400e; margin-bottom: 16px; line-height: 1.7; }
+  .note strong { color: #78350f; }
+
+  .conclusion { background: #ecfdf5; border: 1px solid #6ee7b7; border-radius: 10px; padding: 16px; font-size: 13px; margin-bottom: 16px; }
+  .conclusion h3 { font-size: 14px; font-weight: 700; color: #047857; margin-bottom: 8px; }
+  .conclusion ul { padding-left: 18px; }
+  .conclusion li { margin-bottom: 4px; }
+
+  .conditions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .cond-item { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; border-bottom: 1px solid #f3f4f6; }
+  .cond-item span:first-child { color: var(--sub); }
+  .cond-item span:last-child { font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .compare-grid, .conditions, .result-detail { grid-template-columns: 1fr; }
+    .flow-row { flex-direction: column; }
+    .arrow { transform: rotate(90deg); padding: 4px 0; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>マイクロ法人 節税シミュレーション</h1>
+  <p class="subtitle">いのっちの2026年見込みで試算</p>
+
+  <!-- 前提条件 -->
+  <div class="card">
+    <h2>前提条件</h2>
+    <div class="conditions">
+      <div class="cond-item"><span>個人事業 売上</span><span>3,600万円</span></div>
+      <div class="cond-item"><span>個人事業 経費</span><span>3,000万円</span></div>
+      <div class="cond-item"><span>事業利益</span><span>600万円</span></div>
+      <div class="cond-item"><span>消費税還付</span><span>120万円</span></div>
+      <div class="cond-item"><span>法人売上</span><span>100万円</span></div>
+      <div class="cond-item"><span>法人経費</span><span>30万円</span></div>
+      <div class="cond-item"><span>家族構成</span><span>配偶者 + 子供3人（5人世帯）</span></div>
+      <div class="cond-item"><span>青色申告控除</span><span>65万円</span></div>
+      <div class="cond-item"><span>税理士</span><span>リベ大税理士法人</span></div>
+      <div class="cond-item"><span>比較方式</span><span>A案（売上分割）</span></div>
+    </div>
+  </div>
+
+  <!-- 結果サマリー -->
+  <div class="card result-card">
+    <h2>シミュレーション結果</h2>
+    <div class="result-sub">マイクロ法人（月4.5万報酬）で年間手取りが…</div>
+    <div class="result-big">+47万円</div>
+    <div class="result-sub">※ 役員報酬0円だと逆に -13万円の損</div>
+    <div class="result-detail">
+      <div class="result-item">
+        <div class="label">個人事業のみ</div>
+        <div class="value">543万円</div>
+      </div>
+      <div class="result-item">
+        <div class="label">個人 + マイクロ法人</div>
+        <div class="value">589万円</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 内訳比較 -->
+  <div class="card">
+    <h2><span class="badge badge-solo">A</span> 個人事業のみ（法人なし）</h2>
+    <table>
+      <thead><tr><th>項目</th><th>金額</th></tr></thead>
+      <tbody>
+        <tr><td>事業売上（3,600+100万）</td><td class="pos">+3,700万</td></tr>
+        <tr><td>事業経費（3,000+30万）</td><td class="neg">-3,030万</td></tr>
+        <tr><td>税理士費用（個人のみプラン）</td><td class="neg">-46万</td></tr>
+        <tr><td>消費税還付</td><td class="pos">+120万</td></tr>
+        <tr><td>国民健康保険（5人世帯）</td><td class="neg">-80万</td></tr>
+        <tr><td>国民年金（2人分）</td><td class="neg">-41万</td></tr>
+        <tr><td>所得税</td><td class="neg">-28万</td></tr>
+        <tr><td>住民税</td><td class="neg">-36万</td></tr>
+        <tr><td>事業税</td><td class="neg">-17万</td></tr>
+        <tr class="total"><td>年間手取り</td><td>543万円</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2><span class="badge badge-loss">B-1</span> 個人+法人（報酬 0円）→ 損する</h2>
+    <table>
+      <thead><tr><th>項目</th><th>金額</th></tr></thead>
+      <tbody>
+        <tr><td>個人事業売上</td><td class="pos">+3,600万</td></tr>
+        <tr><td>個人事業経費</td><td class="neg">-3,000万</td></tr>
+        <tr><td>消費税還付</td><td class="pos">+120万</td></tr>
+        <tr><td>国民健康保険（5人世帯）</td><td class="neg">-77万</td></tr>
+        <tr><td>国民年金（2人分）</td><td class="neg">-41万</td></tr>
+        <tr><td>所得税</td><td class="neg">-24万</td></tr>
+        <tr><td>住民税</td><td class="neg">-34万</td></tr>
+        <tr><td>事業税</td><td class="neg">-16万</td></tr>
+        <tr><td>法人内部留保（売上100−経費30−運営費69）</td><td class="pos">+1万</td></tr>
+        <tr class="total"><td>年間手取り</td><td>529万円</td></tr>
+        <tr><td colspan="2" style="color:var(--negative);font-size:12px;font-weight:600;text-align:center;padding-top:8px;">個人のみより 13万円の損。報酬0では社保メリットなし</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2><span class="badge badge-gain">B-2</span> 個人+法人（報酬 月4.5万）→ お得!</h2>
+    <table>
+      <thead><tr><th>項目</th><th>金額</th></tr></thead>
+      <tbody>
+        <tr><td>個人事業売上</td><td class="pos">+3,600万</td></tr>
+        <tr><td>個人事業経費</td><td class="neg">-3,000万</td></tr>
+        <tr><td>消費税還付</td><td class="pos">+120万</td></tr>
+        <tr><td>役員報酬（給与）</td><td class="pos">+54万</td></tr>
+        <tr><td>協会けんぽ（本人負担）</td><td class="neg">-13万</td></tr>
+        <tr><td>所得税</td><td class="neg">-45万</td></tr>
+        <tr><td>住民税</td><td class="neg">-44万</td></tr>
+        <tr><td>事業税</td><td class="neg">-16万</td></tr>
+        <tr><td>法人内部留保（売上100−経費30−報酬54−社保13−運営費69）</td><td class="neg">-67万</td></tr>
+        <tr class="total"><td>年間手取り</td><td style="color:var(--positive);">589万円</td></tr>
+        <tr><td colspan="2" style="color:var(--positive);font-size:12px;font-weight:600;text-align:center;padding-top:8px;">個人のみより +47万円のメリット!</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- なぜ47万円変わるのか -->
+  <div class="flow-section">
+    <h2>なぜ47万円も変わるのか？</h2>
+    <p style="font-size:12px;color:var(--sub);margin-bottom:12px;">最大の要因は「5人家族の国保 → 協会けんぽ」への切替</p>
+    <div class="compare-grid">
+      <div class="compare-box box-solo">
+        <h3>個人事業のみの社会保険</h3>
+        <ul>
+          <li><span>国民健康保険</span><span class="neg">80万円</span></li>
+          <li><span>├ 所得割（10%）</span><span class="muted">52万</span></li>
+          <li><span>├ 均等割（5人×5万）</span><span class="muted">25万</span></li>
+          <li><span>└ 平等割</span><span class="muted">3万</span></li>
+          <li><span>国民年金（2人分）</span><span class="neg">41万円</span></li>
+          <li style="border-top:2px solid #fbbf24;padding-top:6px;font-weight:700;"><span>合計</span><span class="neg">120万円</span></li>
+        </ul>
+      </div>
+      <div class="compare-box box-both">
+        <h3>マイクロ法人の社会保険</h3>
+        <ul>
+          <li><span>協会けんぽ（健康保険）</span><span class="pos">7万円</span></li>
+          <li><span>厚生年金</span><span class="pos">19万円</span></li>
+          <li><span>家族の追加負担</span><span class="pos">0円</span></li>
+          <li><span>配偶者の年金（第3号）</span><span class="pos">0円</span></li>
+          <li><span>&nbsp;</span><span>&nbsp;</span></li>
+          <li style="border-top:2px solid #34d399;padding-top:6px;font-weight:700;"><span>合計</span><span class="pos">26万円</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <div class="flow-row">
+        <div class="flow-box fb-green">社保の節約<small>120万 → 26万</small></div>
+        <span class="arrow">→</span>
+        <div class="flow-box fb-orange">▲94万円の削減</div>
+      </div>
+      <div class="flow-row" style="margin-top:8px;">
+        <div class="flow-box fb-red">税金が増える<small>控除減で課税UP</small></div>
+        <span class="arrow">+</span>
+        <div class="flow-box fb-red">運営費の増加<small>69万−46万=+23万</small></div>
+        <span class="arrow">=</span>
+        <div class="flow-box fb-red">▲47万円のコスト増</div>
+      </div>
+      <div class="flow-row" style="margin-top:12px;">
+        <div class="flow-box fb-purple" style="font-size:14px;padding:14px 20px;">94万の節約 − 47万のコスト = <strong>+47万円のメリット</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 注意点 -->
+  <div class="note">
+    <strong>注意:</strong> この試算は概算です。実際の国保料は自治体で異なり、協会けんぽの料率も都道府県で変わります。また法人内部留保が -67万円（赤字）のため、法人に資本金を入れる必要があります。正確な数字はリベ大税理士法人に確認してください。
+  </div>
+
+  <!-- 結論 -->
+  <div class="conclusion">
+    <h3>リベ税への相談ポイント</h3>
+    <ul>
+      <li><strong>報酬0円なら作る意味なし</strong> → 社保メリットが出ない（-13万の損）</li>
+      <li><strong>月4.5万の報酬を出せば年+47万円</strong> → 5人家族の社保削減が大きい</li>
+      <li>法人の事業内容（コンサル？投資配当？）の税務リスクを確認</li>
+      <li>設立タイミング（今期途中 or 来期から）のベストを相談</li>
+      <li>法人が赤字67万/年 → 必要な資本金の額を確認</li>
+      <li>消費税還付（120万）への影響がないか確認</li>
+    </ul>
+  </div>
+
+  <div style="text-align:center;color:var(--sub);font-size:11px;padding:16px 0;">
+    試算日: 2026-04-17 | いのっち用マイクロ法人シミュレーション
+  </div>
+
+</div>
+</body>
+</html>

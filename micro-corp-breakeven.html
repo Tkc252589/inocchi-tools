@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>マイクロ法人 損益分岐点シミュレーション</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#fafafa;--card:#fff;--border:#e5e7eb;--text:#111827;--sub:#6b7280;--pos:#059669;--neg:#dc2626;--accent:#0f766e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:20px}
+  .container{max-width:900px;margin:0 auto}
+  h1{font-size:22px;font-weight:700;text-align:center;margin-bottom:4px}
+  .subtitle{text-align:center;color:var(--sub);font-size:13px;margin-bottom:24px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px}
+  .card h2{font-size:15px;font-weight:700;margin-bottom:12px}
+  .pos{color:var(--pos)}.neg{color:var(--neg)}
+
+  .result-box{text-align:center;padding:20px;border-radius:14px;margin-bottom:16px;border:2px solid}
+  .result-box.good{background:#ecfdf5;border-color:#34d399}
+  .result-box .big{font-family:'Outfit',sans-serif;font-size:28px;font-weight:700}
+  .result-box .detail{font-size:13px;color:var(--sub);margin-top:4px}
+
+  canvas{width:100%!important;max-height:400px}
+
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{padding:8px 10px;text-align:center;border-bottom:1px solid #f3f4f6}
+  th{background:#f8fafc;font-weight:600;color:var(--sub);font-size:11px;position:sticky;top:0}
+  td:first-child{text-align:left;font-weight:600}
+  tr.highlight{background:#ecfdf5}
+  tr.breakeven{background:#fffbeb;font-weight:700}
+
+  .legend{display:flex;gap:16px;margin:12px 0;font-size:11px;color:var(--sub);flex-wrap:wrap;justify-content:center}
+  .legend span{display:flex;align-items:center;gap:4px}
+  .legend .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+  .conditions{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px}
+  .cond-item{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #f3f4f6}
+  .cond-item span:first-child{color:var(--sub)}
+  .cond-item span:last-child{font-weight:600}
+
+  .insight{padding:14px;border-radius:10px;margin-bottom:10px;font-size:13px}
+  .insight-green{background:#ecfdf5;border:1px solid #a7f3d0}
+  .insight-yellow{background:#fffbeb;border:1px solid #fde68a}
+  .insight-red{background:#fef2f2;border:1px solid #fecaca}
+  .insight strong{font-weight:700}
+
+  .note{background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:14px;font-size:12px;color:#0c4a6e;margin-bottom:16px}
+
+  @media(max-width:600px){.conditions{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>マイクロ法人 損益分岐点</h1>
+<p class="subtitle">事業所得がいくらあればマイクロ法人が得になるか？</p>
+
+<!-- いのっちの結論 -->
+<div class="result-box good">
+  <div style="font-size:14px;font-weight:600;color:var(--accent)">いのっちの場合（配偶者+子供3人 = 5人世帯）</div>
+  <div class="big" style="color:var(--accent)">事業所得0円でもマイクロ法人が得</div>
+  <div class="detail">5人家族の国保（均等割だけで年25万）が重すぎるため、所得に関係なく社保切替のメリットが上回る</div>
+</div>
+
+<!-- 前提条件 -->
+<div class="card">
+  <h2>計算の前提</h2>
+  <div class="conditions">
+    <div class="cond-item"><span>法人売上</span><span>100万円（コンサル型）</span></div>
+    <div class="cond-item"><span>法人経費</span><span>30万円</span></div>
+    <div class="cond-item"><span>法人運営費</span><span>69万円（リベ税セット+マネフォ+均等割）</span></div>
+    <div class="cond-item"><span>個人のみ税理士費</span><span>46万円（リベ税 個人プラン）</span></div>
+    <div class="cond-item"><span>最適役員報酬</span><span>月4.5万円</span></div>
+    <div class="cond-item"><span>青色申告控除</span><span>65万円</span></div>
+    <div class="cond-item"><span>消費税還付</span><span>120万円</span></div>
+    <div class="cond-item"><span>比較方式</span><span>A案（売上分割）</span></div>
+  </div>
+</div>
+
+<!-- グラフ -->
+<div class="card">
+  <h2>家族構成別 — マイクロ法人の年間メリット額</h2>
+  <canvas id="chart"></canvas>
+  <div class="legend">
+    <span><span class="dot" style="background:#ef4444"></span> 1人（独身）</span>
+    <span><span class="dot" style="background:#f97316"></span> 2人（夫婦）</span>
+    <span><span class="dot" style="background:#eab308"></span> 3人（夫婦+子1）</span>
+    <span><span class="dot" style="background:#22c55e"></span> 4人（夫婦+子2）</span>
+    <span><span class="dot" style="background:#0f766e;border:2px solid #0f766e"></span> 5人（いのっち）</span>
+  </div>
+</div>
+
+<!-- 詳細テーブル -->
+<div class="card">
+  <h2>損益分岐点の一覧</h2>
+  <div style="overflow-x:auto">
+    <table id="breakeven-table">
+      <thead>
+        <tr>
+          <th>家族構成</th>
+          <th>損益分岐点</th>
+          <th>所得200万<br>での差額</th>
+          <th>所得400万<br>での差額</th>
+          <th>所得600万<br>での差額</th>
+          <th>所得800万<br>での差額</th>
+          <th>所得1000万<br>での差額</th>
+        </tr>
+      </thead>
+      <tbody id="breakeven-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 全データ -->
+<div class="card">
+  <h2>いのっち（5人世帯）の詳細 — 事業所得別の手取り比較</h2>
+  <div style="overflow-x:auto">
+    <table id="detail-table">
+      <thead>
+        <tr>
+          <th style="text-align:left">事業所得</th>
+          <th>個人のみ<br>手取り</th>
+          <th>マイクロ法人<br>手取り</th>
+          <th>差額</th>
+          <th>社保<br>（個人のみ）</th>
+          <th>社保<br>（法人あり）</th>
+          <th>税金<br>（個人のみ）</th>
+          <th>税金<br>（法人あり）</th>
+        </tr>
+      </thead>
+      <tbody id="detail-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- インサイト -->
+<div class="card">
+  <h2>読み取れること</h2>
+  <div class="insight insight-green">
+    <strong>5人世帯（いのっち）:</strong> 事業所得がゼロでもマイクロ法人が年16万お得。所得600万なら年47万。国保の均等割（5人×5万=25万）と国民年金2人分（41万）が重いため、協会けんぽ（年26万）に切り替えるだけで大幅に得する。
+  </div>
+  <div class="insight insight-yellow">
+    <strong>独身の場合:</strong> 損益分岐点は事業所得300万円前後。それ以下だと法人運営費の方が高くつく。独身で利益が少ないなら無理にマイクロ法人を作る必要はない。
+  </div>
+  <div class="insight insight-red">
+    <strong>注意:</strong> この試算は法人売上100万円がある前提。法人売上がゼロなら報酬が出せないので、社保切替のメリットは発生しない。「マイクロ法人の売上をどう作るか」が大前提。
+  </div>
+</div>
+
+<div class="note">
+  <strong>補足:</strong> 国保料率は自治体で大きく異なります（所得割7〜12%、均等割3〜6万/人）。この試算は所得割10%、均等割5万/人で計算しています。お住まいの自治体の料率で大きく変わるため、リベ税に正確な試算を依頼してください。
+</div>
+
+<div style="text-align:center;color:var(--sub);font-size:11px;padding:16px 0">
+  作成日: 2026-04-17 | マイクロ法人 損益分岐点シミュレーション
+</div>
+
+</div>
+
+<script>
+// ========== 計算エンジン ==========
+function incomeTax(t) {
+  if (t <= 0) return 0;
+  let tax;
+  if (t <= 1950000) tax = t * 0.05;
+  else if (t <= 3300000) tax = t * 0.10 - 97500;
+  else if (t <= 6950000) tax = t * 0.20 - 427500;
+  else if (t <= 9000000) tax = t * 0.23 - 636000;
+  else if (t <= 18000000) tax = t * 0.33 - 1536000;
+  else if (t <= 40000000) tax = t * 0.40 - 2796000;
+  else tax = t * 0.45 - 4796000;
+  return tax * 1.021;
+}
+function residentTax(t) { return t <= 0 ? 0 : t * 0.10 + 5000; }
+function businessTax(gp) { return Math.max(0, gp - 2900000) * 0.05; }
+function nhi(income, hs) {
+  if (income <= 0) return hs * 50000;
+  const tx = Math.max(0, income - 430000);
+  return Math.min(tx * 0.10 + hs * 50000 + 30000, 900000);
+}
+function np(n) { return n * 204000; }
+function spouseDed(has) { return has ? 380000 : 0; }
+
+const SALARY = 45000;
+const ANNUAL_SALARY = SALARY * 12; // 540,000
+const STD_SALARY = 58000;
+const SH_HEALTH = STD_SALARY * 0.10 * 12; // 69,600
+const SH_PENSION_BASE = 88000;
+const SH_PENSION = SH_PENSION_BASE * 0.183 * 12; // 193,248
+const SH_TOTAL = SH_HEALTH + SH_PENSION; // 262,848
+const SH_EE = SH_TOTAL / 2; // 131,424
+const SH_ER = SH_TOTAL / 2;
+const RUNNING_COST = 693760;
+const SOLO_TAX_COST = 462000;
+const CORP_REV = 1000000;
+const CORP_EXP = 300000;
+const BLUE = 650000;
+const VAT_REFUND = 1200000;
+const BASIC_DED = 480000;
+
+// Corp retained (fixed for all scenarios)
+const CORP_PROFIT = CORP_REV - CORP_EXP - ANNUAL_SALARY - SH_ER - RUNNING_COST;
+const CORP_TAX = CORP_PROFIT > 0 ? CORP_PROFIT * 0.25 : 0;
+const CORP_RETAINED = CORP_REV - CORP_EXP - ANNUAL_SALARY - SH_ER - RUNNING_COST - CORP_TAX;
+
+function calcSolo(P, hs, pm, hasSpouse) {
+  const gp = P + (CORP_REV - CORP_EXP) - SOLO_TAX_COST;
+  const bi = Math.max(0, gp - BLUE);
+  const nhiVal = nhi(bi, hs);
+  const npVal = np(pm);
+  const si = nhiVal + npVal;
+  const sd = spouseDed(hasSpouse);
+  const td = BASIC_DED + sd + si;
+  const taxable = Math.max(0, bi - td);
+  const it = incomeTax(taxable);
+  const rt = residentTax(taxable);
+  const bt = businessTax(gp);
+  const handed = gp + VAT_REFUND - it - rt - bt - si;
+  return { handed, si, tax: it + rt + bt, nhi: nhiVal, np: npVal };
+}
+
+function calcBoth(P, hs, pm, hasSpouse) {
+  const gp = P;
+  const bi = Math.max(0, gp - BLUE);
+  const sd = spouseDed(hasSpouse);
+  const td = BASIC_DED + sd + SH_EE;
+  const totalIncome = bi; // salary income = 0 (salary < salary deduction)
+  const taxable = Math.max(0, totalIncome - td);
+  const it = incomeTax(taxable);
+  const rt = residentTax(taxable);
+  const bt = businessTax(gp);
+  const personalH = gp + VAT_REFUND + ANNUAL_SALARY - it - rt - bt - SH_EE;
+  const totalH = personalH + CORP_RETAINED;
+  return { handed: totalH, si: SH_TOTAL, tax: it + rt + bt + CORP_TAX, personalH };
+}
+
+// ========== データ生成 ==========
+const families = [
+  { label: '1人（独身）', hs: 1, pm: 1, spouse: false, color: '#ef4444' },
+  { label: '2人（夫婦）', hs: 2, pm: 2, spouse: true, color: '#f97316' },
+  { label: '3人（夫婦+子1）', hs: 3, pm: 2, spouse: true, color: '#eab308' },
+  { label: '4人（夫婦+子2）', hs: 4, pm: 2, spouse: true, color: '#22c55e' },
+  { label: '5人（いのっち）', hs: 5, pm: 2, spouse: true, color: '#0f766e' },
+];
+
+const incomes = [0, 500000, 1000000, 1500000, 2000000, 2500000, 3000000, 4000000, 5000000, 6000000, 8000000, 10000000, 15000000, 20000000];
+const fmt = v => Math.round(v / 10000);
+const fmtS = v => { const m = fmt(v); return (m >= 0 ? '+' : '') + m + '万'; };
+
+// Compute all data
+const allData = {};
+families.forEach(f => {
+  allData[f.label] = incomes.map(P => {
+    const solo = calcSolo(P, f.hs, f.pm, f.spouse);
+    const both = calcBoth(P, f.hs, f.pm, f.spouse);
+    return { P, solo: solo.handed, both: both.handed, diff: both.handed - solo.handed, soloSI: solo.si, bothSI: both.si, soloTax: solo.tax, bothTax: both.tax };
+  });
+});
+
+// Find breakeven for each family
+function findBreakeven(data) {
+  for (let i = 0; i < data.length - 1; i++) {
+    if (data[i].diff < 0 && data[i + 1].diff >= 0) {
+      // Linear interpolation
+      const d0 = data[i].diff, d1 = data[i + 1].diff;
+      const p0 = data[i].P, p1 = data[i + 1].P;
+      const be = p0 + (0 - d0) / (d1 - d0) * (p1 - p0);
+      return Math.round(be / 10000);
+    }
+  }
+  if (data[0].diff >= 0) return '常にお得';
+  return '常に損';
+}
+
+// ========== 損益分岐点テーブル ==========
+const beBody = document.getElementById('breakeven-body');
+const refIncomes = [2000000, 4000000, 6000000, 8000000, 10000000];
+families.forEach(f => {
+  const data = allData[f.label];
+  const be = findBreakeven(data);
+  const tr = document.createElement('tr');
+  if (f.label.includes('いのっち')) tr.classList.add('highlight');
+  let beDisplay = typeof be === 'string' ? `<span style="color:var(--pos);font-weight:700">${be}</span>` : `<span style="font-weight:700">${be}万円</span>`;
+  let html = `<td style="text-align:left"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${f.color};margin-right:6px"></span>${f.label}</td><td>${beDisplay}</td>`;
+  refIncomes.forEach(inc => {
+    const d = data.find(x => x.P === inc);
+    const v = d ? d.diff : 0;
+    const cls = v >= 0 ? 'pos' : 'neg';
+    html += `<td class="${cls}">${fmtS(v)}</td>`;
+  });
+  tr.innerHTML = html;
+  beBody.appendChild(tr);
+});
+
+// ========== 詳細テーブル（5人世帯） ==========
+const detBody = document.getElementById('detail-body');
+const data5 = allData['5人（いのっち）'];
+data5.forEach(d => {
+  const tr = document.createElement('tr');
+  if (d.P === 6000000) tr.classList.add('highlight');
+  const cls = d.diff >= 0 ? 'pos' : 'neg';
+  tr.innerHTML = `
+    <td style="text-align:left">${fmt(d.P)}万円</td>
+    <td>${fmt(d.solo)}万</td>
+    <td>${fmt(d.both)}万</td>
+    <td class="${cls}" style="font-weight:700">${fmtS(d.diff)}</td>
+    <td>${fmt(d.soloSI)}万</td>
+    <td>${fmt(d.bothSI)}万</td>
+    <td>${fmt(d.soloTax)}万</td>
+    <td>${fmt(d.bothTax)}万</td>`;
+  detBody.appendChild(tr);
+});
+
+// ========== グラフ描画 ==========
+const canvas = document.getElementById('chart');
+const ctx = canvas.getContext('2d');
+function drawChart() {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = 400 * dpr;
+  canvas.style.height = '400px';
+  ctx.scale(dpr, dpr);
+  const W = rect.width, H = 400;
+  const pad = { t: 20, r: 20, b: 50, l: 60 };
+  const gW = W - pad.l - pad.r, gH = H - pad.t - pad.b;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Data bounds
+  const maxP = 15000000;
+  const plotIncomes = incomes.filter(p => p <= maxP);
+  let minD = Infinity, maxD = -Infinity;
+  families.forEach(f => {
+    allData[f.label].filter(d => d.P <= maxP).forEach(d => {
+      minD = Math.min(minD, d.diff);
+      maxD = Math.max(maxD, d.diff);
+    });
+  });
+  minD = Math.min(minD, -300000);
+  maxD = Math.max(maxD, 800000);
+  const rangeD = maxD - minD;
+
+  function x(p) { return pad.l + (p / maxP) * gW; }
+  function y(d) { return pad.t + (1 - (d - minD) / rangeD) * gH; }
+
+  // Grid
+  ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 0.5;
+  for (let v = -200000; v <= maxD; v += 200000) {
+    ctx.beginPath(); ctx.moveTo(pad.l, y(v)); ctx.lineTo(W - pad.r, y(v)); ctx.stroke();
+  }
+  // Zero line
+  ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(pad.l, y(0)); ctx.lineTo(W - pad.r, y(0)); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // X axis labels
+  ctx.fillStyle = '#6b7280'; ctx.font = '11px Outfit, Noto Sans JP'; ctx.textAlign = 'center';
+  [0, 2000000, 4000000, 6000000, 8000000, 10000000, 12000000, 15000000].forEach(p => {
+    if (p <= maxP) ctx.fillText(fmt(p) + '万', x(p), H - pad.b + 20);
+  });
+  ctx.fillText('事業所得', W / 2, H - 5);
+
+  // Y axis labels
+  ctx.textAlign = 'right';
+  for (let v = -200000; v <= maxD; v += 200000) {
+    const m = Math.round(v / 10000);
+    ctx.fillText((m >= 0 ? '+' : '') + m + '万', pad.l - 8, y(v) + 4);
+  }
+
+  // Lines
+  families.forEach(f => {
+    const data = allData[f.label].filter(d => d.P <= maxP);
+    ctx.strokeStyle = f.color;
+    ctx.lineWidth = f.label.includes('いのっち') ? 3 : 1.5;
+    ctx.beginPath();
+    data.forEach((d, i) => {
+      const px = x(d.P), py = y(d.diff);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+
+    // Dots
+    data.forEach(d => {
+      ctx.fillStyle = f.color;
+      ctx.beginPath();
+      ctx.arc(x(d.P), y(d.diff), f.label.includes('いのっち') ? 4 : 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  });
+
+  // "得" / "損" labels
+  ctx.fillStyle = '#059669'; ctx.font = 'bold 12px Noto Sans JP'; ctx.textAlign = 'left';
+  ctx.fillText('↑ マイクロ法人が得', pad.l + 8, pad.t + 16);
+  ctx.fillStyle = '#dc2626';
+  ctx.fillText('↓ 個人事業が得', pad.l + 8, y(0) + 20);
+}
+drawChart();
+window.addEventListener('resize', drawChart);
+</script>
+</body>
+</html>

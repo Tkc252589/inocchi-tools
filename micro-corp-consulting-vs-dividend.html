@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>コンサル型 vs 配当型 比較</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#fafafa;--card:#fff;--border:#e5e7eb;--text:#111827;--sub:#6b7280;--accent:#0f766e;--pos:#059669;--neg:#dc2626; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:20px}
+  .container{max-width:860px;margin:0 auto}
+  h1{font-size:22px;font-weight:700;text-align:center;margin-bottom:4px}
+  .subtitle{text-align:center;color:var(--sub);font-size:13px;margin-bottom:24px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px}
+  .card h2{font-size:15px;font-weight:700;margin-bottom:12px}
+
+  .verdict{text-align:center;padding:24px;border-radius:14px;margin-bottom:16px;border:2px solid}
+  .verdict-win{background:#ecfdf5;border-color:#34d399}
+  .verdict h2{font-size:18px;margin-bottom:4px}
+  .verdict .big{font-family:'Outfit',sans-serif;font-size:36px;font-weight:700;color:var(--accent)}
+  .verdict .reason{font-size:13px;color:var(--sub);margin-top:4px}
+
+  .vs-grid{display:grid;grid-template-columns:1fr 40px 1fr;gap:0;margin-bottom:16px}
+  .vs-col{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
+  .vs-center{display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--sub)}
+  .vs-col h3{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .vs-col h3 .icon{font-size:20px}
+  .tag{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600}
+  .tag-rec{background:#d1fae5;color:#047857}
+  .tag-ok{background:#fef3c7;color:#92400e}
+
+  .row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid #f3f4f6}
+  .row:last-child{border:none}
+  .row span:last-child{font-family:'Outfit',sans-serif;font-weight:600}
+  .row-head{font-size:11px;font-weight:700;color:var(--sub);padding:8px 0 4px;text-transform:uppercase;letter-spacing:.05em}
+  .row-total{border-top:2px solid var(--text);font-weight:700;font-size:14px;padding-top:8px;margin-top:4px}
+  .pos{color:var(--pos)}.neg{color:var(--neg)}
+
+  .point{display:flex;align-items:flex-start;gap:8px;font-size:12px;padding:6px 0}
+  .point .emoji{font-size:16px;flex-shrink:0;margin-top:1px}
+  .merit{background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;padding:14px;margin-top:10px}
+  .demerit{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px;margin-top:10px}
+  .merit h4,.demerit h4{font-size:12px;font-weight:700;margin-bottom:6px}
+  .merit h4{color:#047857}.demerit h4{color:#b91c1c}
+
+  .note{background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:14px 16px;font-size:12px;color:#0c4a6e;margin-bottom:16px}
+  .note strong{color:#075985}
+
+  .tax-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+  .tax-box{padding:14px;border-radius:10px;border:1.5px solid;font-size:12px}
+  .tax-box h4{font-size:12px;font-weight:700;margin-bottom:6px}
+  .tax-box.solo{border-color:#fbbf24;background:#fffbeb}
+  .tax-box.corp{border-color:#34d399;background:#ecfdf5}
+
+  .flow-row{display:flex;align-items:center;gap:0;flex-wrap:wrap;justify-content:center;margin:10px 0}
+  .fbox{padding:10px 14px;border-radius:10px;text-align:center;font-size:12px;font-weight:600;border:1.5px solid;min-width:100px;line-height:1.4}
+  .fbox small{display:block;font-weight:400;font-size:10px;opacity:.7;margin-top:2px}
+  .fb-g{background:rgba(5,150,105,.08);border-color:#059669;color:#047857}
+  .fb-b{background:rgba(59,130,246,.08);border-color:#3b82f6;color:#1d4ed8}
+  .fb-p{background:rgba(139,92,246,.08);border-color:#8b5cf6;color:#6d28d9}
+  .fb-o{background:rgba(249,115,22,.08);border-color:#f97316;color:#c2410c}
+  .arr{color:#94a3b8;padding:0 8px;font-size:18px}
+
+  .conclusion{background:linear-gradient(135deg,#134e4a,#0f766e);color:#fff;border:none;border-radius:14px;padding:24px;margin-bottom:16px}
+  .conclusion h2{color:#fff;margin-bottom:12px}
+  .conclusion ul{padding-left:18px;font-size:13px}
+  .conclusion li{margin-bottom:6px}
+  .conclusion li strong{color:#6ee7b7}
+
+  @media(max-width:700px){
+    .vs-grid{grid-template-columns:1fr;gap:8px}
+    .vs-center{padding:4px 0;font-size:16px}
+    .tax-compare{grid-template-columns:1fr}
+    .flow-row{flex-direction:column}
+    .arr{transform:rotate(90deg);padding:4px 0}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>コンサル型 vs 配当型</h1>
+<p class="subtitle">マイクロ法人の業種選び — いのっちの条件で比較</p>
+
+<!-- 結論 -->
+<div class="verdict verdict-win">
+  <h2>おすすめは…</h2>
+  <div class="big">配当型（投資法人）</div>
+  <div class="reason">手取り額は同じだが、手間・リスク・長期メリットで配当型が優位</div>
+</div>
+
+<!-- VS比較 -->
+<div class="vs-grid">
+  <!-- コンサル -->
+  <div class="vs-col">
+    <h3><span class="icon">💼</span>コンサル型 <span class="tag tag-ok">条件付きOK</span></h3>
+
+    <div class="row-head">数字の比較（月4.5万報酬）</div>
+    <div class="row"><span>法人売上</span><span>100万</span></div>
+    <div class="row"><span>法人経費</span><span>30万</span></div>
+    <div class="row"><span>法人内部留保</span><span class="neg">-67万</span></div>
+    <div class="row"><span>法人税</span><span>0万</span></div>
+    <div class="row row-total"><span>年間手取り</span><span>589万</span></div>
+    <div class="row"><span>vs 個人のみ</span><span class="pos">+47万</span></div>
+
+    <div class="merit">
+      <h4>メリット</h4>
+      <div class="point"><span class="emoji">+</span><span>投資元本が不要（労働で売上を作る）</span></div>
+      <div class="point"><span class="emoji">+</span><span>粗利率が高い（経費が少ない）</span></div>
+      <div class="point"><span class="emoji">+</span><span>すぐに始められる</span></div>
+    </div>
+    <div class="demerit">
+      <h4>デメリット・リスク</h4>
+      <div class="point"><span class="emoji">!</span><span><strong>同業種の二刀流リスク</strong><br>個人事業がeBayせどり → 法人もeBay系コンサルだと税務署に「実質同一事業」と認定されるリスク</span></div>
+      <div class="point"><span class="emoji">!</span><span>クライアントを自力で探す必要あり</span></div>
+      <div class="point"><span class="emoji">!</span><span>自分の労働時間を使う</span></div>
+      <div class="point"><span class="emoji">!</span><span>売上が安定しない可能性</span></div>
+    </div>
+  </div>
+
+  <div class="vs-center">VS</div>
+
+  <!-- 配当 -->
+  <div class="vs-col">
+    <h3><span class="icon">📈</span>配当型（投資法人） <span class="tag tag-rec">おすすめ</span></h3>
+
+    <div class="row-head">数字の比較（月4.5万報酬）</div>
+    <div class="row"><span>法人の配当収入</span><span>100万</span></div>
+    <div class="row"><span>法人経費</span><span>30万</span></div>
+    <div class="row"><span>法人内部留保</span><span class="neg">-67万</span></div>
+    <div class="row"><span>法人税</span><span>0万（95%益金不算入）</span></div>
+    <div class="row row-total"><span>年間手取り</span><span>589万</span></div>
+    <div class="row"><span>vs 個人のみ</span><span class="pos">+11〜47万</span></div>
+
+    <div class="merit">
+      <h4>メリット</h4>
+      <div class="point"><span class="emoji">+</span><span><strong>手間ゼロ</strong>：証券口座に入れたら放置でOK</span></div>
+      <div class="point"><span class="emoji">+</span><span><strong>95%益金不算入</strong>：法人内で配当がほぼ非課税</span></div>
+      <div class="point"><span class="emoji">+</span><span><strong>同業種リスクなし</strong>：eBay事業と完全に別事業</span></div>
+      <div class="point"><span class="emoji">+</span><span><strong>長期複利</strong>：法人内で再投資すれば課税なしで資産が増える</span></div>
+      <div class="point"><span class="emoji">+</span><span>売上が配当なので安定（高配当株/ETF）</span></div>
+    </div>
+    <div class="demerit">
+      <h4>デメリット・リスク</h4>
+      <div class="point"><span class="emoji">!</span><span><strong>投資元本が必要</strong><br>年100万の配当 ÷ 利回り4% = 約2,500万円の元本</span></div>
+      <div class="point"><span class="emoji">!</span><span>投資リスク（元本割れの可能性）</span></div>
+      <div class="point"><span class="emoji">!</span><span>法人から個人に資金を出す時に課税される</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 配当の税制メリット詳細 -->
+<div class="card">
+  <h2>配当型の最大の武器：95%益金不算入とは？</h2>
+  <p style="font-size:12px;color:var(--sub);margin-bottom:12px;">同じ100万円の配当を個人 vs 法人で受け取った場合の税金の違い</p>
+
+  <div class="tax-compare">
+    <div class="tax-box solo">
+      <h4>個人で配当を受け取ると</h4>
+      <div class="row"><span>配当収入</span><span>100万</span></div>
+      <div class="row"><span>税金（申告分離 20.315%）</span><span class="neg">-20.3万</span></div>
+      <div class="row" style="font-weight:700;border-top:2px solid #fbbf24;padding-top:6px"><span>手元に残る</span><span>79.7万</span></div>
+      <div style="font-size:11px;color:var(--sub);margin-top:6px;">毎年20%取られるので複利効果が弱まる</div>
+    </div>
+    <div class="tax-box corp">
+      <h4>法人で配当を受け取ると</h4>
+      <div class="row"><span>配当収入</span><span>100万</span></div>
+      <div class="row"><span>課税対象（5%のみ）</span><span>5万</span></div>
+      <div class="row"><span>法人税（5万×25%）</span><span class="pos">-1.25万</span></div>
+      <div class="row" style="font-weight:700;border-top:2px solid #34d399;padding-top:6px"><span>法人内に残る</span><span class="pos">98.75万</span></div>
+      <div style="font-size:11px;color:var(--sub);margin-top:6px;">95%が非課税なので法人内で効率よく再投資できる</div>
+    </div>
+  </div>
+
+  <div class="flow-row" style="margin-top:12px">
+    <div class="fbox fb-o">個人で受取<small>毎年20.3%課税</small></div>
+    <span class="arr">vs</span>
+    <div class="fbox fb-g">法人で受取<small>実質1.25%課税</small></div>
+    <span class="arr">→</span>
+    <div class="fbox fb-p">年間 約19万円の差<small>100万配当あたり</small></div>
+  </div>
+</div>
+
+<!-- 必要な投資元本 -->
+<div class="card">
+  <h2>配当型に必要な投資元本の目安</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:13px">
+    <thead>
+      <tr style="background:#f8fafc">
+        <th style="padding:8px 12px;text-align:left;font-size:12px;color:var(--sub)">目標配当</th>
+        <th style="padding:8px 12px;text-align:center;font-size:12px;color:var(--sub)">利回り3%</th>
+        <th style="padding:8px 12px;text-align:center;font-size:12px;color:var(--sub)">利回り4%</th>
+        <th style="padding:8px 12px;text-align:center;font-size:12px;color:var(--sub)">利回り5%</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding:8px 12px">年50万</td><td style="padding:8px 12px;text-align:center">1,667万</td><td style="padding:8px 12px;text-align:center">1,250万</td><td style="padding:8px 12px;text-align:center">1,000万</td></tr>
+      <tr style="background:#ecfdf5;font-weight:600"><td style="padding:8px 12px">年100万</td><td style="padding:8px 12px;text-align:center">3,333万</td><td style="padding:8px 12px;text-align:center">2,500万</td><td style="padding:8px 12px;text-align:center">2,000万</td></tr>
+      <tr><td style="padding:8px 12px">年150万</td><td style="padding:8px 12px;text-align:center">5,000万</td><td style="padding:8px 12px;text-align:center">3,750万</td><td style="padding:8px 12px;text-align:center">3,000万</td></tr>
+      <tr><td style="padding:8px 12px">年200万</td><td style="padding:8px 12px;text-align:center">6,667万</td><td style="padding:8px 12px;text-align:center">5,000万</td><td style="padding:8px 12px;text-align:center">4,000万</td></tr>
+    </tbody>
+  </table>
+  <div style="font-size:11px;color:var(--sub);margin-top:8px;text-align:center">例：VYM（米国高配当ETF）の利回り約3%、日本高配当株なら4〜5%程度</div>
+</div>
+
+<!-- どっちを選ぶべきか -->
+<div class="card">
+  <h2>結局どっちを選ぶべき？</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px">
+      <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px">💼 コンサル型を選ぶ人</div>
+      <ul style="font-size:12px;padding-left:16px;color:#78350f">
+        <li>投資に回せる資金が少ない</li>
+        <li>すでにeBay以外でコンサル実績がある</li>
+        <li>すぐ始めたい（元本準備期間なし）</li>
+      </ul>
+    </div>
+    <div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:10px;padding:14px">
+      <div style="font-size:13px;font-weight:700;color:#047857;margin-bottom:6px">📈 配当型を選ぶ人</div>
+      <ul style="font-size:12px;padding-left:16px;color:#065f46">
+        <li>2,000〜2,500万円の投資資金がある</li>
+        <li>手間をかけたくない</li>
+        <li>長期的な資産形成もしたい</li>
+        <li>税務リスクを最小化したい</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- リベ税への相談 -->
+<div class="conclusion">
+  <h2>リベ税に聞くべきこと</h2>
+  <ul>
+    <li><strong>配当型の場合</strong>、法人の証券口座で高配当株/ETFを持つ具体的な手順</li>
+    <li><strong>95%益金不算入</strong>の適用条件（完全子法人株式等に該当するか）</li>
+    <li><strong>コンサル型の場合</strong>、eBay事業との同業種認定リスクの回避方法</li>
+    <li>法人から個人へ<strong>資金を戻す時の最適な方法</strong>（配当 vs 役員報酬 vs 貸付）</li>
+    <li>投資元本を法人に入れる方法（<strong>資本金 vs 役員借入金</strong>）</li>
+    <li>法人の赤字67万/年をどう処理するか（<strong>繰越欠損金</strong>の活用）</li>
+  </ul>
+</div>
+
+<div class="note">
+  <strong>補足:</strong> 手取り額（589万）はコンサル型も配当型も同じです。違いは「手間」「リスク」「長期的な資産形成効果」。配当型は投資元本のハードルがあるものの、一度仕組みを作れば完全放置で社保メリットを享受し続けられるのが最大の強みです。
+</div>
+
+<div style="text-align:center;color:var(--sub);font-size:11px;padding:16px 0">
+  試算日: 2026-04-17 | コンサル vs 配当 比較
+</div>
+
+</div>
+</body>
+</html>

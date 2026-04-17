@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>事業拡大ガイド — 従業員を雇うには</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#fafafa;--card:#fff;--border:#e5e7eb;--text:#111827;--sub:#6b7280;--accent:#0f766e;--pos:#059669;--neg:#dc2626;--blue:#2563eb;--purple:#7c3aed;--orange:#ea580c}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:20px}
+  .container{max-width:860px;margin:0 auto}
+  h1{font-size:22px;font-weight:700;text-align:center;margin-bottom:4px}
+  .subtitle{text-align:center;color:var(--sub);font-size:13px;margin-bottom:24px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px}
+  .card h2{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+  .answer-box{background:#ecfdf5;border:2px solid #34d399;border-radius:14px;padding:20px;margin-bottom:16px;text-align:center}
+  .answer-box .big{font-size:22px;font-weight:700;color:var(--accent)}
+  .answer-box .detail{font-size:13px;color:var(--sub);margin-top:4px}
+
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #f3f4f6}
+  th{background:#f8fafc;font-weight:600;color:var(--sub);font-size:11px}
+  .pos{color:var(--pos)}.neg{color:var(--neg)}
+  .check{color:var(--pos);font-weight:700}.cross{color:var(--neg);font-weight:700}
+
+  .timeline{position:relative;padding-left:28px;margin:16px 0}
+  .timeline::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--border)}
+  .tl-item{position:relative;margin-bottom:16px}
+  .tl-item::before{content:'';position:absolute;left:-22px;top:6px;width:12px;height:12px;border-radius:50%;border:2px solid}
+  .tl-now::before{background:#d1fae5;border-color:var(--pos)}
+  .tl-next::before{background:#dbeafe;border-color:var(--blue)}
+  .tl-future::before{background:#ede9fe;border-color:var(--purple)}
+  .tl-item h3{font-size:13px;font-weight:700;margin-bottom:2px}
+  .tl-item p{font-size:12px;color:var(--sub)}
+  .tl-tag{font-size:10px;padding:1px 8px;border-radius:99px;font-weight:600;margin-left:6px}
+  .tl-tag-now{background:#d1fae5;color:#047857}
+  .tl-tag-soon{background:#dbeafe;color:#1d4ed8}
+  .tl-tag-later{background:#ede9fe;color:#6d28d9}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .box{padding:14px;border-radius:10px;border:1.5px solid;font-size:12px}
+  .box h4{font-size:12px;font-weight:700;margin-bottom:6px}
+  .box-green{border-color:#34d399;background:#ecfdf5}
+  .box-blue{border-color:#60a5fa;background:#eff6ff}
+  .box-purple{border-color:#a78bfa;background:#f5f3ff}
+  .box-orange{border-color:#fb923c;background:#fff7ed}
+  .box-red{border-color:#f87171;background:#fef2f2}
+
+  .point{display:flex;align-items:flex-start;gap:6px;font-size:12px;padding:4px 0}
+  .point .em{flex-shrink:0;margin-top:1px}
+
+  .flow-row{display:flex;align-items:center;gap:0;flex-wrap:wrap;justify-content:center;margin:10px 0}
+  .fbox{padding:10px 14px;border-radius:10px;text-align:center;font-size:12px;font-weight:600;border:1.5px solid;min-width:90px;line-height:1.4}
+  .fbox small{display:block;font-weight:400;font-size:10px;opacity:.7;margin-top:2px}
+  .fb-g{background:rgba(5,150,105,.08);border-color:#059669;color:#047857}
+  .fb-b{background:rgba(59,130,246,.08);border-color:#3b82f6;color:#1d4ed8}
+  .fb-p{background:rgba(139,92,246,.08);border-color:#8b5cf6;color:#6d28d9}
+  .fb-o{background:rgba(249,115,22,.08);border-color:#f97316;color:#c2410c}
+  .fb-r{background:rgba(239,68,68,.08);border-color:#ef4444;color:#b91c1c}
+  .arr{color:#94a3b8;padding:0 6px;font-size:16px}
+
+  .note{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px 16px;font-size:12px;color:#92400e;margin-bottom:16px}
+  .note strong{color:#78350f}
+
+  .conclusion{background:linear-gradient(135deg,#134e4a,#0f766e);color:#fff;border:none;border-radius:14px;padding:24px;margin-bottom:16px}
+  .conclusion h2{color:#fff;margin-bottom:12px}
+  .conclusion ul{padding-left:18px;font-size:13px}
+  .conclusion li{margin-bottom:6px}
+  .conclusion li strong{color:#6ee7b7}
+
+  @media(max-width:700px){
+    .grid2,.grid3{grid-template-columns:1fr}
+    .flow-row{flex-direction:column}
+    .arr{transform:rotate(90deg);padding:4px 0}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>事業拡大ガイド</h1>
+<p class="subtitle">従業員を雇う時の選択肢を整理</p>
+
+<!-- 結論 -->
+<div class="answer-box">
+  <div class="big">個人事業主のままでも雇えます</div>
+  <div class="detail">ただし5人以上で社保義務が発生。事業拡大を見据えるなら法人化がおすすめ</div>
+</div>
+
+<!-- 個人事業主で雇う場合の義務 -->
+<div class="card">
+  <h2>個人事業主で従業員を雇うとき何が必要？</h2>
+  <table>
+    <thead>
+      <tr><th>やること</th><th>1人目から</th><th>5人以上</th><th>届出先</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>給与支払事務所の届出</strong></td><td class="check">必須</td><td class="check">必須</td><td>税務署</td></tr>
+      <tr><td><strong>源泉徴収</strong>（毎月の給与から天引き）</td><td class="check">必須</td><td class="check">必須</td><td>税務署</td></tr>
+      <tr><td><strong>労災保険</strong></td><td class="check">必須</td><td class="check">必須</td><td>労働基準監督署</td></tr>
+      <tr><td><strong>雇用保険</strong></td><td class="check">必須</td><td class="check">必須</td><td>ハローワーク</td></tr>
+      <tr><td><strong>健康保険・厚生年金</strong>（社会保険）</td><td style="color:var(--sub)">任意</td><td class="check">強制加入</td><td>年金事務所</td></tr>
+      <tr><td><strong>年末調整</strong></td><td class="check">必須</td><td class="check">必須</td><td>税務署</td></tr>
+      <tr><td><strong>36協定</strong>（残業させる場合）</td><td class="check">必須</td><td class="check">必須</td><td>労働基準監督署</td></tr>
+    </tbody>
+  </table>
+  <div class="note" style="margin-top:12px">
+    <strong>ポイント:</strong> 個人事業主でも1人雇った瞬間から「労災保険」「雇用保険」「源泉徴収」は必須。従業員5人以上になると社会保険（健康保険+厚生年金）も強制加入になり、コストが一気に上がります。
+  </div>
+</div>
+
+<!-- 3つの選択肢 -->
+<div class="card">
+  <h2>事業拡大の3つのパターン</h2>
+
+  <div class="grid3" style="margin-top:12px">
+    <div class="box box-green">
+      <h4>A. 個人事業のまま雇う</h4>
+      <div class="point"><span class="em">+</span><span>手続きがシンプル</span></div>
+      <div class="point"><span class="em">+</span><span>設立費用ゼロ</span></div>
+      <div class="point"><span class="em">-</span><span>利益増→累進課税で税率UP</span></div>
+      <div class="point"><span class="em">-</span><span>5人超で社保義務</span></div>
+      <div class="point"><span class="em">-</span><span>信用面で不利（採用・取引）</span></div>
+      <div style="margin-top:8px;padding-top:8px;border-top:1px dashed #a7f3d0;font-size:11px;color:#047857;font-weight:600">向いてる人：1〜2人の少人数</div>
+    </div>
+    <div class="box box-blue">
+      <h4>B. 個人事業を法人化する</h4>
+      <div class="point"><span class="em">+</span><span>法人税率で節税（最大34%）</span></div>
+      <div class="point"><span class="em">+</span><span>信用力UP（求人・取引）</span></div>
+      <div class="point"><span class="em">+</span><span>経費の幅が広い</span></div>
+      <div class="point"><span class="em">+</span><span>退職金・福利厚生で節税</span></div>
+      <div class="point"><span class="em">-</span><span>設立費用（6〜22万円）</span></div>
+      <div style="margin-top:8px;padding-top:8px;border-top:1px dashed #93c5fd;font-size:11px;color:#1d4ed8;font-weight:600">向いてる人：3人以上 or 利益800万超</div>
+    </div>
+    <div class="box box-purple">
+      <h4>C. マイクロ法人 + 個人事業<br>（今の検討パターン）</h4>
+      <div class="point"><span class="em">+</span><span>社保最適化はマイクロ法人</span></div>
+      <div class="point"><span class="em">+</span><span>eBay事業は個人で継続</span></div>
+      <div class="point"><span class="em">?</span><span>従業員はどっちで雇う？</span></div>
+      <div class="point"><span class="em">-</span><span>構造が複雑になる</span></div>
+      <div style="margin-top:8px;padding-top:8px;border-top:1px dashed #c4b5fd;font-size:11px;color:#6d28d9;font-weight:600">注意：従業員はマイクロ法人では雇わない</div>
+    </div>
+  </div>
+</div>
+
+<!-- マイクロ法人 + 従業員の注意 -->
+<div class="card">
+  <h2>マイクロ法人で従業員を雇うとどうなる？</h2>
+  <div class="box box-red" style="margin-top:8px">
+    <h4 style="color:#b91c1c">マイクロ法人で雇うのはNG</h4>
+    <div class="point"><span class="em">!</span><span>従業員を雇うと社保料が跳ね上がる（低報酬の意味がなくなる）</span></div>
+    <div class="point"><span class="em">!</span><span>マイクロ法人は「社保最適化」が目的。従業員がいたら普通の法人と同じ</span></div>
+    <div class="point"><span class="em">!</span><span>配当型で売上100万の法人に従業員を入れる合理性がない</span></div>
+  </div>
+
+  <div style="font-size:13px;font-weight:700;margin:16px 0 8px;color:var(--accent)">ではどうする？</div>
+
+  <div class="flow-row">
+    <div class="fbox fb-p">マイクロ法人<small>社保最適化専用<br>自分だけ・配当収入</small></div>
+    <span class="arr">+</span>
+    <div class="fbox fb-b">個人事業 or 別法人<small>eBay事業<br>従業員はこちらで雇う</small></div>
+    <span class="arr">=</span>
+    <div class="fbox fb-g">最適な構造<small>社保メリット維持<br>+ 事業拡大</small></div>
+  </div>
+</div>
+
+<!-- 事業規模別ロードマップ -->
+<div class="card">
+  <h2>いのっちのロードマップ（案）</h2>
+  <div class="timeline">
+    <div class="tl-item tl-now">
+      <h3>STEP 1 — 今すぐ <span class="tl-tag tl-tag-now">現在</span></h3>
+      <p>
+        <strong>マイクロ法人（配当型）を設立</strong><br>
+        社保最適化で年47万節約。eBay事業は個人事業のまま継続。<br>
+        従業員はまだ不要 → この構造で十分。
+      </p>
+    </div>
+    <div class="tl-item tl-next">
+      <h3>STEP 2 — 従業員1〜2人 <span class="tl-tag tl-tag-soon">近い将来</span></h3>
+      <p>
+        <strong>個人事業で雇う</strong>（社保義務なし・労災と雇用保険のみ）<br>
+        梱包・発送・リサーチなどのアシスタントを雇用。<br>
+        マイクロ法人はそのまま維持（社保最適化用）。
+      </p>
+    </div>
+    <div class="tl-item tl-next">
+      <h3>STEP 3 — 利益が増えてきたら <span class="tl-tag tl-tag-soon">利益800万〜</span></h3>
+      <p>
+        <strong>個人事業 → eBay法人に法人化</strong><br>
+        累進課税（最大55%）より法人税（最大34%）が有利に。<br>
+        この時点で2法人体制：<br>
+        ① マイクロ法人（配当・社保用）<br>
+        ② eBay法人（事業・従業員用）
+      </p>
+    </div>
+    <div class="tl-item tl-future">
+      <h3>STEP 4 — 大規模化 <span class="tl-tag tl-tag-later">将来</span></h3>
+      <p>
+        <strong>eBay法人で本格採用</strong>（5人以上）<br>
+        社保完備の会社として採用力UP。<br>
+        マイクロ法人は引き続き配当で社保最適化（自分の社保だけ）。<br>
+        eBay法人の役員報酬は別途設定。
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- コスト比較 -->
+<div class="card">
+  <h2>従業員1人を雇うコスト（月給20万の場合）</h2>
+  <table>
+    <thead><tr><th>項目</th><th>個人事業で雇う</th><th>法人で雇う</th></tr></thead>
+    <tbody>
+      <tr><td>月給（額面）</td><td>20万</td><td>20万</td></tr>
+      <tr><td>労災保険（事業主負担）</td><td>約600円/月</td><td>約600円/月</td></tr>
+      <tr><td>雇用保険（事業主負担）</td><td>約1,300円/月</td><td>約1,300円/月</td></tr>
+      <tr><td>社会保険（事業主負担）</td><td style="color:var(--sub)">任意（4人以下）</td><td class="neg">約3万円/月</td></tr>
+      <tr style="font-weight:700;border-top:2px solid var(--text)"><td>事業主の実質負担</td><td>約20.2万/月</td><td>約23.2万/月</td></tr>
+      <tr style="font-weight:700"><td>年間コスト</td><td>約242万/年</td><td>約278万/年</td></tr>
+    </tbody>
+  </table>
+  <div style="font-size:11px;color:var(--sub);margin-top:8px">※ 個人事業で5人以上雇うと社保が強制加入になり法人と同じコストになる</div>
+</div>
+
+<!-- 法人化の判断基準 -->
+<div class="card">
+  <h2>個人事業のまま vs 法人化の判断基準</h2>
+  <table>
+    <thead><tr><th>判断ポイント</th><th>個人事業のまま</th><th>法人化すべき</th></tr></thead>
+    <tbody>
+      <tr><td>事業利益</td><td>600万以下</td><td class="pos">800万以上</td></tr>
+      <tr><td>従業員数</td><td>1〜4人</td><td class="pos">5人以上</td></tr>
+      <tr><td>取引先の信用</td><td>個人OK</td><td class="pos">法人格が必要</td></tr>
+      <tr><td>採用力</td><td>知人・紹介中心</td><td class="pos">求人サイトで募集</td></tr>
+      <tr><td>手続きの手間</td><td class="pos">シンプル</td><td>やや複雑</td></tr>
+      <tr><td>税率</td><td class="neg">所得税 最大55%</td><td class="pos">法人税 最大34%</td></tr>
+      <tr><td>社会保険</td><td class="pos">4人以下なら任意</td><td class="neg">1人から強制</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 結論 -->
+<div class="conclusion">
+  <h2>いのっちへのおすすめプラン</h2>
+  <ul>
+    <li><strong>今：</strong>マイクロ法人（配当型）を設立 → 社保で年47万節約</li>
+    <li><strong>従業員を雇いたくなったら：</strong>個人事業（eBay）で雇う。4人以下なら社保義務なしで低コスト</li>
+    <li><strong>利益800万超えたら：</strong>eBay事業を法人化。累進課税 → 法人税で節税。従業員もこの法人で雇用</li>
+    <li><strong>マイクロ法人はずっと維持：</strong>自分の社保最適化専用。従業員は入れない</li>
+  </ul>
+</div>
+
+<div class="note">
+  <strong>リベ税に確認すべきこと:</strong> 将来の法人化を見据えた場合のマイクロ法人との2法人体制の税務リスク、個人事業で従業員を雇う際の届出手順、法人化のベストなタイミング
+</div>
+
+<div style="text-align:center;color:var(--sub);font-size:11px;padding:16px 0">
+  作成日: 2026-04-17 | 事業拡大ガイド
+</div>
+
+</div>
+</body>
+</html>

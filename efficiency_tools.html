@@ -236,7 +236,7 @@
     <h1>Claude 活用リスト</h1>
     <p class="header-sub">せどり業務の効率化を中心にClaude Codeで作ったものまとめ</p>
     <div class="stats">
-      <div class="stat"><span class="stat-dot" style="background:var(--done)"></span> 活用中 <span class="stat-num">22</span></div>
+      <div class="stat"><span class="stat-dot" style="background:var(--done)"></span> 活用中 <span class="stat-num">23</span></div>
       <div class="stat"><span class="stat-dot" style="background:var(--todo)"></span> これから <span class="stat-num">15</span></div>
     </div>
   </div>
@@ -291,6 +291,53 @@
           <div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/monthly_bs_infographic.html" target="_blank">月次BS・KPI自動更新 <span class="chip chip-claude">Claude</span> <span class="chip chip-html">HTML</span></a></div>
           <div class="card-sub">SBI残高・アメックス未払金・在庫・売上をChromeから自動取得→GASで貸借対照表に一括書き込み</div>
         </div></div>
+        <!-- マイクロ法人シミュレーター -->
+        <div class="card-expandable" id="ex-microcorp">
+          <div class="card-head" onclick="toggleCard('ex-microcorp')">
+            <span class="card-icon icon-done"></span>
+            <div class="card-body">
+              <div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/micro-corp-simulator/" target="_blank" onclick="event.stopPropagation();">マイクロ法人 節税シミュレーター <span class="chip chip-html">HTML</span></a></div>
+              <div class="card-sub">個人事業 vs マイクロ法人併用の年間手取りを比較。社会保険・所得税・法人税を自動計算</div>
+            </div>
+            <span class="toggle">図解</span>
+          </div>
+          <div class="card-detail">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:600;">シミュレーションの流れ:</div>
+            <div class="flow">
+              <div class="fn fn-blue">📝 入力<small>家族構成・売上<br>経費・法人売上</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-purple">🔍 最適化<small>役員報酬を<br>自動で最適探索</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-cyan">⚖️ 比較計算<small>個人のみ vs<br>個人+法人</small></div>
+              <span class="fa">→</span>
+              <div class="fn fn-green">📊 結果表示<small>年間手取り差額<br>内訳・AIアドバイス</small></div>
+            </div>
+            <div class="fa-down">↓ 2つのシナリオを同時計算</div>
+            <div class="branch-row">
+              <div class="branch-box" style="border-color: rgba(249,115,22,0.3);">
+                <span class="bl" style="background:rgba(249,115,22,0.2);color:#fdba74;">🧑 個人事業のみ</span>
+                <div class="flow-v">
+                  <div class="fn fn-orange" style="width:100%;margin-bottom:6px;">売上 − 経費 = 事業所得</div>
+                  <div class="fn fn-red" style="width:100%;margin-bottom:6px;">所得税 + 住民税 + 事業税<small>累進課税（5〜45%）</small></div>
+                  <div class="fn fn-pink" style="width:100%;">国保 + 国民年金<small>家族人数分の均等割あり</small></div>
+                </div>
+              </div>
+              <div class="branch-box" style="border-color: rgba(34,197,94,0.3);">
+                <span class="bl" style="background:rgba(34,197,94,0.2);color:#86efac;">🏢 個人 + マイクロ法人</span>
+                <div class="flow-v">
+                  <div class="fn fn-green" style="width:100%;margin-bottom:6px;">個人事業 + 役員報酬<small>給与所得控除を活用</small></div>
+                  <div class="fn fn-cyan" style="width:100%;margin-bottom:6px;">協会けんぽ<small>家族何人でも追加負担なし</small></div>
+                  <div class="fn fn-purple" style="width:100%;">法人税 + 運営費<small>税理士・会計ソフト等</small></div>
+                </div>
+              </div>
+            </div>
+            <div class="flow-note">
+              <strong>メリットが出やすいケース:</strong> 家族が多い（国保の均等割削減）、事業所得が高い（累進税率の緩和）、配偶者あり（第3号被保険者で年金免除）<br>
+              <strong>注意:</strong> 法人運営費（税理士・会計ソフト・法人住民税均等割）が節税効果を上回ると逆にマイナスになる
+            </div>
+          </div>
+        </div>
+
         <div class="card"><span class="card-icon icon-done"></span><div class="card-body">
           <div class="card-title"><a class="card-link" href="https://tkc252589.github.io/inocchi-tools/weekly_research_infographic.html" target="_blank">週次コミュニティリサーチ自動化 <span class="chip chip-claude">Claude</span> <span class="chip chip-html">HTML</span></a></div>
           <div class="card-sub">
@@ -764,7 +811,7 @@
 
   </div><!-- /tab-community -->
 
-  <div class="footer">// 最終更新: 2026-04-13</div>
+  <div class="footer">// 最終更新: 2026-04-17</div>
 
 </div><!-- /container -->
 

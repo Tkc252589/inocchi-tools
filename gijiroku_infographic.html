@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude活用事例 - AI議事録自動化ツール</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .card {
+    width: 800px;
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+
+  .header {
+    background: linear-gradient(135deg, #7c3aed, #1a73e8);
+    color: #fff;
+    padding: 36px 40px 28px;
+    position: relative;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 0; right: 0;
+    height: 40px;
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+  }
+  .header-label {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 26px;
+    font-weight: 900;
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+  .header p {
+    font-size: 14px;
+    opacity: 0.85;
+  }
+
+  .body { padding: 20px 40px 36px; }
+
+  .problem {
+    background: #fff3e0;
+    border-left: 4px solid #f9ab00;
+    border-radius: 0 12px 12px 0;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+  }
+  .problem-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: #e65100;
+    margin-bottom: 8px;
+  }
+  .problem ul { list-style: none; }
+  .problem li {
+    font-size: 14px;
+    color: #555;
+    padding: 3px 0 3px 20px;
+    position: relative;
+  }
+  .problem li::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: #f9ab00;
+    font-weight: 700;
+  }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title .dot {
+    width: 8px; height: 8px;
+    background: #7c3aed;
+    border-radius: 50%;
+  }
+
+  .compare {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .compare-box {
+    flex: 1;
+    border-radius: 14px;
+    padding: 22px 20px;
+  }
+  .compare-before {
+    background: #fef2f2;
+    border: 2px solid #fecaca;
+  }
+  .compare-after {
+    background: #f0fdf4;
+    border: 2px solid #bbf7d0;
+  }
+  .compare-label {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .compare-before .compare-label { color: #dc2626; }
+  .compare-after .compare-label { color: #16a34a; }
+
+  .step-list { list-style: none; }
+  .step-list li {
+    font-size: 13px;
+    color: #555;
+    padding: 5px 0;
+    padding-left: 24px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .compare-before .step-list li::before {
+    content: '✕';
+    position: absolute;
+    left: 0;
+    color: #ef4444;
+    font-weight: 700;
+  }
+  .compare-after .step-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #16a34a;
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  /* フロー（縦型） */
+  .flow-vertical {
+    margin-bottom: 28px;
+  }
+  .flow-v-step {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 4px;
+  }
+  .flow-v-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .flow-v-icon.user { background: #ede9fe; }
+  .flow-v-icon.ai { background: #e0f2fe; }
+  .flow-v-icon.output { background: #f0fdf4; }
+  .flow-v-content h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+  }
+  .flow-v-content p {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+  }
+  .flow-v-arrow {
+    text-align: center;
+    font-size: 18px;
+    color: #7c3aed;
+    margin: 2px 0 2px 16px;
+  }
+  .flow-v-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .flow-v-label.user-label { background: #ede9fe; color: #7c3aed; }
+  .flow-v-label.ai-label { background: #e0f2fe; color: #1a73e8; }
+
+  /* 音声の図解 */
+  .audio-diagram {
+    margin-bottom: 28px;
+  }
+  .diagram-box {
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 12px;
+  }
+  .diagram-bad {
+    background: #fef2f2;
+    border: 2px solid #fecaca;
+  }
+  .diagram-good {
+    background: #f0fdf4;
+    border: 2px solid #bbf7d0;
+  }
+  .diagram-label {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .diagram-bad .diagram-label { color: #dc2626; }
+  .diagram-good .diagram-label { color: #16a34a; }
+  .diagram-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .diagram-node {
+    text-align: center;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .diagram-node.app { background: #e0e7ff; color: #3730a3; }
+  .diagram-node.multi { background: #ede9fe; color: #7c3aed; border: 2px solid #7c3aed; }
+  .diagram-node.speaker { background: #fef3c7; color: #92400e; }
+  .diagram-node.blackhole { background: #dbeafe; color: #1e40af; }
+  .diagram-node.tool { background: #d1fae5; color: #065f46; }
+  .diagram-node.dead { background: #fee2e2; color: #991b1b; }
+  .diagram-arrow { font-size: 18px; color: #7c3aed; font-weight: 700; }
+  .diagram-split {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .diagram-branch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .diagram-note {
+    font-size: 11px;
+    color: #888;
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  /* 警告ボックス */
+  .warning-box {
+    background: #fef3c7;
+    border: 2px solid #f59e0b;
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .warning-icon { font-size: 28px; flex-shrink: 0; }
+  .warning-text h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 4px;
+  }
+  .warning-text p {
+    font-size: 13px;
+    color: #78350f;
+    line-height: 1.5;
+  }
+
+  /* セットアップ手順 */
+  .setup-steps {
+    margin-bottom: 28px;
+  }
+  .setup-step {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+  }
+  .setup-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #7c3aed;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .setup-content h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .setup-content p {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+  }
+  .setup-content code {
+    display: block;
+    background: #1e1e1e;
+    color: #e0e0e0;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 11px;
+    margin-top: 6px;
+    overflow-x: auto;
+    white-space: pre;
+    font-family: 'SF Mono', Consolas, monospace;
+  }
+
+  /* Claude への指示 */
+  .prompt-box {
+    background: #1e1e1e;
+    color: #e0e0e0;
+    border-radius: 12px;
+    padding: 20px 24px;
+    font-size: 13px;
+    line-height: 1.7;
+    position: relative;
+    margin-bottom: 28px;
+  }
+  .prompt-box::before {
+    content: 'Claude Code への指示（これをコピペ）';
+    position: absolute;
+    top: -10px;
+    left: 16px;
+    background: #7c3aed;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 12px;
+    border-radius: 10px;
+  }
+
+  /* ポイント */
+  .points {
+    background: #f5f3ff;
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-bottom: 28px;
+  }
+  .points ul { list-style: none; }
+  .points li {
+    font-size: 13px;
+    color: #555;
+    padding: 6px 0 6px 24px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .points li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #7c3aed;
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  /* 毎回の使い方 */
+  .daily-use {
+    background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+    border: 2px solid #c4b5fd;
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 28px;
+    text-align: center;
+  }
+  .daily-use h3 {
+    font-size: 16px;
+    font-weight: 900;
+    color: #7c3aed;
+    margin-bottom: 16px;
+  }
+  .daily-steps {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .daily-step {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px 14px;
+    width: 150px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .daily-step .num {
+    font-size: 24px;
+    font-weight: 900;
+    color: #7c3aed;
+  }
+  .daily-step .icon { font-size: 28px; margin: 6px 0; }
+  .daily-step p {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+  }
+  .daily-arrow {
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    color: #7c3aed;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 12px;
+    color: #999;
+    border-top: 1px solid #f0f0f0;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <!-- ヘッダー -->
+  <div class="header">
+    <div class="header-label">Claude Code 活用事例</div>
+    <h1>AI議事録自動化ツール</h1>
+    <p>会議を録音 → AI が文字起こし → 議事録 + アクションアイテムを自動生成</p>
+  </div>
+
+  <div class="body">
+
+    <!-- 課題 -->
+    <div class="problem">
+      <div class="problem-title">こんな悩みありませんか？</div>
+      <ul>
+        <li>会議中にメモを取ると議論に集中できない</li>
+        <li>議事録を書く時間がもったいない（1時間の会議 → 30分の議事録作成）</li>
+        <li>「あれ、何が決まったんだっけ？」とアクションアイテムが曖昧に</li>
+        <li>議事録の共有を忘れて、決定事項が宙に浮く</li>
+      </ul>
+    </div>
+
+    <!-- Before / After -->
+    <div class="section-title"><span class="dot"></span> Before / After</div>
+    <div class="compare">
+      <div class="compare-box compare-before">
+        <div class="compare-label">❌ Before（手動）</div>
+        <ul class="step-list">
+          <li>会議中に必死にメモ</li>
+          <li>終了後30分かけて議事録作成</li>
+          <li>アクションアイテムを思い出す</li>
+          <li>Google Docsにコピペ</li>
+          <li>関係者に共有メール</li>
+        </ul>
+      </div>
+      <div class="compare-box compare-after">
+        <div class="compare-label">✅ After（自動化）</div>
+        <ul class="step-list">
+          <li>「録音開始」をダブルクリック</li>
+          <li>会議に100%集中</li>
+          <li>「録音停止」をダブルクリック</li>
+          <li>数分待つだけで全部完成！</li>
+          <li>議事録 + アクションアイテム + PDF</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 全体フロー -->
+    <div class="section-title"><span class="dot"></span> ツールの動き</div>
+    <div class="flow-vertical">
+      <div class="flow-v-label user-label">あなたがやること</div>
+      <div class="flow-v-step">
+        <div class="flow-v-icon user">📂</div>
+        <div class="flow-v-content">
+          <h3>録音開始.command をダブルクリック</h3>
+          <p>デスクトップに置いたファイルをダブルクリックするだけ</p>
+        </div>
+      </div>
+      <div class="flow-v-arrow">↓ 〜〜 会議する 〜〜 ↓</div>
+      <div class="flow-v-step">
+        <div class="flow-v-icon user">📂</div>
+        <div class="flow-v-content">
+          <h3>録音停止.command をダブルクリック</h3>
+          <p>会議が終わったらダブルクリック。あとはAIにおまかせ！</p>
+        </div>
+      </div>
+      <div class="flow-v-arrow">↓</div>
+
+      <div class="flow-v-label ai-label">AIが自動でやること</div>
+      <div class="flow-v-step">
+        <div class="flow-v-icon ai">🗣️</div>
+        <div class="flow-v-content">
+          <h3>Whisper が文字起こし</h3>
+          <p>Apple Silicon最適化のAIモデルが音声をテキスト化（ローカル処理）</p>
+        </div>
+      </div>
+      <div class="flow-v-arrow">↓</div>
+      <div class="flow-v-step">
+        <div class="flow-v-icon ai">📝</div>
+        <div class="flow-v-content">
+          <h3>Gemini が議事録を作成</h3>
+          <p>要約 + 参加者抽出 + アクションアイテム + タイトル生成</p>
+        </div>
+      </div>
+      <div class="flow-v-arrow">↓</div>
+      <div class="flow-v-step">
+        <div class="flow-v-icon output">📄</div>
+        <div class="flow-v-content">
+          <h3>Google Docs + PDF に自動保存</h3>
+          <p>議事録ドキュメント + PDFが自動で作成・Google Driveに保存</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 音声の仕組み -->
+    <div class="section-title"><span class="dot"></span> 音声キャプチャの仕組み（一番大事！）</div>
+    <div class="audio-diagram">
+      <div class="diagram-box diagram-bad">
+        <div class="diagram-label">❌ ダメな例（録音できない）</div>
+        <div class="diagram-flow">
+          <div class="diagram-node app">🖥️ 会議アプリ<br>Meet / Zoom</div>
+          <div class="diagram-arrow">→</div>
+          <div class="diagram-node speaker">🔊 スピーカー<br>聞こえる</div>
+        </div>
+        <div class="diagram-note">→ BlackHoleに音が流れない → 録音ツールは無音を録音 😢</div>
+      </div>
+      <div class="diagram-box diagram-good">
+        <div class="diagram-label">✅ 正しい設定（録音できる！）</div>
+        <div class="diagram-flow">
+          <div class="diagram-node app">🖥️ 会議アプリ<br>Meet / Zoom</div>
+          <div class="diagram-arrow">→</div>
+          <div class="diagram-node multi">🔀 マルチ出力<br>「会議録音」</div>
+        </div>
+        <div class="diagram-split">
+          <div class="diagram-branch">
+            <div class="diagram-arrow">↓</div>
+            <div class="diagram-node speaker">🔊 スピーカー<br>聞こえる！</div>
+          </div>
+          <div class="diagram-branch">
+            <div class="diagram-arrow">↓</div>
+            <div class="diagram-node blackhole">🎙️ BlackHole<br>録音ツールへ</div>
+            <div class="diagram-arrow">↓</div>
+            <div class="diagram-node tool">📝 議事録ツール<br>AI処理開始！</div>
+          </div>
+        </div>
+        <div class="diagram-note">音が2つに分岐 → スピーカーで聞けて、同時に録音もできる！</div>
+      </div>
+    </div>
+
+    <!-- 警告 -->
+    <div class="warning-box">
+      <div class="warning-icon">⚠️</div>
+      <div class="warning-text">
+        <h3>会議前に毎回確認！（忘れると録音失敗）</h3>
+        <p>画面右上のスピーカーアイコン 🔊 をクリック → 出力を<strong>「会議録音」</strong>に変更してから会議を開始してください。これを忘れると無音録音になります。</p>
+      </div>
+    </div>
+
+    <!-- セットアップ手順 -->
+    <div class="section-title"><span class="dot"></span> セットアップ手順（初回のみ）</div>
+    <div class="setup-steps">
+      <div class="setup-step">
+        <div class="setup-num">1</div>
+        <div class="setup-content">
+          <h3>Homebrew + 必要ソフトのインストール</h3>
+          <code>brew install python@3.12 ffmpeg
+brew install --cask blackhole-2ch</code>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-num">2</div>
+        <div class="setup-content">
+          <h3>Python仮想環境の作成</h3>
+          <code>mkdir -p ~/.local/share/gijiroku
+/opt/homebrew/bin/python3.12 -m venv ~/.local/share/gijiroku/venv
+~/.local/share/gijiroku/venv/bin/pip install mlx-whisper google-genai \
+  google-api-python-client google-auth-httplib2 google-auth-oauthlib</code>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-num">3</div>
+        <div class="setup-content">
+          <h3>Audio MIDI設定でマルチ出力デバイスを作成</h3>
+          <p>「Audio MIDI設定」→ 左下の＋ → マルチ出力デバイスを作成 → BlackHole 2ch + スピーカーにチェック → 名前を「会議録音」に変更</p>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-num">4</div>
+        <div class="setup-content">
+          <h3>Gemini APIキー取得</h3>
+          <p>https://aistudio.google.com/apikey → 「APIキーを作成」→ コピー</p>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-num">5</div>
+        <div class="setup-content">
+          <h3>Google OAuth設定</h3>
+          <p>Google Cloud Console → OAuthクライアントID作成（デスクトップアプリ）→ JSONダウンロード → Google Docs API / Drive API を有効化</p>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-num">6</div>
+        <div class="setup-content">
+          <h3>Claude Code にツール作成を依頼</h3>
+          <p>下の指示文をClaude Codeに貼り付けるだけ！</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Claude への指示 -->
+    <div class="prompt-box">
+以下のファイル構成で議事録自動化ツールを作成してください。<br><br>
+
+場所: ~/Documents/議事録/<br><br>
+
+機能:<br>
+- BlackHole 2ch経由でシステム音声をWAV録音（16kHz、モノラル）<br>
+- mlx-whisper（mlx-community/whisper-large-v3-turbo）で日本語文字起こし<br>
+- Gemini 2.5 Flashで議事録整形・タイトル生成・参加者抽出・アクションアイテム抽出<br>
+- Google Docs APIで議事録をドキュメント化・PDF化・Google Driveに保存<br>
+- macOS通知センターで進捗通知<br>
+- 録音開始.command / 録音停止.command をダブルクリックで操作<br><br>
+
+必要なファイル:<br>
+- 録音開始.command / 録音停止.command（zshスクリプト）<br>
+- scripts/record_start.py, record_stop.py, transcribe.py<br>
+- scripts/formatter.py, google_docs.py, notify.py<br>
+- config/settings.json<br><br>
+
+venvの場所: ~/.local/share/gijiroku/venv/<br>
+config/client_secret.json に Google OAuthクライアントIDのJSONを手動配置<br>
+初回実行時にブラウザでGoogle認証が開きます。
+    </div>
+
+    <!-- ポイント -->
+    <div class="section-title"><span class="dot"></span> ポイント</div>
+    <div class="points">
+      <ul>
+        <li>Mac（Apple Silicon M1〜M4）専用。Whisperがローカルで高速動作</li>
+        <li>APIコスト：Gemini 2.5 Flash使用で1回あたり約1円以下</li>
+        <li>録音データはローカル処理→プライバシー安全</li>
+        <li>長時間会議（2時間超）はメモリ消費大。1時間程度が最適</li>
+        <li>Google Docs + PDFが自動生成されるので共有も簡単</li>
+      </ul>
+    </div>
+
+    <!-- 毎回の使い方 -->
+    <div class="daily-use">
+      <h3>毎回の使い方（これだけ覚えればOK！）</h3>
+      <div class="daily-steps">
+        <div class="daily-step">
+          <div class="num">①</div>
+          <div class="icon">🔊</div>
+          <p>出力を<br>「会議録音」に</p>
+        </div>
+        <div class="daily-arrow">→</div>
+        <div class="daily-step">
+          <div class="num">②</div>
+          <div class="icon">▶️</div>
+          <p>録音開始<br>ダブルクリック</p>
+        </div>
+        <div class="daily-arrow">→</div>
+        <div class="daily-step">
+          <div class="num">③</div>
+          <div class="icon">⏹</div>
+          <p>録音停止<br>ダブルクリック</p>
+        </div>
+        <div class="daily-arrow">→</div>
+        <div class="daily-step">
+          <div class="num">④</div>
+          <div class="icon">☕</div>
+          <p>数分待てば<br>議事録完成！</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Built with Claude Code — AI議事録自動化ツール
+  </div>
+
+</div>
+</body>
+</html>

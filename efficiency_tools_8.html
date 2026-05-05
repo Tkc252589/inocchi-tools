@@ -317,8 +317,8 @@ if(sessionStorage.getItem('unlocked')==='1'){document.getElementById('lock-scree
     <div class="card">
       <span class="card-icon icon-done"></span>
       <div class="card-body">
-        <div class="card-title"><a href="ebay_3button_flow.html#post-listing" target="_blank" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--muted);">価格一括更新</a> <span class="chip chip-api">eBay API</span></div>
-        <div class="card-sub">スプシで価格変更 → eBayに一括反映。送料・Best Offerも同時更新</div>
+        <div class="card-title"><a href="ebay_3button_flow.html#post-listing" target="_blank" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--muted);">価格・送料・広告率の一括更新</a> <span class="chip chip-api">eBay API</span></div>
+        <div class="card-sub">スプシで価格変更 → US送料(20%)・Best Offer(75%)・利益額が自動連動 → eBayに一括反映。広告率もスプシから設定可能</div>
       </div>
     </div>
     <div class="card">
@@ -386,6 +386,52 @@ if(sessionStorage.getItem('unlocked')==='1'){document.getElementById('lock-scree
 
 <div class="divider"></div>
 
+<!-- ===== Carousell ===== -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-tag tag-done">稼働中</span>
+    <span class="section-title">Carousell（東南アジアEC）</span>
+    <a href="carousell_tools_infographic.html" target="_blank" style="margin-left:auto;font-size:12px;color:#818cf8;text-decoration:none;border:1px solid rgba(129,140,248,0.3);padding:3px 10px;border-radius:8px;">📊 図解</a>
+  </div>
+
+  <div class="group">
+    <div class="group-label">
+      <span class="gl-dot gl-tool"></span>
+      <span class="text-tool">出品・在庫管理</span>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title"><a href="%E5%9B%B3%E8%A7%A3_Carousell_Auto_List.html" target="_blank" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--muted);">出品作業の簡素化</a> <span class="chip chip-gas">GAS</span></div>
+        <div class="card-sub">メルカリ検索 → AI生成 → 出品リスト転記の3ステップで出品完了</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title"><a href="carousell_tools_infographic.html" target="_blank" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--muted);">在庫一括削除・URLオープン</a> <span class="chip chip-gas">GAS</span></div>
+        <div class="card-sub">在庫の一括削除、1クリックで在庫URLを全タブ展開、スマホから在庫チェック</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title"><a href="carousell_tools_infographic.html" target="_blank" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--muted);">顧客対応記録ツール</a> <span class="chip chip-gas">GAS</span></div>
+        <div class="card-sub">ブックマークレット1クリックで商品名・価格・チャットURLをスプシに自動保存</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title"><a href="brand_analysis_q1_2026.html" target="_blank" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--muted);">ブランド別販売分析レポート</a> <span class="chip chip-gas">GAS</span></div>
+        <div class="card-sub">売上データをブランド別に集計・可視化。Q1 2026レポート</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
 <!-- ===== その他ツール ===== -->
 <div class="section">
   <div class="section-header">
@@ -401,22 +447,15 @@ if(sessionStorage.getItem('unlocked')==='1'){document.getElementById('lock-scree
     <div class="card">
       <span class="card-icon icon-done"></span>
       <div class="card-body">
-        <div class="card-title"><a href="general_tools_infographic.html" target="_blank" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--muted);">自社ECサイト構築</a> <span class="chip chip-api">Next.js</span></div>
-        <div class="card-sub">海外向けカタログ+チャット型EC。スプシ→AI生成→サイト表示。多言語対応（英語・中国語）</div>
+        <div class="card-title">自社ECサイト構築 <span class="chip chip-api">Next.js</span></div>
+        <div class="card-sub">海外向けカタログ+WhatsApp型EC。スプシ→AI生成→サイト表示。多言語対応（英語・中国語）。Cloudflare Workers+D1</div>
       </div>
     </div>
     <div class="card">
       <span class="card-icon icon-done"></span>
       <div class="card-body">
-        <div class="card-title"><a href="general_tools_infographic.html" target="_blank" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--muted);">ブログ自動化</a> <span class="chip chip-claude">Claude</span></div>
+        <div class="card-title">ブログ自動化 <span class="chip chip-claude">Claude</span></div>
         <div class="card-sub">Hugo+Cloudflare Pages（無料）。Claude APIで記事自動生成。WordPress月額4万円→0円に削減</div>
-      </div>
-    </div>
-    <div class="card">
-      <span class="card-icon icon-done"></span>
-      <div class="card-body">
-        <div class="card-title"><a href="carousell_tools_infographic.html" target="_blank" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--muted);">顧客対応記録ツール</a> <span class="chip chip-gas">GAS</span></div>
-        <div class="card-sub">ブックマークレット1クリックで商品名・価格・チャットURLをスプシに自動保存</div>
       </div>
     </div>
     <div class="card">
@@ -424,6 +463,13 @@ if(sessionStorage.getItem('unlocked')==='1'){document.getElementById('lock-scree
       <div class="card-body">
         <div class="card-title"><a href="ohayo_infographic.html" target="_blank" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--muted);">朝フロースケジュール管理</a> <span class="chip chip-claude">Claude</span></div>
         <div class="card-sub">Googleカレンダー連携。45分タイムブロック自動生成。「おはよう」で1日の予定を最適化</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title"><a href="spsh_launcher_infographic.html" target="_blank" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--muted);">スプシランチャー</a> <span class="chip chip-gas">Chrome拡張</span></div>
+        <div class="card-sub">よく使うスプレッドシート一覧をワンクリックで表示・アクセス</div>
       </div>
     </div>
   </div>
@@ -634,6 +680,36 @@ if(sessionStorage.getItem('unlocked')==='1'){document.getElementById('lock-scree
       <div class="card-body">
         <div class="card-title">フリマ出品検知・通知</div>
         <div class="card-sub">特定キーワード+価格条件で新着出品を自動検知 → LINE通知</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== どうやって作ったか ===== -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-tag" style="background:rgba(167,139,250,0.08);color:#a78bfa;border:1px solid rgba(167,139,250,0.2);">HOW</span>
+    <span class="section-title">どうやって作ったか</span>
+  </div>
+
+  <div class="group">
+    <div class="card" style="border-color:#4338ca;background:linear-gradient(135deg,rgba(30,27,75,0.5),var(--surface));">
+      <div class="card-body">
+        <div class="card-title" style="font-size:15px;margin-bottom:8px;">Claude Code（AIエージェント）に自然言語で指示するだけ</div>
+        <div class="card-sub" style="line-height:1.8;">
+          すべてのツールは <strong style="color:var(--text);">Claude Code</strong>（Anthropic社のAI開発エージェント）を使って構築しています。<br><br>
+          <strong style="color:#a78bfa;">作り方:</strong> 「ヤフオクのURLを貼ったら自動で商品情報取得して、英語のeBay出品データをAIで作って、白背景の画像も作って、APIで出品してほしい」のように<strong style="color:var(--text);">やりたいことを日本語で伝えるだけ</strong>。<br><br>
+          <strong style="color:#a78bfa;">技術スタック:</strong><br>
+          ・基盤 → Google スプレッドシート + GAS（Google Apps Script）<br>
+          ・出品データ生成 → ChatGPT API（Vision対応）<br>
+          ・画像処理 → Gemini API（白抜き・分類）<br>
+          ・出品・管理 → eBay Trading API / Taxonomy API<br>
+          ・開発・分析 → Claude Code<br><br>
+          <strong style="color:#a78bfa;">コスト:</strong> ツール基盤はGoogle Workspace（無料〜）のみ。API利用料は月数百円程度。<br>
+          <strong style="color:#a78bfa;">開発期間:</strong> 1ツールあたり数時間〜1日。AIに指示→テスト→改善のサイクルで高速開発。
+        </div>
       </div>
     </div>
   </div>

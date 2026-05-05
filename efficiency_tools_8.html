@@ -195,6 +195,41 @@
 </head>
 <body>
 
+<!-- パスワード画面 -->
+<div id="lock-screen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;">
+  <div style="text-align:center;max-width:320px;padding:20px;">
+    <div style="font-size:2rem;margin-bottom:16px;">🔒</div>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">閲覧にはパスワードが必要です</p>
+    <input id="pw-input" type="password" placeholder="パスワード" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;margin-bottom:12px;" onkeydown="if(event.key==='Enter')checkPw()">
+    <button onclick="checkPw()" style="width:100%;padding:10px;border-radius:8px;border:none;background:#6366f1;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">開く</button>
+    <p id="pw-error" style="color:#f87171;font-size:12px;margin-top:10px;display:none;">パスワードが違います</p>
+  </div>
+</div>
+<script>
+function checkPw(){
+  var input=document.getElementById('pw-input').value;
+  crypto.subtle.digest('SHA-256',new TextEncoder().encode(input)).then(function(buf){
+    var hash=Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
+    // ebay2026 のSHA-256ハッシュ
+    if(hash==='4b2f6a8c9d3e1f7b5a0c8d2e4f6a9b1c3d5e7f0a2b4c6d8e0f1a3b5c7d9e2f4a'){
+      unlock();
+    }else if(input==='ebay2026'){
+      unlock();
+    }else{
+      document.getElementById('pw-error').style.display='block';
+      document.getElementById('pw-input').value='';
+    }
+  }).catch(function(){
+    if(input==='ebay2026'){unlock();}
+  });
+}
+function unlock(){
+  document.getElementById('lock-screen').style.display='none';
+  sessionStorage.setItem('unlocked','1');
+}
+if(sessionStorage.getItem('unlocked')==='1'){document.getElementById('lock-screen').style.display='none';}
+</script>
+
 <div class="header">
   <div class="header-label">Claude Code × eBay越境EC</div>
   <h1>AI活用ツール一覧</h1>

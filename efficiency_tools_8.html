@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude AI × eBay越境EC 活用ツール一覧</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f11;
+    --surface: #18181c;
+    --surface2: #22222a;
+    --border: #2e2e38;
+    --text: #e8e8f0;
+    --muted: #7a7a90;
+    --done: #34d399;
+    --done-bg: rgba(52,211,153,0.08);
+    --done-border: rgba(52,211,153,0.2);
+    --todo: #60a5fa;
+    --todo-bg: rgba(96,165,250,0.08);
+    --todo-border: rgba(96,165,250,0.2);
+    --ebay: #a78bfa;
+    --ai: #f472b6;
+    --tool: #fb923c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 24px 80px;
+    line-height: 1.6;
+  }
+  .header {
+    max-width: 760px;
+    margin: 0 auto 48px;
+  }
+  .header-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .stats {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .stat-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .stat-num { font-weight: 700; color: var(--text); }
+
+  .section {
+    max-width: 760px;
+    margin: 0 auto 40px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+  .tag-done { background: var(--done-bg); color: var(--done); border: 1px solid var(--done-border); }
+  .tag-todo { background: var(--todo-bg); color: var(--todo); border: 1px solid var(--todo-border); }
+  .section-title { font-size: 17px; font-weight: 700; }
+
+  .group { margin-bottom: 20px; }
+  .group-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding-left: 2px;
+  }
+  .gl-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .gl-ebay { background: var(--ebay); box-shadow: 0 0 6px var(--ebay); }
+  .gl-ai { background: var(--ai); box-shadow: 0 0 6px var(--ai); }
+  .gl-tool { background: var(--tool); box-shadow: 0 0 6px var(--tool); }
+  .text-ebay { color: var(--ebay); }
+  .text-ai { color: var(--ai); }
+  .text-tool { color: var(--tool); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .card:hover {
+    background: var(--surface2);
+    border-color: #3e3e50;
+  }
+  .card-icon {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+  .icon-done { background: var(--done); box-shadow: 0 0 6px rgba(52,211,153,0.5); }
+  .icon-todo { background: var(--todo); box-shadow: 0 0 6px rgba(96,165,250,0.4); }
+  .card-body { flex: 1; }
+  .card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .card-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3px;
+    line-height: 1.5;
+  }
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+  .chip-gas { background: rgba(251,146,60,0.12); color: #fb923c; border: 1px solid rgba(251,146,60,0.25); }
+  .chip-ai { background: rgba(167,139,250,0.12); color: #a78bfa; border: 1px solid rgba(167,139,250,0.25); }
+  .chip-api { background: rgba(96,165,250,0.12); color: #60a5fa; border: 1px solid rgba(96,165,250,0.25); }
+  .chip-claude { background: rgba(244,114,182,0.12); color: #f472b6; border: 1px solid rgba(244,114,182,0.25); }
+
+  .divider {
+    max-width: 760px;
+    margin: 0 auto 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  .footer {
+    max-width: 760px;
+    margin: 0 auto;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Claude Code × eBay越境EC</div>
+  <h1>AI活用ツール一覧</h1>
+  <p class="header-sub">eBay越境EC事業で構築した自動化ツール群 ― すべてスプシ+GASベース、追加コストほぼゼロ</p>
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-dot" style="background:var(--done)"></span>
+      稼働中 <span class="stat-num">30</span>
+    </div>
+    <div class="stat">
+      <span class="stat-dot" style="background:var(--todo)"></span>
+      開発予定 <span class="stat-num">5</span>
+    </div>
+    <div class="stat">
+      <span class="stat-dot" style="background:var(--ebay)"></span>
+      運用アカウント <span class="stat-num">3</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 出品自動化 ===== -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-tag tag-done">稼働中</span>
+    <span class="section-title">eBay出品自動化（3ボタン出品）</span>
+  </div>
+
+  <div class="group">
+    <div class="group-label">
+      <span class="gl-dot gl-ebay"></span>
+      <span class="text-ebay">出品フロー</span>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">URL情報取得 <span class="chip chip-gas">GAS</span></div>
+        <div class="card-sub">ヤフオク・メルカリのURLを貼るだけで商品名・価格・画像・説明文を自動取得</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">AI出品データ生成 <span class="chip chip-ai">ChatGPT</span></div>
+        <div class="card-sub">英語タイトル（SEO最適化80文字）・HTML説明文・Item Specifics・カテゴリ・価格を自動生成</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">AI白抜き画像処理 <span class="chip chip-ai">Gemini</span></div>
+        <div class="card-sub">商品写真の背景を自動で白に変換（eBay推奨フォーマット）→ eBayサーバーに自動アップロード</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">eBay API出品 <span class="chip chip-api">eBay API</span></div>
+        <div class="card-sub">一括出品・選択行出品。カテゴリ自動判定（Taxonomy API）、ビジネスポリシー自動設定</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">自動価格計算 <span class="chip chip-gas">GAS</span></div>
+        <div class="card-sub">仕入値+送料+為替+eBay手数料+目標利益率から出品価格を自動算出。Best Offer 75%自動設定</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">利益シミュレーション <span class="chip chip-gas">GAS</span></div>
+        <div class="card-sub">出品価格を変えるとリアルタイムで利益額・利益率が変動。広告費も自動計算</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-label">
+      <span class="gl-dot gl-ebay"></span>
+      <span class="text-ebay">出品後の管理</span>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">実物写真の追加 <span class="chip chip-api">eBay API</span></div>
+        <div class="card-sub">WebAppから写真アップロード → 既存写真+追加写真をeBayに自動反映（Seller Hub不要）</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">価格一括更新 <span class="chip chip-api">eBay API</span></div>
+        <div class="card-sub">スプシで価格変更 → eBayに一括反映。送料・Best Offerも同時更新</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">既存出品取り込み <span class="chip chip-api">eBay API</span></div>
+        <div class="card-sub">Seller Hubの既存出品をスプシに同期。仕入値を逆算して利益管理に統合</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">ステータス管理 <span class="chip chip-gas">GAS</span></div>
+        <div class="card-sub">生成済み → 写真済み → 出品済み。色分けで一覧把握</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== 複数アカウント ===== -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-tag tag-done">稼働中</span>
+    <span class="section-title">複数アカウント運用</span>
+  </div>
+
+  <div class="group">
+    <div class="group-label">
+      <span class="gl-dot gl-ebay"></span>
+      <span class="text-ebay">アカウント別ツール</span>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">有在庫出品ツール（ブランド品） <span class="chip chip-gas">GAS</span> <span class="chip chip-ai">ChatGPT</span></div>
+        <div class="card-sub">スプシのメニューだけで完結する3ボタンフロー。操作マニュアル付きで担当者が自走可能</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">無在庫出品ツール（複数ソース） <span class="chip chip-gas">GAS</span> <span class="chip chip-ai">ChatGPT</span></div>
+        <div class="card-sub">メルカリ・Amazon・楽天・ヤフオクからリサーチ → AI出品データ生成 → eBay出品。Playwright対応</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">フォーム入力型出品ツール <span class="chip chip-gas">GAS</span> <span class="chip chip-api">eBay API</span></div>
+        <div class="card-sub">Googleフォームで商品情報+写真投稿 → AI生成 → eBay API出品。LINE通知付き。スケジュール出品対応</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">在庫・仕入・販売の統合管理 <span class="chip chip-gas">GAS</span></div>
+        <div class="card-sub">仕入→在庫→販売→粗利を一気通貫で管理。月次推移・週次販売分析付き</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== その他ツール ===== -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-tag tag-done">稼働中</span>
+    <span class="section-title">その他のツール</span>
+  </div>
+
+  <div class="group">
+    <div class="group-label">
+      <span class="gl-dot gl-tool"></span>
+      <span class="text-tool">EC・ブログ・業務</span>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">自社ECサイト構築 <span class="chip chip-api">Next.js</span></div>
+        <div class="card-sub">海外向けカタログ+チャット型EC。スプシ→AI生成→サイト表示。多言語対応（英語・中国語）</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">ブログ自動化 <span class="chip chip-claude">Claude</span></div>
+        <div class="card-sub">Hugo+Cloudflare Pages（無料）。Claude APIで記事自動生成。WordPress月額4万円→0円に削減</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">顧客対応記録ツール <span class="chip chip-gas">GAS</span></div>
+        <div class="card-sub">ブックマークレット1クリックで商品名・価格・チャットURLをスプシに自動保存</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">朝フロースケジュール管理 <span class="chip chip-claude">Claude</span></div>
+        <div class="card-sub">Googleカレンダー連携。45分タイムブロック自動生成。「おはよう」で1日の予定を最適化</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== リサーチ ===== -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-tag tag-done">稼働中</span>
+    <span class="section-title">リサーチ・分析</span>
+  </div>
+
+  <div class="group">
+    <div class="group-label">
+      <span class="gl-dot gl-tool"></span>
+      <span class="text-tool">市場調査</span>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">SellerHacks連携</div>
+        <div class="card-sub">eBay市場データ分析（売れ筋・価格帯・競合セラー）</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">Browse API補完 <span class="chip chip-api">eBay API</span></div>
+        <div class="card-sub">SellerHacksで不足するデータをeBay APIで取得</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">月次レポート自動生成 <span class="chip chip-claude">Claude</span></div>
+        <div class="card-sub">銀行残高・売上・在庫を自動収集 → 7名の専門AIが多角的に分析 → HTMLレポート自動生成</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== AIエージェント ===== -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-tag tag-done">稼働中</span>
+    <span class="section-title">AIエージェントチーム（12名体制）</span>
+  </div>
+
+  <div class="group">
+    <div class="group-label">
+      <span class="gl-dot gl-ai"></span>
+      <span class="text-ai">専門AI</span>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">ツカサ（PM・司令塔） <span class="chip chip-claude">Claude</span></div>
+        <div class="card-sub">全タスクの受付・分析・優先順位付け・担当AIへの振り分け</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">モトキー（eBay専門家） <span class="chip chip-claude">Claude</span></div>
+        <div class="card-sub">出品最適化・発送・アカウントヘルス・バイヤー対応・全ジャンル知識</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">アイ（業務自動化） <span class="chip chip-claude">Claude</span></div>
+        <div class="card-sub">GAS/API開発・DX推進・ツール構築</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">カオル（会計・税務） <span class="chip chip-claude">Claude</span></div>
+        <div class="card-sub">越境EC税務・確定申告・B/S分析・収支管理</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">ジョブズ（経営戦略） <span class="chip chip-claude">Claude</span></div>
+        <div class="card-sub">事業判断・Go/No-Go判定・投資対効果分析</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">リサ（法務） <span class="chip chip-claude">Claude</span></div>
+        <div class="card-sub">契約書レビュー・プラットフォーム規約確認・越境EC法務</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">エミ（品質保証） <span class="chip chip-claude">Claude</span></div>
+        <div class="card-sub">リスク評価・実現性検証・批判的レビュー</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">その他5名</div>
+        <div class="card-sub">秘書（アユミ）・家計管理（カオリン）・ブログ（ブン）・Carousell（リー）・人事（ジンジー）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== 対応規模 ===== -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-tag tag-done">実績</span>
+    <span class="section-title">対応規模・技術スタック</span>
+  </div>
+
+  <div class="group">
+    <div class="group-label">
+      <span class="gl-dot gl-tool"></span>
+      <span class="text-tool">インフラ</span>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">運用アカウント 3件</div>
+        <div class="card-sub">有在庫（ブランド品）・無在庫（メルカリ/Amazon/楽天ソース）の両方に対応</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">対応仕入れソース 4サイト</div>
+        <div class="card-sub">ヤフオク・メルカリ・Amazon・楽天</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">ツール基盤: Google Workspace</div>
+        <div class="card-sub">スプレッドシート+GAS。追加コストほぼゼロ。ブラウザだけで操作可能</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-done"></span>
+      <div class="card-body">
+        <div class="card-title">AI活用</div>
+        <div class="card-sub">ChatGPT API（出品データ生成）・Gemini API（画像処理）・Claude（分析・開発・エージェント）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== 開発予定 ===== -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-tag tag-todo">開発予定</span>
+    <span class="section-title">今後のツール</span>
+  </div>
+
+  <div class="group">
+    <div class="group-label">
+      <span class="gl-dot gl-ebay"></span>
+      <span class="text-ebay">eBay</span>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-todo"></span>
+      <div class="card-body">
+        <div class="card-title">eBay注文自動取得 <span class="chip chip-api">eBay API</span></div>
+        <div class="card-sub">売れた商品の注文情報をスプシに自動記録</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-todo"></span>
+      <div class="card-body">
+        <div class="card-title">eLogi・CPASS連携</div>
+        <div class="card-sub">国際発送の追跡番号・送料を自動連携</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-todo"></span>
+      <div class="card-body">
+        <div class="card-title">バイヤーメッセージ自動翻訳・返信 <span class="chip chip-ai">ChatGPT</span></div>
+        <div class="card-sub">英語メッセージを日本語翻訳 → テンプレ返信案を自動生成</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-todo"></span>
+      <div class="card-body">
+        <div class="card-title">確定申告書類自動生成</div>
+        <div class="card-sub">年間取引データから確定申告用の書類を自動作成</div>
+      </div>
+    </div>
+    <div class="card">
+      <span class="card-icon icon-todo"></span>
+      <div class="card-body">
+        <div class="card-title">フリマ出品検知・通知</div>
+        <div class="card-sub">特定キーワード+価格条件で新着出品を自動検知 → LINE通知</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">// 2026-05-05 更新</div>
+
+</body>
+</html>

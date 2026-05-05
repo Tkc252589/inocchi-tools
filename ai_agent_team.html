@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIエージェントチーム — 12名体制の専門AI組織</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0e1a;
+  --bg2: #0f1525;
+  --bg3: #151d30;
+  --card: #1a2235;
+  --card2: #1e2840;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --text: #f0f4ff;
+  --muted: #7b8ab8;
+  --muted2: #9aaad0;
+
+  --sales:   #f59e0b;
+  --sales-l: rgba(245,158,11,0.15);
+  --sales-b: rgba(245,158,11,0.35);
+
+  --tech:    #06b6d4;
+  --tech-l:  rgba(6,182,212,0.15);
+  --tech-b:  rgba(6,182,212,0.35);
+
+  --fin:     #10b981;
+  --fin-l:   rgba(16,185,129,0.15);
+  --fin-b:   rgba(16,185,129,0.35);
+
+  --strat:   #8b5cf6;
+  --strat-l: rgba(139,92,246,0.15);
+  --strat-b: rgba(139,92,246,0.35);
+
+  --legal:   #ef4444;
+  --legal-l: rgba(239,68,68,0.15);
+  --legal-b: rgba(239,68,68,0.35);
+
+  --content: #ec4899;
+  --content-l: rgba(236,72,153,0.15);
+  --content-b: rgba(236,72,153,0.35);
+
+  --hr:      #f97316;
+  --hr-l:    rgba(249,115,22,0.15);
+  --hr-b:    rgba(249,115,22,0.35);
+
+  --sec:     #64748b;
+  --sec-l:   rgba(100,116,139,0.15);
+  --sec-b:   rgba(100,116,139,0.35);
+
+  --pm:      #6366f1;
+  --pm-l:    rgba(99,102,241,0.2);
+  --pm-b:    rgba(99,102,241,0.5);
+}
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, #05091a 0%, #0d1229 35%, #101830 65%, #131d38 100%);
+  padding: 60px 24px 52px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(99,102,241,0.2);
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 700px; height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%);
+  top: -300px; left: 50%;
+  transform: translateX(-50%);
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(6,182,212,0.06) 0%, transparent 70%);
+  bottom: -200px; right: -100px;
+}
+.hero-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(99,102,241,0.15);
+  border: 1px solid rgba(99,102,241,0.35);
+  color: #a5b4fc;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 16px;
+  border-radius: 100px;
+  margin-bottom: 24px;
+  letter-spacing: 0.06em;
+  position: relative;
+  z-index: 1;
+}
+.hero-chip::before {
+  content: '';
+  width: 7px; height: 7px;
+  background: #4ade80;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #4ade80;
+  animation: blink 1.8s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;box-shadow:0 0 8px #4ade80}50%{opacity:.3;box-shadow:none} }
+
+.hero h1 {
+  font-size: clamp(24px, 5.5vw, 44px);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.25;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+  position: relative;
+  z-index: 1;
+}
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(90deg, #818cf8, #a5f3fc, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: 14px;
+  color: var(--muted2);
+  max-width: 480px;
+  margin: 0 auto 30px;
+  line-height: 1.8;
+  position: relative;
+  z-index: 1;
+}
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+.hero-stat {
+  text-align: center;
+}
+.hero-stat-num {
+  font-size: 28px;
+  font-weight: 900;
+  color: #a5b4fc;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.hero-stat-label {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+/* ── MAIN ── */
+.main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 16px 80px;
+}
+
+/* ── SECTION ── */
+.section {
+  background: var(--card);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  padding: 32px 28px;
+  margin-bottom: 20px;
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.section-num {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: #fff;
+}
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ── PM CENTER ── */
+.pm-center {
+  background: linear-gradient(135deg, rgba(99,102,241,0.2) 0%, rgba(99,102,241,0.08) 100%);
+  border: 2px solid rgba(99,102,241,0.5);
+  border-radius: 20px;
+  padding: 28px 24px;
+  text-align: center;
+  position: relative;
+  margin-bottom: 32px;
+  box-shadow: 0 0 40px rgba(99,102,241,0.15), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.pm-glow {
+  position: absolute;
+  top: -1px; left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #6366f1, #818cf8);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 3px 16px;
+  border-radius: 0 0 10px 10px;
+  text-transform: uppercase;
+}
+.pm-avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 16px auto 12px;
+  box-shadow: 0 0 24px rgba(99,102,241,0.4);
+}
+.pm-name {
+  font-size: 22px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.pm-role {
+  font-size: 13px;
+  color: #a5b4fc;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+.pm-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+}
+.pm-tag {
+  background: rgba(99,102,241,0.2);
+  border: 1px solid rgba(99,102,241,0.35);
+  color: #c7d2fe;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* ── CONNECTOR ── */
+.connector-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.connector-line {
+  width: 2px;
+  height: 40px;
+  background: linear-gradient(to bottom, rgba(99,102,241,0.5), rgba(99,102,241,0.1));
+}
+
+/* ── DEPT GRID ── */
+.dept-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+@media(max-width: 600px){ .dept-grid { grid-template-columns: 1fr; } }
+
+/* ── DEPT CARD ── */
+.dept-card {
+  border-radius: 16px;
+  border: 1px solid;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.dept-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  right: 0; height: 3px;
+  border-radius: 16px 16px 0 0;
+}
+.dept-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.dept-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.dept-name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.dept-members {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── MEMBER ── */
+.member {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.member-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  border: 1.5px solid;
+}
+.member-body {
+  flex: 1;
+  min-width: 0;
+}
+.member-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.member-spec {
+  font-size: 10px;
+  font-weight: 600;
+  margin-bottom: 3px;
+  letter-spacing: 0.03em;
+}
+.member-desc {
+  font-size: 11px;
+  color: var(--muted2);
+  line-height: 1.6;
+}
+
+/* ── SALES DEPT ── */
+.dept-sales {
+  background: var(--sales-l);
+  border-color: var(--sales-b);
+}
+.dept-sales::before { background: var(--sales); }
+.dept-sales .dept-icon { background: rgba(245,158,11,0.2); }
+.dept-sales .dept-name { color: var(--sales); }
+.dept-sales .member-avatar { background: rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.4); }
+.dept-sales .member-spec { color: var(--sales); }
+
+/* ── TECH DEPT ── */
+.dept-tech {
+  background: var(--tech-l);
+  border-color: var(--tech-b);
+}
+.dept-tech::before { background: var(--tech); }
+.dept-tech .dept-icon { background: rgba(6,182,212,0.2); }
+.dept-tech .dept-name { color: var(--tech); }
+.dept-tech .member-avatar { background: rgba(6,182,212,0.15); border-color: rgba(6,182,212,0.4); }
+.dept-tech .member-spec { color: var(--tech); }
+
+/* ── FIN DEPT ── */
+.dept-fin {
+  background: var(--fin-l);
+  border-color: var(--fin-b);
+}
+.dept-fin::before { background: var(--fin); }
+.dept-fin .dept-icon { background: rgba(16,185,129,0.2); }
+.dept-fin .dept-name { color: var(--fin); }
+.dept-fin .member-avatar { background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.4); }
+.dept-fin .member-spec { color: var(--fin); }
+
+/* ── STRAT DEPT ── */
+.dept-strat {
+  background: var(--strat-l);
+  border-color: var(--strat-b);
+}
+.dept-strat::before { background: var(--strat); }
+.dept-strat .dept-icon { background: rgba(139,92,246,0.2); }
+.dept-strat .dept-name { color: var(--strat); }
+.dept-strat .member-avatar { background: rgba(139,92,246,0.15); border-color: rgba(139,92,246,0.4); }
+.dept-strat .member-spec { color: var(--strat); }
+
+/* ── LEGAL DEPT ── */
+.dept-legal {
+  background: var(--legal-l);
+  border-color: var(--legal-b);
+}
+.dept-legal::before { background: var(--legal); }
+.dept-legal .dept-icon { background: rgba(239,68,68,0.2); }
+.dept-legal .dept-name { color: var(--legal); }
+.dept-legal .member-avatar { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); }
+.dept-legal .member-spec { color: var(--legal); }
+
+/* ── CONTENT DEPT ── */
+.dept-content {
+  background: var(--content-l);
+  border-color: var(--content-b);
+}
+.dept-content::before { background: var(--content); }
+.dept-content .dept-icon { background: rgba(236,72,153,0.2); }
+.dept-content .dept-name { color: var(--content); }
+.dept-content .member-avatar { background: rgba(236,72,153,0.15); border-color: rgba(236,72,153,0.4); }
+.dept-content .member-spec { color: var(--content); }
+
+/* ── HR DEPT ── */
+.dept-hr {
+  background: var(--hr-l);
+  border-color: var(--hr-b);
+}
+.dept-hr::before { background: var(--hr); }
+.dept-hr .dept-icon { background: rgba(249,115,22,0.2); }
+.dept-hr .dept-name { color: var(--hr); }
+.dept-hr .member-avatar { background: rgba(249,115,22,0.15); border-color: rgba(249,115,22,0.4); }
+.dept-hr .member-spec { color: var(--hr); }
+
+/* ── SEC DEPT ── */
+.dept-sec {
+  background: var(--sec-l);
+  border-color: var(--sec-b);
+}
+.dept-sec::before { background: #94a3b8; }
+.dept-sec .dept-icon { background: rgba(100,116,139,0.2); }
+.dept-sec .dept-name { color: #94a3b8; }
+.dept-sec .member-avatar { background: rgba(100,116,139,0.15); border-color: rgba(100,116,139,0.4); }
+.dept-sec .member-spec { color: #94a3b8; }
+
+/* ── FLOW ── */
+.flow-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+}
+@media(max-width: 640px){ .flow-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.flow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  padding: 20px 12px;
+}
+.flow-step:not(:last-child)::after {
+  content: '→';
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: var(--muted);
+  z-index: 1;
+}
+@media(max-width: 640px){
+  .flow-step:nth-child(2)::after { content: none; }
+  .flow-step:nth-child(even):not(:last-child)::after { content: none; }
+}
+.flow-step-num {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--bg3);
+  border: 2px solid rgba(99,102,241,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 900;
+  color: #a5b4fc;
+  margin-bottom: 12px;
+  box-shadow: 0 0 12px rgba(99,102,241,0.2);
+}
+.flow-step-icon { font-size: 24px; margin-bottom: 8px; }
+.flow-step-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+.flow-step-desc {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+/* ── CAPABILITY GRID ── */
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+@media(max-width: 580px){ .cap-grid { grid-template-columns: 1fr; } }
+.cap-card {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 18px;
+}
+.cap-icon { font-size: 26px; margin-bottom: 10px; }
+.cap-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+.cap-desc {
+  font-size: 11px;
+  color: var(--muted2);
+  line-height: 1.7;
+}
+
+/* ── FOOTER ── */
+.footer {
+  background: linear-gradient(135deg, #05091a, #0d1229);
+  border-top: 1px solid rgba(99,102,241,0.2);
+  padding: 32px 24px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 2;
+}
+.footer strong { color: #a5b4fc; }
+
+/* ── MEMBER DIVIDER ── */
+.member-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+  margin: 4px 0;
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-chip">Claude AI × 専門AI組織</div>
+  <h1>AIエージェントチーム<br><em>12名体制の専門AI組織</em></h1>
+  <p class="hero-sub">PM「ツカサ」が司令塔となり、専門AIが部門を横断して連携。<br>あらゆるビジネスタスクをAIチームが自律的に処理する。</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num">12</div>
+      <div class="hero-stat-label">専門AIメンバー</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">8</div>
+      <div class="hero-stat-label">専門部門</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">24/7</div>
+      <div class="hero-stat-label">稼働体制</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">1</div>
+      <div class="hero-stat-label">PM司令塔</div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- 1. 組織図 -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num" style="background:#6366f1">1</div>
+      <span class="section-title">組織チャート — ツカサを中心とした専門AI体制</span>
+    </div>
+
+    <!-- PM Center -->
+    <div class="pm-center">
+      <div class="pm-glow">COMMAND CENTER</div>
+      <div class="pm-avatar">🧭</div>
+      <div class="pm-name">ツカサ（PM・司令塔）</div>
+      <div class="pm-role">全タスクの受付・分析・振り分けを担う常駐プロジェクトマネージャー</div>
+      <div class="pm-tags">
+        <span class="pm-tag">タスク受付・分析</span>
+        <span class="pm-tag">担当AIへの自動振り分け</span>
+        <span class="pm-tag">優先順位付け</span>
+        <span class="pm-tag">コンテキスト管理</span>
+        <span class="pm-tag">セッション引き継ぎ</span>
+      </div>
+    </div>
+
+    <div class="connector-wrap">
+      <div class="connector-line"></div>
+    </div>
+
+    <!-- Dept Grid -->
+    <div class="dept-grid">
+
+      <!-- 営業部 -->
+      <div class="dept-card dept-sales">
+        <div class="dept-header">
+          <div class="dept-icon">🛒</div>
+          <div class="dept-name">営業部</div>
+        </div>
+        <div class="dept-members">
+          <div class="member">
+            <div class="member-avatar">🏪</div>
+            <div class="member-body">
+              <div class="member-name">モトキー</div>
+              <div class="member-spec">eBay専門家</div>
+              <div class="member-desc">出品最適化・発送管理・アカウントヘルス・バイヤー対応</div>
+            </div>
+          </div>
+          <div class="member-divider"></div>
+          <div class="member">
+            <div class="member-avatar">🌏</div>
+            <div class="member-body">
+              <div class="member-name">リー</div>
+              <div class="member-spec">Carousell / 東南アジア EC</div>
+              <div class="member-desc">無在庫販売・越境EC・シンガポール市場対応</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 技術部 -->
+      <div class="dept-card dept-tech">
+        <div class="dept-header">
+          <div class="dept-icon">⚙️</div>
+          <div class="dept-name">技術部</div>
+        </div>
+        <div class="dept-members">
+          <div class="member">
+            <div class="member-avatar">🤖</div>
+            <div class="member-body">
+              <div class="member-name">アイ</div>
+              <div class="member-spec">業務自動化エンジニア</div>
+              <div class="member-desc">GAS / API開発・DX推進・業務ツール構築</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 財務部 -->
+      <div class="dept-card dept-fin">
+        <div class="dept-header">
+          <div class="dept-icon">💰</div>
+          <div class="dept-name">財務部</div>
+        </div>
+        <div class="dept-members">
+          <div class="member">
+            <div class="member-avatar">📊</div>
+            <div class="member-body">
+              <div class="member-name">カオル</div>
+              <div class="member-spec">会計・税務</div>
+              <div class="member-desc">越境EC税務・確定申告・B/S分析</div>
+            </div>
+          </div>
+          <div class="member-divider"></div>
+          <div class="member">
+            <div class="member-avatar">🏦</div>
+            <div class="member-body">
+              <div class="member-name">カオリン</div>
+              <div class="member-spec">家計管理</div>
+              <div class="member-desc">MoneyForward連携・貯蓄計画・支出最適化</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 戦略参謀室 -->
+      <div class="dept-card dept-strat">
+        <div class="dept-header">
+          <div class="dept-icon">♟️</div>
+          <div class="dept-name">戦略参謀室</div>
+        </div>
+        <div class="dept-members">
+          <div class="member">
+            <div class="member-avatar">🍎</div>
+            <div class="member-body">
+              <div class="member-name">ジョブズ</div>
+              <div class="member-spec">経営戦略</div>
+              <div class="member-desc">事業判断・Go / No-Go判定・長期戦略立案</div>
+            </div>
+          </div>
+          <div class="member-divider"></div>
+          <div class="member">
+            <div class="member-avatar">🔍</div>
+            <div class="member-body">
+              <div class="member-name">エミ</div>
+              <div class="member-spec">品質保証・リスク管理</div>
+              <div class="member-desc">リスク評価・実現性検証・品質チェック</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 法務部 -->
+      <div class="dept-card dept-legal">
+        <div class="dept-header">
+          <div class="dept-icon">⚖️</div>
+          <div class="dept-name">法務部</div>
+        </div>
+        <div class="dept-members">
+          <div class="member">
+            <div class="member-avatar">📜</div>
+            <div class="member-body">
+              <div class="member-name">リサ</div>
+              <div class="member-spec">法務担当</div>
+              <div class="member-desc">契約書レビュー・プラットフォーム規約・コンプライアンス確認</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- コンテンツ部 -->
+      <div class="dept-card dept-content">
+        <div class="dept-header">
+          <div class="dept-icon">✍️</div>
+          <div class="dept-name">コンテンツ部</div>
+        </div>
+        <div class="dept-members">
+          <div class="member">
+            <div class="member-avatar">📝</div>
+            <div class="member-body">
+              <div class="member-name">ブン</div>
+              <div class="member-spec">ブログ・SEO</div>
+              <div class="member-desc">記事構成・キーワード戦略・アフィリエイト最適化</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 人事部 -->
+      <div class="dept-card dept-hr">
+        <div class="dept-header">
+          <div class="dept-icon">👥</div>
+          <div class="dept-name">人事部</div>
+        </div>
+        <div class="dept-members">
+          <div class="member">
+            <div class="member-avatar">🌱</div>
+            <div class="member-body">
+              <div class="member-name">ジンジー</div>
+              <div class="member-spec">AIエージェント採用・設計</div>
+              <div class="member-desc">新AIエージェントの設計・採用・育成・組織最適化</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 秘書室 -->
+      <div class="dept-card dept-sec">
+        <div class="dept-header">
+          <div class="dept-icon">🗂️</div>
+          <div class="dept-name">秘書室</div>
+        </div>
+        <div class="dept-members">
+          <div class="member">
+            <div class="member-avatar">📅</div>
+            <div class="member-body">
+              <div class="member-name">アユミ</div>
+              <div class="member-spec">秘書</div>
+              <div class="member-desc">スケジュール管理・タスク優先順位・調整業務</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 2. 処理フロー -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num" style="background:#06b6d4">2</div>
+      <span class="section-title">タスク処理フロー — 依頼から実行まで</span>
+    </div>
+    <div class="flow-grid">
+      <div class="flow-step">
+        <div class="flow-step-num">1</div>
+        <div class="flow-step-icon">💬</div>
+        <div class="flow-step-title">ユーザーが<br>依頼を投げる</div>
+        <div class="flow-step-desc">どんな形式でもOK。会話・指示・相談すべて受け付ける</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">2</div>
+        <div class="flow-step-icon">🧭</div>
+        <div class="flow-step-title">ツカサが分析・<br>振り分け判断</div>
+        <div class="flow-step-desc">タスクを分解し最適なAIを特定。単独か複数連携かを自動判断</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">3</div>
+        <div class="flow-step-icon">⚡</div>
+        <div class="flow-step-title">担当AIが<br>専門知識で実行</div>
+        <div class="flow-step-desc">各部門AIが深い専門知識をもとに回答・実行・提案を行う</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">4</div>
+        <div class="flow-step-icon">🔗</div>
+        <div class="flow-step-title">複数AIが連携して<br>複雑タスクを処理</div>
+        <div class="flow-step-desc">必要に応じて部門横断で協力。複雑な問題も解決</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. チームの強み -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num" style="background:#10b981">3</div>
+      <span class="section-title">このチーム体制の強み</span>
+    </div>
+    <div class="cap-grid">
+      <div class="cap-card">
+        <div class="cap-icon">🎯</div>
+        <div class="cap-title">深い専門性</div>
+        <div class="cap-desc">汎用AIではなく、各分野に特化したAIが担当。eBay・会計・法務・SEOそれぞれのプロが対応する</div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">⚡</div>
+        <div class="cap-title">即時並列処理</div>
+        <div class="cap-desc">複数のタスクを複数AIが同時に処理。待ち時間ゼロで複合的な課題を一括解決できる</div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">🔄</div>
+        <div class="cap-title">継続的な記憶</div>
+        <div class="cap-desc">セッションをまたいで文脈を引き継ぐ。前回の判断・方針・進捗を毎回ゼロから説明不要</div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">📈</div>
+        <div class="cap-title">年間目標への連動</div>
+        <div class="cap-desc">今年1,000万・来年1億という目標を軸に、すべての判断・タスクの優先順位を最適化する</div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">🛡️</div>
+        <div class="cap-title">二重チェック体制</div>
+        <div class="cap-desc">ジョブズ（戦略）とエミ（品質・リスク）が重要判断を多角的に検証。Go/No-Goを明確化</div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">🌱</div>
+        <div class="cap-title">自己進化する組織</div>
+        <div class="cap-desc">ジンジーが新しいAIエージェントの設計・採用を担当。チームは必要に応じて拡張・最適化される</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="footer">
+  <strong>AIエージェントチーム — 12名体制の専門AI組織</strong><br>
+  ツカサ（PM）を中心に、営業・技術・財務・戦略・法務・コンテンツ・人事・秘書の8部門が連携<br>
+  Powered by Claude (Anthropic) — すべてのタスクをAIチームが専門的に処理する
+</div>
+
+</body>
+</html>

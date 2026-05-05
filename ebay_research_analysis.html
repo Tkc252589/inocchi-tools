@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>リサーチ・分析ツール — eBay市場調査と事業分析</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0f1117;
+  --bg2: #161b27;
+  --bg3: #1e2538;
+  --border: rgba(255,255,255,0.08);
+  --border-l: rgba(255,255,255,0.14);
+  --text: #f0f4ff;
+  --muted: #8892a4;
+  --muted2: #b0baca;
+  --orange: #f97316;
+  --orange-d: #c2410c;
+  --orange-g: linear-gradient(135deg, #f97316, #fb923c);
+  --blue: #3b82f6;
+  --blue-d: #1d4ed8;
+  --blue-g: linear-gradient(135deg, #3b82f6, #60a5fa);
+  --purple: #8b5cf6;
+  --purple-d: #6d28d9;
+  --purple-g: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  --green: #10b981;
+  --green-d: #047857;
+  --green-g: linear-gradient(135deg, #10b981, #34d399);
+  --amber: #f59e0b;
+  --teal: #14b8a6;
+  --pink: #ec4899;
+}
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, #0c0f1a 0%, #0f172a 35%, #1e1040 65%, #160b2e 100%);
+  padding: 60px 24px 52px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(139,92,246,0.2);
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%);
+  top: -200px; right: -100px;
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(249,115,22,0.07) 0%, transparent 70%);
+  bottom: -150px; left: -80px;
+  pointer-events: none;
+}
+.hero-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(139,92,246,0.15);
+  border: 1px solid rgba(139,92,246,0.35);
+  color: #c4b5fd;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 16px;
+  border-radius: 100px;
+  margin-bottom: 22px;
+  letter-spacing: 0.08em;
+  position: relative; z-index: 1;
+}
+.hero-chip::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: #a78bfa;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(0.8)} }
+
+.hero h1 {
+  font-size: clamp(22px, 5vw, 42px);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.25;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+  position: relative; z-index: 1;
+}
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(90deg, #fb923c, #f472b6, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  max-width: 480px;
+  margin: 0 auto 32px;
+  line-height: 1.8;
+  position: relative; z-index: 1;
+}
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  position: relative; z-index: 1;
+}
+.hero-tag {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.75);
+  font-size: 12px;
+  padding: 5px 14px;
+  border-radius: 8px;
+}
+
+/* ── MAIN ── */
+.main {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 36px 16px 72px;
+}
+
+/* ── SECTION ── */
+.section {
+  background: var(--bg2);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  padding: 28px 24px;
+  margin-bottom: 20px;
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.section-num {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  flex-shrink: 0;
+  color: #fff;
+}
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+}
+.section-subtitle {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* ── TOOL CARDS ── */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+@media(max-width: 580px){ .tool-grid { grid-template-columns: 1fr; } }
+@media(min-width: 581px) and (max-width: 720px){ .tool-grid { grid-template-columns: 1fr 1fr; } }
+
+.tool-card {
+  background: var(--bg3);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 18px 16px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.tool-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: 14px 14px 0 0;
+}
+.tool-card.orange::before { background: var(--orange-g); }
+.tool-card.blue::before { background: var(--blue-g); }
+.tool-card.purple::before { background: var(--purple-g); }
+.tool-card.green::before { background: var(--green-g); }
+.tool-card.amber::before { background: linear-gradient(135deg,#f59e0b,#fbbf24); }
+.tool-card.teal::before { background: linear-gradient(135deg,#14b8a6,#2dd4bf); }
+
+.tool-icon {
+  font-size: 26px;
+  margin-bottom: 10px;
+  display: block;
+}
+.tool-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+.tool-desc {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.tool-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-top: 8px;
+  letter-spacing: 0.04em;
+}
+.badge-orange { background: rgba(249,115,22,0.15); color: #fb923c; border: 1px solid rgba(249,115,22,0.25); }
+.badge-blue { background: rgba(59,130,246,0.15); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
+.badge-purple { background: rgba(139,92,246,0.15); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.25); }
+.badge-green { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.25); }
+.badge-amber { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.25); }
+.badge-teal { background: rgba(20,184,166,0.15); color: #5eead4; border: 1px solid rgba(20,184,166,0.25); }
+
+/* ── APPROACH STEPS ── */
+.approach-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.approach-step {
+  flex: 1;
+  min-width: 140px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 14px 12px;
+  text-align: center;
+}
+.approach-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+.approach-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+.approach-note {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.approach-arrow {
+  font-size: 18px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+/* ── FLOW DIAGRAM ── */
+.flow-diagram {
+  background: var(--bg3);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.flow-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.flow-track {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.flow-node {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border-l);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+.flow-node .node-icon { font-size: 14px; }
+.flow-arrow {
+  color: var(--muted);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.flow-node.active {
+  background: rgba(139,92,246,0.18);
+  border-color: rgba(139,92,246,0.35);
+  color: #c4b5fd;
+}
+.flow-node.output {
+  background: rgba(16,185,129,0.15);
+  border-color: rgba(16,185,129,0.3);
+  color: #6ee7b7;
+}
+
+/* ── DATA SOURCES ── */
+.data-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+@media(max-width: 600px){ .data-row { grid-template-columns: repeat(2, 1fr); } }
+.data-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 12px;
+  text-align: center;
+}
+.data-icon { font-size: 22px; margin-bottom: 7px; }
+.data-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.data-src {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ── AI EXPERTS ── */
+.experts-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+@media(max-width: 700px){ .experts-grid { grid-template-columns: repeat(4, 1fr); } }
+@media(max-width: 460px){ .experts-grid { grid-template-columns: repeat(3, 1fr); } }
+.expert-card {
+  background: var(--bg3);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 12px 8px;
+  text-align: center;
+}
+.expert-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  margin: 0 auto 7px;
+}
+.expert-role {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 3px;
+  line-height: 1.3;
+}
+.expert-focus {
+  font-size: 9px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ── OUTPUT HIGHLIGHT ── */
+.output-highlight {
+  background: linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(20,184,166,0.08) 100%);
+  border: 1px solid rgba(16,185,129,0.2);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.output-hl-icon { font-size: 28px; flex-shrink: 0; }
+.output-hl-title { font-size: 13px; font-weight: 700; color: #6ee7b7; margin-bottom: 3px; }
+.output-hl-desc { font-size: 11px; color: var(--muted2); line-height: 1.65; }
+
+/* ── OTHER TOOLS GRID ── */
+.other-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+@media(max-width: 580px){ .other-grid { grid-template-columns: 1fr; } }
+.other-card {
+  background: var(--bg3);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 18px 16px;
+  position: relative;
+  overflow: hidden;
+}
+.other-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: 0 0 14px 14px;
+}
+.other-card.c1::after { background: linear-gradient(90deg,#f97316,#fb923c); }
+.other-card.c2::after { background: linear-gradient(90deg,#8b5cf6,#a78bfa); }
+.other-card.c3::after { background: linear-gradient(90deg,#14b8a6,#2dd4bf); }
+.other-icon { font-size: 28px; margin-bottom: 10px; display: block; }
+.other-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.other-desc { font-size: 11px; color: var(--muted); line-height: 1.7; }
+
+/* ── FOOTER ── */
+.footer {
+  background: #080b12;
+  border-top: 1px solid rgba(139,92,246,0.15);
+  padding: 32px 24px;
+  text-align: center;
+  color: rgba(255,255,255,0.3);
+  font-size: 11px;
+  line-height: 2.2;
+}
+.footer strong { color: rgba(167,139,250,0.7); }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-chip">eBay物販 × AI分析 × 自動化</div>
+  <h1>リサーチ・分析ツール<br><em>eBay市場調査と事業分析</em></h1>
+  <p class="hero-sub">売れ筋調査から月次財務レポートまで、AIと自動化で市場の動きをリアルタイムに把握する</p>
+  <div class="hero-tags">
+    <span class="hero-tag">🔍 eBayリサーチ</span>
+    <span class="hero-tag">📊 月次レポート</span>
+    <span class="hero-tag">🤖 7名のAI分析</span>
+    <span class="hero-tag">⚡ GAS自動化</span>
+    <span class="hero-tag">📈 利益シミュレーション</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Section 1: eBayリサーチ -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num" style="background:var(--orange-g)">1</div>
+      <div>
+        <div class="section-title">eBayリサーチ</div>
+        <div class="section-subtitle">市場調査ツールと段階的アプローチ</div>
+      </div>
+    </div>
+
+    <div class="tool-grid">
+      <div class="tool-card orange">
+        <span class="tool-icon">🔎</span>
+        <div class="tool-name">SellerHacks</div>
+        <div class="tool-desc">月額課金ツール。売れ筋商品・価格帯・競合セラーの販売傾向を分析。市場動向の主力リサーチソース。</div>
+        <span class="tool-badge badge-orange">月額ツール</span>
+      </div>
+
+      <div class="tool-card blue">
+        <span class="tool-icon">🔌</span>
+        <div class="tool-name">Browse API補完</div>
+        <div class="tool-desc">SellerHacksで不足するデータをeBay公式APIで取得。在庫数・落札価格・カテゴリ別データを直接取得可能。</div>
+        <span class="tool-badge badge-blue">eBay公式API</span>
+      </div>
+
+      <div class="tool-card purple">
+        <span class="tool-icon">📐</span>
+        <div class="tool-name">段階的アプローチ</div>
+        <div class="tool-desc">まずSellerHacksを実運用。不足したデータ・機能を特定してからAPI自作で補完する効率的な開発方針。</div>
+        <span class="tool-badge badge-purple">実用優先</span>
+      </div>
+    </div>
+
+    <!-- アプローチフロー -->
+    <div class="approach-row">
+      <div class="approach-step">
+        <div class="approach-num">STEP 1</div>
+        <div class="approach-label">SellerHacks<br>実運用開始</div>
+        <div class="approach-note">月額ツールで<br>まず動かす</div>
+      </div>
+      <div class="approach-arrow">→</div>
+      <div class="approach-step">
+        <div class="approach-num">STEP 2</div>
+        <div class="approach-label">不足データを<br>特定する</div>
+        <div class="approach-note">使いながら<br>ギャップを発見</div>
+      </div>
+      <div class="approach-arrow">→</div>
+      <div class="approach-step">
+        <div class="approach-num">STEP 3</div>
+        <div class="approach-label">Browse APIで<br>自作補完</div>
+        <div class="approach-note">必要な部分だけ<br>API実装</div>
+      </div>
+      <div class="approach-arrow">→</div>
+      <div class="approach-step">
+        <div class="approach-num">STEP 4</div>
+        <div class="approach-label">統合リサーチ<br>環境完成</div>
+        <div class="approach-note">独自ダッシュボード<br>で一元管理</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Section 2: 月次レポート自動生成 -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num" style="background:var(--blue-g)">2</div>
+      <div>
+        <div class="section-title">月次レポート自動生成</div>
+        <div class="section-subtitle">データ収集 → GAS書き込み → 7名のAI分析 → HTMLレポート</div>
+      </div>
+    </div>
+
+    <!-- フロー図 -->
+    <div class="flow-diagram">
+      <div class="flow-label">自動化フロー</div>
+      <div class="flow-track">
+        <div class="flow-node"><span class="node-icon">🏦</span>データ収集</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node active"><span class="node-icon">⚡</span>GAS書き込み</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node active"><span class="node-icon">🤖</span>7名のAI分析</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node output"><span class="node-icon">📄</span>HTMLレポート</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node output"><span class="node-icon">☁️</span>Drive保存</div>
+      </div>
+    </div>
+
+    <!-- データソース -->
+    <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px;">収集データ</div>
+    <div class="data-row">
+      <div class="data-card">
+        <div class="data-icon">🏦</div>
+        <div class="data-name">銀行残高</div>
+        <div class="data-src">SBIネット銀行<br>自動取得</div>
+      </div>
+      <div class="data-card">
+        <div class="data-icon">💳</div>
+        <div class="data-name">クレカ利用額</div>
+        <div class="data-src">アメックス<br>月次集計</div>
+      </div>
+      <div class="data-card">
+        <div class="data-icon">📦</div>
+        <div class="data-name">売上データ</div>
+        <div class="data-src">各プラットフォーム<br>集計</div>
+      </div>
+      <div class="data-card">
+        <div class="data-icon">🗄️</div>
+        <div class="data-name">在庫評価額</div>
+        <div class="data-src">スプシ連動<br>リアルタイム</div>
+      </div>
+    </div>
+
+    <!-- AI専門家 -->
+    <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px;">7名の専門AI — 多角的分析チーム</div>
+    <div class="experts-grid">
+      <div class="expert-card">
+        <div class="expert-avatar" style="background:rgba(249,115,22,0.2);">👔</div>
+        <div class="expert-role">CEO</div>
+        <div class="expert-focus">経営判断・方向性</div>
+      </div>
+      <div class="expert-card">
+        <div class="expert-avatar" style="background:rgba(59,130,246,0.2);">🏪</div>
+        <div class="expert-role">eBay専門家</div>
+        <div class="expert-focus">販売戦略</div>
+      </div>
+      <div class="expert-card">
+        <div class="expert-avatar" style="background:rgba(16,185,129,0.2);">📒</div>
+        <div class="expert-role">経理</div>
+        <div class="expert-focus">財務健全性</div>
+      </div>
+      <div class="expert-card">
+        <div class="expert-avatar" style="background:rgba(239,68,68,0.2);">🛡️</div>
+        <div class="expert-role">リスク管理</div>
+        <div class="expert-focus">リスク評価</div>
+      </div>
+      <div class="expert-card">
+        <div class="expert-avatar" style="background:rgba(139,92,246,0.2);">🤖</div>
+        <div class="expert-role">AI効率化</div>
+        <div class="expert-focus">業務改善提案</div>
+      </div>
+      <div class="expert-card">
+        <div class="expert-avatar" style="background:rgba(245,158,11,0.2);">📈</div>
+        <div class="expert-role">投資家</div>
+        <div class="expert-focus">投資対効果</div>
+      </div>
+      <div class="expert-card">
+        <div class="expert-avatar" style="background:rgba(107,114,128,0.3);">🔍</div>
+        <div class="expert-role">リアリスト</div>
+        <div class="expert-focus">現実的評価</div>
+      </div>
+    </div>
+
+    <!-- アウトプット -->
+    <div class="output-highlight">
+      <div class="output-hl-icon">📊</div>
+      <div>
+        <div class="output-hl-title">HTMLレポートを自動生成 → Google Driveに保存</div>
+        <div class="output-hl-desc">7名の分析結果を統合し、ビジュアルHTMLレポートとして出力。月次定例での報告資料として即活用可能。コマンド一発で全自動実行。</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Section 3: その他の分析ツール -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num" style="background:var(--purple-g)">3</div>
+      <div>
+        <div class="section-title">その他の分析ツール</div>
+        <div class="section-subtitle">事業データを多角的に可視化するサポートツール群</div>
+      </div>
+    </div>
+
+    <div class="other-grid">
+      <div class="other-card c1">
+        <span class="other-icon">🏷️</span>
+        <div class="other-name">ブランド別販売分析レポート</div>
+        <div class="other-desc">ブランドごとの売上・利益率・回転率を集計し、注力すべきカテゴリを可視化。仕入れ判断の精度向上に活用。</div>
+      </div>
+      <div class="other-card c2">
+        <span class="other-icon">📡</span>
+        <div class="other-name">週次コミュニティリサーチ自動化</div>
+        <div class="other-desc">リベシティ等のコミュニティから有用な市場情報・トレンドを定期収集し、週次でまとめて共有。</div>
+      </div>
+      <div class="other-card c3">
+        <span class="other-icon">💹</span>
+        <div class="other-name">利益シミュレーション</div>
+        <div class="other-desc">スプレッドシート連動のリアルタイム計算。仕入れ値・送料・eBay手数料を入力すると即座に利益率を算出。</div>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /main -->
+
+<div class="footer">
+  <strong>リサーチ・分析ツール — eBay市場調査と事業分析</strong><br>
+  SellerHacks × eBay Browse API × GAS × 7名のAIエージェント<br>
+  データ収集から意思決定まで、すべて自動化された事業分析基盤
+</div>
+
+</body>
+</html>

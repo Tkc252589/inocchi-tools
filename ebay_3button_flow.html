@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eBay出品自動化 — 3ボタン出品フロー</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0e1a;
+  --bg2: #111827;
+  --bg3: #1a2235;
+  --border: #1f2d45;
+  --border-l: #2a3f5f;
+  --text: #e2e8f0;
+  --muted: #7b8fb0;
+  --blue: #3b82f6;
+  --blue-d: #1d4ed8;
+  --blue-l: #93c5fd;
+  --cyan: #06b6d4;
+  --cyan-l: #67e8f9;
+  --green: #10b981;
+  --green-l: #6ee7b7;
+  --amber: #f59e0b;
+  --amber-l: #fcd34d;
+  --purple: #8b5cf6;
+  --purple-l: #c4b5fd;
+  --pink: #ec4899;
+  --pink-l: #f9a8d4;
+  --orange: #f97316;
+  --orange-l: #fdba74;
+  --red: #ef4444;
+  --teal: #14b8a6;
+}
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, #060b18 0%, #0d1b33 30%, #0f2952 60%, #1a3a6e 100%);
+  padding: 60px 24px 52px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
+  top: -200px; right: -100px;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%);
+  bottom: -150px; left: -80px;
+}
+.hero-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(59,130,246,0.12);
+  border: 1px solid rgba(59,130,246,0.3);
+  color: var(--blue-l);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 16px;
+  border-radius: 100px;
+  margin-bottom: 22px;
+  letter-spacing: 0.08em;
+  position: relative;
+  z-index: 1;
+}
+.hero-chip::before {
+  content: '';
+  width: 7px; height: 7px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--green);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;box-shadow:0 0 6px var(--green)}50%{opacity:.4;box-shadow:none} }
+
+.hero h1 {
+  font-size: clamp(24px, 5.5vw, 44px);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+  position: relative;
+  z-index: 1;
+}
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  max-width: 460px;
+  margin: 0 auto 30px;
+  line-height: 1.8;
+  position: relative;
+  z-index: 1;
+}
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+.hero-tag {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.7);
+  font-size: 11px;
+  padding: 5px 13px;
+  border-radius: 6px;
+}
+
+/* ── MAIN ── */
+.main {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 36px 16px 72px;
+}
+
+/* ── SECTION ── */
+.section {
+  background: var(--bg2);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  padding: 28px 24px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: 20px 20px 0 0;
+}
+.section.blue::before  { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+.section.purple::before { background: linear-gradient(90deg, var(--purple), var(--pink)); }
+.section.green::before  { background: linear-gradient(90deg, var(--green), var(--teal)); }
+.section.amber::before  { background: linear-gradient(90deg, var(--amber), var(--orange)); }
+.section.cyan::before   { background: linear-gradient(90deg, var(--cyan), var(--blue)); }
+.section.red::before    { background: linear-gradient(90deg, var(--red), var(--pink)); }
+
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.section-num {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: #fff;
+}
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ── OVERVIEW BUTTONS ── */
+.btn-overview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+@media(max-width: 560px){ .btn-overview { grid-template-columns: 1fr; } }
+.btn-card {
+  border-radius: 16px;
+  padding: 20px 16px;
+  text-align: center;
+  border: 1.5px solid;
+  position: relative;
+  overflow: hidden;
+}
+.btn-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  opacity: 0.04;
+  border-radius: 14px;
+}
+.btn-card.b1 { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.35); }
+.btn-card.b2 { background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.35); }
+.btn-card.b3 { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.35); }
+.btn-num {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+.btn-card.b1 .btn-num { color: var(--blue-l); }
+.btn-card.b2 .btn-num { color: var(--purple-l); }
+.btn-card.b3 .btn-num { color: var(--green-l); }
+.btn-icon { font-size: 28px; margin-bottom: 8px; display: block; }
+.btn-label {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.btn-card.b1 .btn-label { color: #bfdbfe; }
+.btn-card.b2 .btn-label { color: #ddd6fe; }
+.btn-card.b3 .btn-label { color: #a7f3d0; }
+.btn-sub {
+  font-size: 11px;
+  margin-top: 5px;
+  line-height: 1.6;
+}
+.btn-card.b1 .btn-sub { color: rgba(147,197,253,0.7); }
+.btn-card.b2 .btn-sub { color: rgba(196,181,253,0.7); }
+.btn-card.b3 .btn-sub { color: rgba(110,231,183,0.7); }
+
+.flow-arrow-center {
+  text-align: center;
+  font-size: 22px;
+  color: var(--muted);
+  margin: 4px 0 12px;
+  letter-spacing: 4px;
+}
+
+.result-box {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-l);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.8;
+}
+.result-box strong { color: var(--amber-l); }
+
+/* ── DETAIL FLOW ── */
+.detail-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.detail-item {
+  display: flex;
+  gap: 16px;
+  position: relative;
+}
+.detail-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 44px;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--border-l), transparent);
+}
+.detail-icon {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.detail-body {
+  flex: 1;
+  padding: 8px 0 22px;
+}
+.detail-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+.detail-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+.pill {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.pill.blue   { background: rgba(59,130,246,0.15);  color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
+.pill.purple { background: rgba(139,92,246,0.15);  color: #c4b5fd; border: 1px solid rgba(139,92,246,0.25); }
+.pill.green  { background: rgba(16,185,129,0.15);  color: #6ee7b7; border: 1px solid rgba(16,185,129,0.25); }
+.pill.amber  { background: rgba(245,158,11,0.15);  color: #fcd34d; border: 1px solid rgba(245,158,11,0.25); }
+.pill.cyan   { background: rgba(6,182,212,0.15);   color: #67e8f9; border: 1px solid rgba(6,182,212,0.25); }
+.pill.pink   { background: rgba(236,72,153,0.15);  color: #f9a8d4; border: 1px solid rgba(236,72,153,0.25); }
+.pill.orange { background: rgba(249,115,22,0.15);  color: #fdba74; border: 1px solid rgba(249,115,22,0.25); }
+.pill.teal   { background: rgba(20,184,166,0.15);  color: #5eead4; border: 1px solid rgba(20,184,166,0.25); }
+
+/* ── PRICE FORMULA ── */
+.formula-box {
+  background: rgba(245,158,11,0.07);
+  border: 1px solid rgba(245,158,11,0.25);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #fcd34d;
+  line-height: 2;
+}
+.formula-box .label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(252,211,77,0.6);
+  margin-bottom: 4px;
+}
+
+/* ── MANAGE GRID ── */
+.manage-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media(max-width: 500px){ .manage-grid { grid-template-columns: 1fr; } }
+.manage-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+.manage-icon { font-size: 22px; margin-bottom: 8px; display: block; }
+.manage-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.manage-desc {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* ── COMPARE ── */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media(max-width: 480px){ .compare-grid { grid-template-columns: 1fr; } }
+.compare-col {
+  border-radius: 14px;
+  padding: 18px;
+}
+.compare-col.before {
+  background: rgba(239,68,68,0.07);
+  border: 1.5px solid rgba(239,68,68,0.25);
+}
+.compare-col.after {
+  background: rgba(16,185,129,0.07);
+  border: 1.5px solid rgba(16,185,129,0.25);
+}
+.compare-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 14px;
+}
+.compare-col.before .compare-label { color: #fca5a5; }
+.compare-col.after  .compare-label { color: #6ee7b7; }
+.compare-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 12px;
+  line-height: 1.7;
+  margin-bottom: 7px;
+  color: var(--muted);
+}
+.compare-item:last-child { margin-bottom: 0; }
+.compare-col.before .compare-item { color: #fca5a5; }
+.compare-col.after  .compare-item { color: #6ee7b7; }
+
+/* ── STAT ROW ── */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+@media(max-width: 480px){ .stat-row { grid-template-columns: 1fr; } }
+.stat-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 14px;
+  text-align: center;
+}
+.stat-num {
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.stat-label {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ── SECTION DIVIDER ── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 16px;
+}
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.divider-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ── BUTTON DETAIL SECTION ── */
+.btn-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+}
+.btn-detail-header.b1 { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); }
+.btn-detail-header.b2 { background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.3); }
+.btn-detail-header.b3 { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); }
+.btn-detail-icon { font-size: 24px; }
+.btn-detail-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+.b1 .btn-detail-title { color: #93c5fd; }
+.b2 .btn-detail-title { color: #c4b5fd; }
+.b3 .btn-detail-title { color: #6ee7b7; }
+.btn-detail-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+/* ── FOOTER ── */
+.footer {
+  background: #060b18;
+  border-top: 1px solid var(--border);
+  padding: 32px 24px;
+  text-align: center;
+  color: rgba(255,255,255,0.3);
+  font-size: 12px;
+  line-height: 2.2;
+}
+.footer strong { color: #93c5fd; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-chip">Google Apps Script × AI × eBay API</div>
+  <h1>eBay出品自動化<br><em>3ボタン出品フロー</em></h1>
+  <p class="hero-sub">ヤフオク・メルカリのURLを貼るだけ。3つのボタンで出品完了。</p>
+  <div class="hero-tags">
+    <span class="hero-tag">🇯🇵 ヤフオク / メルカリ</span>
+    <span class="hero-tag">🤖 ChatGPT Vision</span>
+    <span class="hero-tag">💎 Gemini API</span>
+    <span class="hero-tag">📦 eBay Trading API</span>
+    <span class="hero-tag">📊 スプレッドシート管理</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- 全体フロー概要 -->
+  <div class="section blue">
+    <div class="section-head">
+      <div class="section-num" style="background:linear-gradient(135deg,#3b82f6,#06b6d4)">▶</div>
+      <span class="section-title">全体フロー — 3ステップで出品完了</span>
+    </div>
+
+    <div class="btn-overview">
+      <div class="btn-card b1">
+        <div class="btn-num">BUTTON 01</div>
+        <span class="btn-icon">🔍</span>
+        <div class="btn-label">URL情報取得</div>
+        <div class="btn-sub">HTMLを解析して商品情報を自動抽出</div>
+      </div>
+      <div class="btn-card b2">
+        <div class="btn-num">BUTTON 02</div>
+        <span class="btn-icon">✨</span>
+        <div class="btn-label">AI出品データ生成</div>
+        <div class="btn-sub">英語タイトル・説明文・価格を自動生成</div>
+      </div>
+      <div class="btn-card b3">
+        <div class="btn-num">BUTTON 03</div>
+        <span class="btn-icon">🖼️</span>
+        <div class="btn-label">白抜き＆画像アップ</div>
+        <div class="btn-sub">背景除去してeBayサーバーへ自動送信</div>
+      </div>
+    </div>
+
+    <div class="flow-arrow-center">↓↓↓</div>
+
+    <div class="result-box">
+      <strong>eBay Trading API（AddFixedPriceItem）</strong> で出品実行<br>
+      一括出品 または 選択行のみ出品 — ビジネスポリシー自動設定
+    </div>
+  </div>
+
+  <!-- ボタン① URL情報取得 -->
+  <div class="section blue">
+    <div class="btn-detail-header b1">
+      <span class="btn-detail-icon">🔍</span>
+      <div>
+        <div class="btn-detail-title">ボタン① — URL情報取得</div>
+        <div class="btn-detail-sub">スプシA列にURLを貼るだけで全情報を自動取得</div>
+      </div>
+    </div>
+
+    <div class="detail-flow">
+
+      <div class="detail-item">
+        <div class="detail-icon" style="background:rgba(59,130,246,0.15)">📋</div>
+        <div class="detail-body">
+          <div class="detail-title" style="color:#93c5fd">対応仕入れ元</div>
+          <div class="detail-desc">スプレッドシートのA列に仕入れ先URLを貼り付ける</div>
+          <div class="pill-row">
+            <span class="pill blue">ヤフオク</span>
+            <span class="pill blue">メルカリ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-icon" style="background:rgba(6,182,212,0.15)">⚙️</div>
+        <div class="detail-body">
+          <div class="detail-title" style="color:#67e8f9">HTML解析</div>
+          <div class="detail-desc">GASがページのHTMLを取得し、各サイトの構造に合わせてデータを抽出する</div>
+          <div class="pill-row">
+            <span class="pill cyan">商品名</span>
+            <span class="pill cyan">現在価格</span>
+            <span class="pill cyan">商品画像URL</span>
+            <span class="pill cyan">商品説明文</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-icon" style="background:rgba(59,130,246,0.15)">🚚</div>
+        <div class="detail-body" style="padding-bottom:0">
+          <div class="detail-title" style="color:#93c5fd">送料自動抽出</div>
+          <div class="detail-desc">送料情報を解析してスプシに記録。価格計算に自動反映される</div>
+          <div class="pill-row">
+            <span class="pill blue">送料無料</span>
+            <span class="pill blue">着払い</span>
+            <span class="pill blue">金額指定（例: ¥800）</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ボタン② AI出品データ生成 -->
+  <div class="section purple">
+    <div class="btn-detail-header b2">
+      <span class="btn-detail-icon">✨</span>
+      <div>
+        <div class="btn-detail-title">ボタン② — AI出品データ生成</div>
+        <div class="btn-detail-sub">ChatGPT Vision APIが商品を解析して英語出品データを完全生成</div>
+      </div>
+    </div>
+
+    <div class="detail-flow">
+
+      <div class="detail-item">
+        <div class="detail-icon" style="background:rgba(139,92,246,0.15)">🤖</div>
+        <div class="detail-body">
+          <div class="detail-title" style="color:#c4b5fd">ChatGPT Vision API 呼び出し</div>
+          <div class="detail-desc">ボタン①で取得した商品情報と画像URLをセットで送信。視覚情報を含めた高精度な解析が可能</div>
+          <div class="pill-row">
+            <span class="pill purple">商品テキスト情報</span>
+            <span class="pill purple">商品画像（Vision）</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-icon" style="background:rgba(236,72,153,0.15)">🔤</div>
+        <div class="detail-body">
+          <div class="detail-title" style="color:#f9a8d4">英語タイトル生成（SEO最適化）</div>
+          <div class="detail-desc">eBayの検索アルゴリズムに最適化した英語タイトルを自動生成</div>
+          <div class="pill-row">
+            <span class="pill pink">80文字以内</span>
+            <span class="pill pink">ブランド名優先</span>
+            <span class="pill pink">キーワード最適化</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-icon" style="background:rgba(139,92,246,0.15)">📝</div>
+        <div class="detail-body">
+          <div class="detail-title" style="color:#c4b5fd">HTML説明文（構造化）</div>
+          <div class="detail-desc">バイヤーが読みやすいHTML形式の商品説明文を自動生成</div>
+          <div class="pill-row">
+            <span class="pill purple">ブランド</span>
+            <span class="pill purple">素材</span>
+            <span class="pill purple">サイズ</span>
+            <span class="pill purple">コンディション</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-icon" style="background:rgba(6,182,212,0.15)">🏷️</div>
+        <div class="detail-body">
+          <div class="detail-title" style="color:#67e8f9">Item Specifics 自動生成</div>
+          <div class="detail-desc">eBayが要求する商品の詳細スペックを自動入力。検索露出を最大化</div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-icon" style="background:rgba(16,185,129,0.15)">📂</div>
+        <div class="detail-body">
+          <div class="detail-title" style="color:#6ee7b7">eBayカテゴリ自動判定</div>
+          <div class="detail-desc">eBay Taxonomy APIで最適なカテゴリIDを自動選択</div>
+          <div class="pill-row">
+            <span class="pill green">Taxonomy API</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-icon" style="background:rgba(245,158,11,0.15)">💰</div>
+        <div class="detail-body" style="padding-bottom:0">
+          <div class="detail-title" style="color:#fcd34d">出品価格自動計算</div>
+          <div class="detail-desc">リアルタイムの為替レートを取得し、目標利益率40%を確保した価格を自動算出</div>
+          <div class="formula-box">
+            <div class="label">PRICE FORMULA</div>
+            （仕入値 ＋ 送料） ÷ 為替レート ＋ eBay手数料 ＋ 目標利益（40%）<br>
+            Best Offer: 出品価格 × 75% を自動設定
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ボタン③ 白抜き＆画像アップロード -->
+  <div class="section green">
+    <div class="btn-detail-header b3">
+      <span class="btn-detail-icon">🖼️</span>
+      <div>
+        <div class="btn-detail-title">ボタン③ — 白抜き＆画像アップロード</div>
+        <div class="btn-detail-sub">Gemini APIが画像を分類・加工してeBayサーバーへ自動送信</div>
+      </div>
+    </div>
+
+    <div class="detail-flow">
+
+      <div class="detail-item">
+        <div class="detail-icon" style="background:rgba(16,185,129,0.15)">🔬</div>
+        <div class="detail-body">
+          <div class="detail-title" style="color:#6ee7b7">Gemini APIで画像分類</div>
+          <div class="detail-desc">商品画像を1枚ずつ解析。白抜き処理が必要かどうかを自動判断</div>
+          <div class="pill-row">
+            <span class="pill green">商品写真（白抜き対象）</span>
+            <span class="pill teal">テキスト画像（スキップ）</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-icon" style="background:rgba(20,184,166,0.15)">✂️</div>
+        <div class="detail-body">
+          <div class="detail-title" style="color:#5eead4">背景を白に変換</div>
+          <div class="detail-desc">商品写真と判定された画像の背景を白色に自動変換。eBayが推奨するクリーンな商品画像に仕上げる</div>
+          <div class="pill-row">
+            <span class="pill teal">背景除去</span>
+            <span class="pill teal">白背景に変換</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-icon" style="background:rgba(16,185,129,0.15)">☁️</div>
+        <div class="detail-body" style="padding-bottom:0">
+          <div class="detail-title" style="color:#6ee7b7">eBayサーバーへ自動アップロード</div>
+          <div class="detail-desc">処理済み画像をeBayの画像ホスティングサーバーにアップロードし、出品データに紐付ける</div>
+          <div class="pill-row">
+            <span class="pill green">eBay EPS（画像サーバー）</span>
+            <span class="pill green">出品データへ自動紐付け</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 出品実行 -->
+  <div class="section amber">
+    <div class="section-head">
+      <div class="section-num" style="background:linear-gradient(135deg,#f59e0b,#f97316)">4</div>
+      <span class="section-title">出品実行 — eBay Trading API</span>
+    </div>
+
+    <div class="detail-flow">
+
+      <div class="detail-item">
+        <div class="detail-icon" style="background:rgba(245,158,11,0.15)">🚀</div>
+        <div class="detail-body">
+          <div class="detail-title" style="color:#fcd34d">AddFixedPriceItem で出品</div>
+          <div class="detail-desc">3つのボタン処理が完了した行のデータをeBay Trading APIに送信。固定価格出品として即時登録される</div>
+          <div class="pill-row">
+            <span class="pill amber">一括出品（全行）</span>
+            <span class="pill amber">選択行のみ出品</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <div class="detail-icon" style="background:rgba(249,115,22,0.15)">⚙️</div>
+        <div class="detail-body" style="padding-bottom:0">
+          <div class="detail-title" style="color:#fdba74">ビジネスポリシー自動設定</div>
+          <div class="detail-desc">支払い・配送・返品ポリシーをビジネスポリシーから自動適用。出品のたびに設定不要</div>
+          <div class="pill-row">
+            <span class="pill orange">Payment Policy</span>
+            <span class="pill orange">Shipping Policy</span>
+            <span class="pill orange">Return Policy</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 出品後の管理 -->
+  <div class="section cyan">
+    <div class="section-head">
+      <div class="section-num" style="background:linear-gradient(135deg,#06b6d4,#3b82f6)">5</div>
+      <span class="section-title">出品後の管理機能</span>
+    </div>
+
+    <div class="manage-grid">
+      <div class="manage-card">
+        <span class="manage-icon">📸</span>
+        <div class="manage-title" style="color:#67e8f9">実物写真の追加</div>
+        <div class="manage-desc">WebAppからReviseFixedPriceItemを呼び出し、手元の実物写真を後から追加登録</div>
+      </div>
+      <div class="manage-card">
+        <span class="manage-icon">💱</span>
+        <div class="manage-title" style="color:#93c5fd">価格一括更新</div>
+        <div class="manage-desc">スプレッドシートの価格を変更するだけでeBayの出品価格に自動反映</div>
+      </div>
+      <div class="manage-card">
+        <span class="manage-icon">🔄</span>
+        <div class="manage-title" style="color:#c4b5fd">既存出品の取り込み</div>
+        <div class="manage-desc">GetMyeBaySellingで既存の出品データを取得し、スプレッドシートに同期</div>
+      </div>
+      <div class="manage-card">
+        <span class="manage-icon">📊</span>
+        <div class="manage-title" style="color:#fcd34d">利益シミュレーション</div>
+        <div class="manage-desc">仕入値・送料・為替・手数料を入力するとリアルタイムで利益額・利益率を計算</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 工数比較 -->
+  <div class="section red">
+    <div class="section-head">
+      <div class="section-num" style="background:linear-gradient(135deg,#ef4444,#ec4899)">6</div>
+      <span class="section-title">自動化あり vs なし</span>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-num" style="background:linear-gradient(90deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">3</div>
+        <div class="stat-label">ボタンを押すだけ<br>で出品完了</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="background:linear-gradient(90deg,#34d399,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">~5分</div>
+        <div class="stat-label">1商品あたりの<br>出品作業時間</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="background:linear-gradient(90deg,#fbbf24,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">40%</div>
+        <div class="stat-label">目標利益率<br>自動確保</div>
+      </div>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-col before">
+        <div class="compare-label">手作業の場合</div>
+        <div class="compare-item"><span>✗</span>ヤフオクから商品情報を手動でコピペ</div>
+        <div class="compare-item"><span>✗</span>英語タイトルを一から考えて翻訳</div>
+        <div class="compare-item"><span>✗</span>HTML説明文を手動で作成</div>
+        <div class="compare-item"><span>✗</span>画像を手動で背景除去ソフトで加工</div>
+        <div class="compare-item"><span>✗</span>価格を電卓で計算してeBayに入力</div>
+        <div class="compare-item"><span>✗</span>1商品30〜60分かかる</div>
+      </div>
+      <div class="compare-col after">
+        <div class="compare-label">自動化後</div>
+        <div class="compare-item"><span>✓</span>URLを貼るだけで全情報を自動取得</div>
+        <div class="compare-item"><span>✓</span>SEO最適化タイトルをAIが自動生成</div>
+        <div class="compare-item"><span>✓</span>構造化HTML説明文を自動生成</div>
+        <div class="compare-item"><span>✓</span>Geminiが自動分類→白背景変換</div>
+        <div class="compare-item"><span>✓</span>為替・手数料込みで自動計算</div>
+        <div class="compare-item"><span>✓</span>1商品約5分で出品完了</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="footer">
+  <strong>eBay出品自動化システム</strong> — Google Apps Script × ChatGPT Vision × Gemini API × eBay Trading API<br>
+  ヤフオク・メルカリ → URL貼り付け → 3ボタン → eBay出品完了<br>
+  スプレッドシート一元管理 / ビジネスポリシー自動設定 / 利益シミュレーション対応
+</div>
+
+</body>
+</html>
